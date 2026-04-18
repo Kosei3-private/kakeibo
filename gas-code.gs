@@ -11,6 +11,45 @@ function doGet(e) {
   return ContentService.createTextOutput('家計簿API').setMimeType(ContentService.MimeType.TEXT);
 }
 
+function doPost(e) {
+  const data = JSON.parse(e.postData.contents);
+  if (data.action === 'batchAdd') return batchAddRecords(data.records);
+  return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'unknown action' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function batchAddRecords(records) {
+  const sheet = getSheet();
+  const startRow = sheet.getLastRow() + 1;
+  const now = new Date();
+
+  const rows = records.map((r, i) => {
+    const torihikiId = startRow - 1 + i; // 取引ID（ユニーク）
+    const serviceId  = r.serviceId != null ? r.serviceId : torihikiId; // サービスID
+    return [
+      torihikiId,
+      serviceId,
+      r.date || '',
+      r.service || '購入',
+      r.category1 || '',
+      r.category2 || '',
+      r.store || '',
+      Number(r.amount) || 0,
+      r.payment1 || '',
+      r.payment2 || '',
+      now
+    ];
+  });
+
+  if (rows.length > 0) {
+    sheet.getRange(startRow, 1, rows.length, 11).setValues(rows);
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok', count: rows.length }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 function getInfo() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = getSheet();
