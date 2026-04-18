@@ -255,7 +255,7 @@
         <div class="chip" data-val="プリペイド" onclick="selectChip(this,'shiharai')">プリペイド</div>
         <div class="chip" data-val="QR決済" onclick="selectChip(this,'shiharai')">QR決済</div>
         <div class="chip" data-val="クレカ" onclick="selectChip(this,'shiharai')">クレカ</div>
-        <div class="chip" data-val="デビット" onclick="selectChip(this,'shiharai')">デビット</div>
+        <div class="chip" data-val="デビット" id="chip-debit" onclick="selectChip(this,'shiharai')">デビット</div>
         <div class="chip" data-val="ポイント" onclick="selectChip(this,'shiharai')">ポイント</div>
       </div>
     </div>
@@ -523,9 +523,9 @@
 <script>
 // ===== 手入力フォーム =====
 const EMONEY_MAP = {
-  'プリペイド': ['quoカード', 'スタバカード', 'majica', 'Amazonギフトカード', 'VポイントPay', 'PASMO'],
-  'QR決済':    ['PayPay1', 'PayPay2', 'Fami Pay', 'WAON'],
-  'ポイント':   ['Vポイント', 'Amazonポイント', 'Ponta', 'リクルートポイント', 'セブンマイル'],
+  'プリペイド': ['quoカード', 'PASMO', 'スタバカード', 'majica', 'Amazonギフトカード', 'VポイントPay'],
+  'QR決済':    ['PayPay1', 'PayPay2', 'Fami Pay'],
+  'ポイント':   ['Ponta', 'WAON', 'Amazonポイント', 'Vポイント', 'リクルートポイント'],
 };
 
 let fState = {
@@ -569,6 +569,15 @@ function selectService(btn) {
   // チャージ・キャッシュバック・もらう・あげる は支払い手段不要
   const needsShiharai = !['チャージ', 'キャッシュバック', 'もらう', 'あげる'].includes(s);
   toggle('f-shiharai-section', needsShiharai);
+
+  // 立て替えはデビット非表示（VBA通り）
+  const debitChip = document.getElementById('chip-debit');
+  if (debitChip) debitChip.style.display = s === '立て替え' ? 'none' : '';
+  if (s === '立て替え' && fState.shiharai === 'デビット') {
+    fState.shiharai = '';
+    clearChips('shiharai');
+    toggle('f-emoney-section', false);
+  }
 }
 
 function selectChip(chip, group) {
