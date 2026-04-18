@@ -372,9 +372,9 @@
 <div class="page" id="page-settings">
   <div class="card">
     <div class="settings-field">
-      <label>Gemini APIキー</label>
-      <input type="password" id="gemini-key" placeholder="AIzaSy...">
-      <p>Google AI Studioで取得したAPIキーを入力してください。<br>このデバイスにのみ保存されます。</p>
+      <label>Claude APIキー</label>
+      <input type="password" id="gemini-key" placeholder="sk-ant-...">
+      <p>Anthropic Consoleで取得したAPIキーを入力してください。<br>このデバイスにのみ保存されます。</p>
     </div>
     <div class="settings-field" style="margin-top:16px;">
       <label>Google Apps Script URL</label>
@@ -465,16 +465,29 @@
 - amount: 合計金額（数字のみ）
 - payment: 現金/クレカ/PayPay/quoカード/その他 から選ぶ`;
 
-      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=${geminiKey}`;
-
-      const res = await fetch(url, {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': geminiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              { inline_data: { mime_type: 'image/jpeg', data: selectedImageBase64 } }
+          model: 'claude-haiku-4-5',
+          max_tokens: 1024,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: 'image/jpeg',
+                  data: selectedImageBase64
+                }
+              },
+              { type: 'text', text: prompt }
             ]
           }]
         })
@@ -486,7 +499,7 @@
         throw new Error(data.error.message);
       }
 
-      const text = data.candidates[0].content.parts[0].text;
+      const text = data.content[0].text;
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('解析失敗');
 
