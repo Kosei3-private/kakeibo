@@ -492,6 +492,15 @@
   <div class="total-assets-bar">
     <div class="label">総資産（本資産）</div>
     <div class="amount" id="total-assets">¥-</div>
+    <div style="font-size:12px; opacity:0.8; margin-top:4px;" id="assets-change-label"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">総資産推移（2025年8月〜）</div>
+    <div class="chart-container" style="height:220px;">
+      <canvas id="asset-trend-chart"></canvas>
+    </div>
+  </div>
   </div>
   <div class="asset-grid" id="asset-grid">
     <div class="empty-state"><div class="icon">⏳</div><p>読み込み中...</p></div>
@@ -787,7 +796,10 @@ let gasUrl = localStorage.getItem('kakeiboGasUrl') || '';
 let assetInits = JSON.parse(localStorage.getItem('assetInits') || '{}');
 let selectedImageBase64 = null;
 let allRecords = [];
-let monthlyChart, categoryChart, paymentChart;
+let monthlyChart, categoryChart, paymentChart, assetTrendChart;
+
+// 初期残高の基準日（2025年8月23日終了時点）
+const INIT_DATE = '2025-08-23';
 
 // ===== Init =====
 document.getElementById('claude-key').value = claudeKey;
@@ -1057,6 +1069,107 @@ function renderDashboard() {
   });
 }
 
+// ===== 指定日時点の総資産を計算 =====
+function calcTotalAssetsAt(records, upToDateStr) {
+  const balances = {};
+  ASSETS.forEach(a => {
+    balances[a.key] = { in: 0, out: 0, init: Number(assetInits[a.key] || 0) };
+  });
+
+  records.filter(r => String(r.date).slice(0,10) <= upToDateStr).forEach(r => {
+    const amount = Number(r.amount || 0);
+    const svc = r.service;
+    const p1 = r.payment1;
+    const p2 = r.payment2;
+    if (!p1) return;
+
+    if (['購入','外食','立て替え','あげる'].includes(svc)) {
+      if (balances[p1]) balances[p1].out += amount;
+    } else if (['キャッシュバック','もらう'].includes(svc)) {
+      if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === 'チャージ') {
+      if (balances[p1]) balances[p1].in += amount;
+      if (p2 && balances[p2]) balances[p2].out += amount;
+    } else if (svc === '預け入れ') {
+      if (balances[p1]) balances[p1].in += amount;
+      if (balances['現金']) balances['現金'].out += amount;
+    } else if (svc === '引き出し') {
+      if (balances[p1]) balances[p1].out += amount;
+      if (balances['現金']) balances['現金'].in += amount;
+    }
+  });
+
+  return ASSETS.reduce((total, a) => {
+    const b = balances[a.key];
+    return total + b.init + b.in - b.out;
+  }, 0);
+}
+
+// ===== 資産推移グラフ =====
+function renderAssetTrend() {
+  // 2025年8月から現在まで月末ごとのスナップショット
+  const labels = [];
+  const values = [];
+
+  // 初期値（8/23時点）
+  labels.push('25/8/23');
+  values.push(Object.values(assetInits).reduce((s, v) => s + Number(v||0), 0));
+
+  const now = new Date();
+  let y = 2025, m = 8; // 8月から開始
+  // 8月の月末から翌月以降
+  while (y < now.getFullYear() || (y === now.getFullYear() && m <= now.getMonth() + 1)) {
+    // 月末日を求める
+    const lastDay = new Date(y, m, 0); // mは1-indexed月なのでmの前月末=当月末
+    const dateStr = lastDay.toLocaleDateString('sv-SE');
+    if (dateStr > INIT_DATE) {
+      const label = `${String(y).slice(2)}/${m}月`;
+      labels.push(label);
+      values.push(calcTotalAssetsAt(allRecords, dateStr));
+    }
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+
+  // 増減を計算して header に表示
+  if (values.length >= 2) {
+    const diff = values[values.length - 1] - values[0];
+    const sign = diff >= 0 ? '+' : '';
+    const el = document.getElementById('assets-change-label');
+    if (el) el.textContent = `初期比 ${sign}¥${diff.toLocaleString()}`;
+  }
+
+  if (assetTrendChart) assetTrendChart.destroy();
+  assetTrendChart = new Chart(document.getElementById('asset-trend-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '総資産',
+        data: values,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16,185,129,0.1)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#10b981',
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          ticks: { callback: v => '¥' + Math.round(v/1000) + 'k' }
+        },
+        x: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
 // ===== Assets =====
 function renderAssets() {
   const balances = {};
@@ -1112,6 +1225,7 @@ function renderAssets() {
 
   document.getElementById('total-assets').textContent = '¥' + totalAssets.toLocaleString();
   document.getElementById('asset-grid').innerHTML = html;
+  renderAssetTrend();
 }
 
 // ===== List =====
