@@ -498,7 +498,8 @@
 
     } catch (e) {
       hideLoading();
-      showToast('読み取りに失敗しました: ' + e.message, true);
+      alert('エラー詳細:\n' + e.message);
+      showToast('読み取りに失敗しました', true);
     }
   }
 
