@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>家計簿スキャナー</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="家計簿スキャナー">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #10b981;
+      color: white;
+      padding: 16px 20px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+    }
+
+    header span { font-size: 13px; font-weight: 400; opacity: 0.8; margin-left: 8px; }
+
+    .tab-bar {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 57px;
+      z-index: 9;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 14px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #94a3b8;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab.active { color: #10b981; border-bottom-color: #10b981; }
+
+    .page { display: none; padding: 20px; }
+    .page.active { display: block; }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
+
+    /* Camera area */
+    .camera-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+      text-align: center;
+      padding: 40px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .camera-area:active { background: #f0fdf4; border-color: #10b981; }
+    .camera-area .icon { font-size: 48px; margin-bottom: 12px; }
+    .camera-area p { color: #64748b; font-size: 14px; }
+    .camera-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    #preview-img {
+      width: 100%;
+      border-radius: 12px;
+      display: none;
+      margin-bottom: 16px;
+      max-height: 300px;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .scan-btn {
+      width: 100%;
+      padding: 16px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: none;
+    }
+
+    .scan-btn:active { transform: scale(0.98); background: #059669; }
+    .scan-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* Form fields */
+    .field { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #f8fafc;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus { outline: none; border-color: #10b981; background: white; }
+
+    .ai-badge {
+      display: inline-block;
+      background: #d1fae5;
+      color: #065f46;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 50px;
+      margin-left: 8px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .submit-btn:disabled { background: #94a3b8; }
+
+    /* Records */
+    .record-item {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .record-left { flex: 1; }
+    .record-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .record-meta { font-size: 12px; color: #94a3b8; }
+    .record-right { text-align: right; margin-left: 12px; }
+    .record-amount { font-size: 18px; font-weight: 700; }
+    .record-date { font-size: 12px; color: #94a3b8; }
+
+    /* Settings */
+    .settings-field { margin-bottom: 16px; }
+    .settings-field label { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+    .settings-field p { font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.6; }
+
+    .save-btn {
+      width: 100%;
+      padding: 14px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: #ef4444; }
+
+    /* Loading overlay */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .loading-overlay.show { display: flex; }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result-section { display: none; }
+    .result-section.show { display: block; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state p { font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<header>家計簿スキャナー <span>レシートを撮って自動記録</span></header>
+
+<div class="tab-bar">
+  <div class="tab active" data-tab="scan">📷 スキャン</div>
+  <div class="tab" data-tab="list">一覧</div>
+  <div class="tab" data-tab="settings">設定</div>
+</div>
+
+<!-- スキャンページ -->
+<div class="page active" id="page-scan">
+
+  <div class="camera-area" id="camera-area">
+    <div class="icon">📷</div>
+    <p>タップしてレシートを撮影<br>または画像を選択</p>
+    <input type="file" accept="image/*" capture="environment" id="file-input">
+  </div>
+
+  <img id="preview-img" alt="プレビュー">
+  <button class="scan-btn" id="scan-btn" onclick="scanReceipt()">✨ AIで読み取る</button>
+
+  <!-- 読み取り結果 -->
+  <div class="result-section" id="result-section">
+    <div class="card">
+      <div style="font-size:13px; color:#10b981; font-weight:700; margin-bottom:16px;">
+        ✨ AI読み取り完了 <span style="font-size:11px; color:#64748b; font-weight:400;">内容を確認・修正してください</span>
+      </div>
+
+      <div class="field">
+        <label>日付 <span class="ai-badge">AI</span></label>
+        <input type="date" id="r-date">
+      </div>
+
+      <div class="field">
+        <label>サービス内容 <span class="ai-badge">AI</span></label>
+        <select id="r-service">
+          <option value="購入">購入</option>
+          <option value="外食">外食</option>
+          <option value="キャッシュバック">キャッシュバック</option>
+          <option value="チャージ">チャージ</option>
+          <option value="立て替え">立て替え</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>品目1（カテゴリ） <span class="ai-badge">AI</span></label>
+        <select id="r-cat1">
+          <option value="食料品">食料品</option>
+          <option value="日用品">日用品</option>
+          <option value="外食">外食</option>
+          <option value="交通費">交通費</option>
+          <option value="医療">医療</option>
+          <option value="娯楽">娯楽</option>
+          <option value="衣類">衣類</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>品目2（詳細） <span class="ai-badge">AI</span></label>
+        <input type="text" id="r-cat2" placeholder="例：昼飯、エナドリ、一般">
+      </div>
+
+      <div class="field">
+        <label>店名 <span class="ai-badge">AI</span></label>
+        <input type="text" id="r-store" placeholder="例：コンビニ、ドンキ">
+      </div>
+
+      <div class="field">
+        <label>金額（円） <span class="ai-badge">AI</span></label>
+        <input type="number" id="r-amount" inputmode="numeric">
+      </div>
+
+      <div class="field">
+        <label>支払い手段 <span class="ai-badge">AI</span></label>
+        <select id="r-payment">
+          <option value="現金">現金</option>
+          <option value="クレカ">クレカ</option>
+          <option value="PayPay">PayPay</option>
+          <option value="quoカード">quoカード</option>
+          <option value="majica">majica</option>
+          <option value="Fami Pay">Fami Pay</option>
+          <option value="WAON">WAON</option>
+          <option value="VポイントPay">VポイントPay</option>
+          <option value="Amazonポイント">Amazonポイント</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <button class="submit-btn" onclick="saveRecord()">💾 保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 一覧ページ -->
+<div class="page" id="page-list">
+  <div id="records-container">
+    <div class="loading" style="text-align:center;padding:40px;color:#94a3b8;">読み込み中...</div>
+  </div>
+</div>
+
+<!-- 設定ページ -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <div class="settings-field">
+      <label>Gemini APIキー</label>
+      <input type="password" id="gemini-key" placeholder="AIzaSy...">
+      <p>Google AI Studioで取得したAPIキーを入力してください。<br>このデバイスにのみ保存されます。</p>
+    </div>
+    <div class="settings-field" style="margin-top:16px;">
+      <label>Google Apps Script URL</label>
+      <input type="url" id="kakeibo-gas-url" placeholder="https://script.google.com/macros/s/...">
+      <p>データ保存先のGASのURLを入力してください。</p>
+    </div>
+    <button class="save-btn" onclick="saveSettings()">保存する</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div id="loading-text">AIで読み取り中...</div>
+</div>
+
+<script>
+  // --- State ---
+  let geminiKey = localStorage.getItem('geminiKey') || '';
+  let gasUrl = localStorage.getItem('kakeiboGasUrl') || '';
+  let selectedImageBase64 = null;
+
+  // --- Init ---
+  document.getElementById('gemini-key').value = geminiKey;
+  document.getElementById('kakeibo-gas-url').value = gasUrl;
+
+  // --- Tabs ---
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('page-' + tab.dataset.tab).classList.add('active');
+      if (tab.dataset.tab === 'list') loadRecords();
+    });
+  });
+
+  // --- File input ---
+  document.getElementById('file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const dataUrl = ev.target.result;
+      selectedImageBase64 = dataUrl.split(',')[1];
+
+      const img = document.getElementById('preview-img');
+      img.src = dataUrl;
+      img.style.display = 'block';
+
+      document.getElementById('camera-area').style.display = 'none';
+      document.getElementById('scan-btn').style.display = 'block';
+      document.getElementById('result-section').classList.remove('show');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // --- Scan receipt ---
+  async function scanReceipt() {
+    if (!geminiKey) {
+      showToast('設定タブでGemini APIキーを入力してください', true);
+      return;
+    }
+    if (!selectedImageBase64) return;
+
+    showLoading('AIで読み取り中...');
+
+    try {
+      const prompt = `このレシートを読み取って、必ず以下のJSON形式のみで返してください（他の文章は不要）：
+{
+  "date": "YYYY-MM-DD",
+  "service": "購入",
+  "category1": "食料品",
+  "category2": "一般",
+  "store": "店名",
+  "amount": 1234,
+  "payment": "現金"
+}
+
+ルール：
+- date: レシートの日付（不明なら今日）
+- service: 購入/外食/その他 から選ぶ
+- category1: 食料品/日用品/外食/交通費/医療/娯楽/衣類/その他 から選ぶ
+- category2: 昼飯/エナドリ/一般/百均/など適切な詳細
+- store: レシートに書いてある店名（短く）
+- amount: 合計金額（数字のみ）
+- payment: 現金/クレカ/PayPay/quoカード/その他 から選ぶ`;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: 'image/jpeg', data: selectedImageBase64 } }
+            ]
+          }]
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      const text = data.candidates[0].content.parts[0].text;
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('解析失敗');
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      fillForm(parsed);
+      hideLoading();
+      document.getElementById('result-section').classList.add('show');
+      showToast('✓ 読み取り完了！内容を確認してください');
+
+    } catch (e) {
+      hideLoading();
+      showToast('読み取りに失敗しました: ' + e.message, true);
+    }
+  }
+
+  function fillForm(data) {
+    document.getElementById('r-date').value = data.date || today();
+    setSelect('r-service', data.service || '購入');
+    setSelect('r-cat1', data.category1 || '食料品');
+    document.getElementById('r-cat2').value = data.category2 || '';
+    document.getElementById('r-store').value = data.store || '';
+    document.getElementById('r-amount').value = data.amount || '';
+    setSelect('r-payment', data.payment || '現金');
+  }
+
+  function setSelect(id, value) {
+    const sel = document.getElementById(id);
+    for (let opt of sel.options) {
+      if (opt.value === value) { sel.value = value; return; }
+    }
+    // 一致しない場合は最初の選択肢
+    sel.selectedIndex = 0;
+  }
+
+  // --- Save record ---
+  async function saveRecord() {
+    if (!gasUrl) {
+      showToast('設定タブでGAS URLを入力してください', true);
+      return;
+    }
+
+    const record = {
+      date: document.getElementById('r-date').value,
+      service: document.getElementById('r-service').value,
+      category1: document.getElementById('r-cat1').value,
+      category2: document.getElementById('r-cat2').value,
+      store: document.getElementById('r-store').value,
+      amount: document.getElementById('r-amount').value,
+      payment: document.getElementById('r-payment').value,
+    };
+
+    if (!record.amount || Number(record.amount) <= 0) {
+      showToast('金額を確認してください', true);
+      return;
+    }
+
+    showLoading('保存中...');
+
+    try {
+      const params = new URLSearchParams({ action: 'add', ...record });
+      await fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+
+      hideLoading();
+      showToast('✓ 保存しました！');
+
+      // Reset
+      document.getElementById('preview-img').style.display = 'none';
+      document.getElementById('camera-area').style.display = 'block';
+      document.getElementById('scan-btn').style.display = 'none';
+      document.getElementById('result-section').classList.remove('show');
+      document.getElementById('file-input').value = '';
+      selectedImageBase64 = null;
+
+    } catch (e) {
+      hideLoading();
+      showToast('保存に失敗しました', true);
+    }
+  }
+
+  // --- Load records ---
+  async function loadRecords() {
+    if (!gasUrl) {
+      document.getElementById('records-container').innerHTML =
+        '<div class="empty-state"><div class="icon">⚙️</div><p>設定タブでURLを入力してください</p></div>';
+      return;
+    }
+
+    try {
+      const res = await fetch(gasUrl + '?action=list');
+      const data = await res.json();
+      const records = data.records || [];
+
+      if (records.length === 0) {
+        document.getElementById('records-container').innerHTML =
+          '<div class="empty-state"><div class="icon">📭</div><p>記録がありません</p></div>';
+        return;
+      }
+
+      const html = records.map(r => `
+        <div class="record-item">
+          <div class="record-left">
+            <div class="record-name">${esc(r.store || r.category1 || '-')}</div>
+            <div class="record-meta">${esc(r.category1)} / ${esc(r.category2)} / ${esc(r.payment)}</div>
+          </div>
+          <div class="record-right">
+            <div class="record-amount">¥${Number(r.amount).toLocaleString()}</div>
+            <div class="record-date">${formatDate(r.date)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('records-container').innerHTML = html;
+    } catch (e) {
+      document.getElementById('records-container').innerHTML =
+        '<div class="empty-state"><div class="icon">❌</div><p>読み込みに失敗しました</p></div>';
+    }
+  }
+
+  // --- Settings ---
+  function saveSettings() {
+    geminiKey = document.getElementById('gemini-key').value.trim();
+    gasUrl = document.getElementById('kakeibo-gas-url').value.trim();
+    localStorage.setItem('geminiKey', geminiKey);
+    localStorage.setItem('kakeiboGasUrl', gasUrl);
+    showToast('✓ 設定を保存しました');
+  }
+
+  // --- Helpers ---
+  function today() {
+    return new Date().toLocaleDateString('sv-SE');
+  }
+
+  function formatDate(d) {
+    if (!d) return '';
+    const dt = new Date(d);
+    return `${dt.getMonth()+1}/${dt.getDate()}`;
+  }
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '') + ' show';
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function showLoading(text) {
+    document.getElementById('loading-text').textContent = text;
+    document.getElementById('loading-overlay').classList.add('show');
+  }
+
+  function hideLoading() {
+    document.getElementById('loading-overlay').classList.remove('show');
+  }
+</script>
+</body>
+</html>
