@@ -105,6 +105,61 @@
     .empty-state { text-align: center; padding: 48px 20px; color: #94a3b8; }
     .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; }
+
+    /* 手入力フォーム */
+    .form-section { margin-bottom: 16px; }
+    .form-label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 8px 16px; border-radius: 50px; border: 2px solid #e2e8f0;
+      background: white; font-size: 14px; font-weight: 600; color: #64748b;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .chip:active { transform: scale(0.95); }
+    .chip.selected { border-color: #10b981; background: #d1fae5; color: #065f46; }
+    .chip.selected-red { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+
+    .amount-input {
+      width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 28px; font-weight: 700; text-align: right; background: #f8fafc;
+      color: #1e293b; -webkit-appearance: none;
+    }
+    .amount-input:focus { outline: none; border-color: #10b981; background: white; }
+
+    .text-input-field {
+      width: 100%; padding: 12px 14px; border: 2px solid #e2e8f0; border-radius: 10px;
+      font-size: 16px; background: #f8fafc; color: #1e293b; -webkit-appearance: none;
+    }
+    .text-input-field:focus { outline: none; border-color: #10b981; background: white; }
+
+    .conditional { display: none; }
+    .conditional.show { display: block; }
+
+    .register-btn {
+      width: 100%; padding: 18px; background: #10b981; color: white; border: none;
+      border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer;
+      margin-top: 8px; transition: all 0.2s;
+    }
+    .register-btn:active { background: #059669; transform: scale(0.98); }
+
+    .add-more-bar {
+      display: none; background: #f0fdf4; border: 2px solid #10b981; border-radius: 14px;
+      padding: 16px; margin-top: 12px; text-align: center;
+    }
+    .add-more-bar.show { display: block; }
+    .add-more-bar p { font-size: 14px; color: #065f46; font-weight: 600; margin-bottom: 12px; }
+    .add-more-bar .btn-row { display: flex; gap: 8px; }
+    .btn-more { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-more-yes { background: #10b981; color: white; }
+    .btn-more-no { background: #e2e8f0; color: #64748b; }
+
+    .service-big-btn {
+      flex: 1; padding: 14px 8px; border-radius: 12px; border: 2px solid #e2e8f0;
+      background: white; font-size: 13px; font-weight: 700; color: #64748b;
+      cursor: pointer; text-align: center; transition: all 0.15s;
+    }
+    .service-big-btn.selected { border-color: #10b981; background: #d1fae5; color: #065f46; }
+    .service-row { display: flex; gap: 6px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
@@ -112,15 +167,132 @@
 <header>家計簿 <span>スキャン・集計・資産管理</span></header>
 
 <div class="tab-bar">
-  <div class="tab active" data-tab="scan">📷 スキャン</div>
+  <div class="tab active" data-tab="input">✏️ 手入力</div>
+  <div class="tab" data-tab="scan">📷 スキャン</div>
   <div class="tab" data-tab="dashboard">📊 ダッシュボード</div>
   <div class="tab" data-tab="assets">💰 資産</div>
   <div class="tab" data-tab="list">📋 一覧</div>
   <div class="tab" data-tab="settings">⚙️ 設定</div>
 </div>
 
+<!-- 手入力 -->
+<div class="page active" id="page-input">
+  <div class="card">
+
+    <!-- 日付 -->
+    <div class="form-section">
+      <span class="form-label">日付</span>
+      <input type="date" id="f-date" class="text-input-field">
+    </div>
+
+    <!-- サービス内容 -->
+    <div class="form-section">
+      <span class="form-label">サービス内容</span>
+      <div class="service-row">
+        <button class="service-big-btn selected" data-service="購入" onclick="selectService(this)">購入</button>
+        <button class="service-big-btn" data-service="キャッシュバック" onclick="selectService(this)">キャッシュバック</button>
+        <button class="service-big-btn" data-service="チャージ" onclick="selectService(this)">チャージ</button>
+        <button class="service-big-btn" data-service="もらう" onclick="selectService(this)">もらう</button>
+        <button class="service-big-btn" data-service="立て替え" onclick="selectService(this)">立て替え</button>
+      </div>
+    </div>
+
+    <!-- 品目（購入・立て替えのみ） -->
+    <div class="form-section conditional show" id="f-hinmoku-section">
+      <span class="form-label">品目</span>
+      <div class="chips" id="f-hinmoku-chips">
+        <div class="chip" data-val="食料品" onclick="selectChip(this,'hinmoku')">食料品</div>
+        <div class="chip" data-val="趣味" onclick="selectChip(this,'hinmoku')">趣味</div>
+        <div class="chip" data-val="衣類" onclick="selectChip(this,'hinmoku')">衣類</div>
+        <div class="chip" data-val="日用品" onclick="selectChip(this,'hinmoku')">日用品</div>
+        <div class="chip" data-val="交通費" onclick="selectChip(this,'hinmoku')">交通費</div>
+        <div class="chip" data-val="医療" onclick="selectChip(this,'hinmoku')">医療</div>
+        <div class="chip" data-val="ギフト券類" onclick="selectChip(this,'hinmoku')">ギフト券類</div>
+      </div>
+    </div>
+
+    <!-- 食料品詳細（品目=食料品のみ） -->
+    <div class="form-section conditional" id="f-shokuhin-section">
+      <span class="form-label">食料品の種類</span>
+      <div class="chips" id="f-shokuhin-chips">
+        <div class="chip" data-val="昼飯" onclick="selectChip(this,'shokuhin')">昼飯</div>
+        <div class="chip" data-val="エナドリ" onclick="selectChip(this,'shokuhin')">エナドリ</div>
+        <div class="chip" data-val="一般" onclick="selectChip(this,'shokuhin')">一般</div>
+      </div>
+    </div>
+
+    <!-- 店 -->
+    <div class="form-section conditional show" id="f-mise-section">
+      <span class="form-label">店</span>
+      <div class="chips" id="f-mise-chips">
+        <div class="chip" data-val="コンビニ" onclick="selectChip(this,'mise')">コンビニ</div>
+        <div class="chip" data-val="スーパー" onclick="selectChip(this,'mise')">スーパー</div>
+        <div class="chip" data-val="ドンキ" onclick="selectChip(this,'mise')">ドンキ</div>
+        <div class="chip" data-val="クリエイト" onclick="selectChip(this,'mise')">クリエイト</div>
+        <div class="chip" data-val="マック" onclick="selectChip(this,'mise')">マック</div>
+        <div class="chip" data-val="自販機" onclick="selectChip(this,'mise')">自販機</div>
+        <div class="chip" data-val="Amazon" onclick="selectChip(this,'mise')">Amazon</div>
+        <div class="chip" data-val="その他" onclick="selectChip(this,'mise')">その他</div>
+      </div>
+      <!-- その他の店 -->
+      <div class="conditional" id="f-other-mise-section" style="margin-top:8px;">
+        <input type="text" id="f-other-mise" class="text-input-field" placeholder="店名を入力">
+      </div>
+    </div>
+
+    <!-- 金額 -->
+    <div class="form-section">
+      <span class="form-label">金額（円）</span>
+      <input type="number" id="f-amount" class="amount-input" placeholder="0" inputmode="numeric">
+    </div>
+
+    <!-- 支払い手段 -->
+    <div class="form-section">
+      <span class="form-label">支払い手段</span>
+      <div class="chips" id="f-shiharai-chips">
+        <div class="chip" data-val="現金" onclick="selectChip(this,'shiharai')">現金</div>
+        <div class="chip" data-val="プリペイド" onclick="selectChip(this,'shiharai')">プリペイド</div>
+        <div class="chip" data-val="QR決済" onclick="selectChip(this,'shiharai')">QR決済</div>
+        <div class="chip" data-val="クレカ" onclick="selectChip(this,'shiharai')">クレカ</div>
+        <div class="chip" data-val="デビット" onclick="selectChip(this,'shiharai')">デビット</div>
+        <div class="chip" data-val="ポイント" onclick="selectChip(this,'shiharai')">ポイント</div>
+      </div>
+    </div>
+
+    <!-- 電子マネー（プリペイド/QR決済/ポイントのみ） -->
+    <div class="form-section conditional" id="f-emoney-section">
+      <span class="form-label">電子マネー</span>
+      <div class="chips" id="f-emoney-chips"></div>
+    </div>
+
+    <!-- チャージ元（チャージのみ） -->
+    <div class="form-section conditional" id="f-charge-from-section">
+      <span class="form-label">チャージ元</span>
+      <div class="chips" id="f-charge-from-chips">
+        <div class="chip" data-val="現金" onclick="selectChip(this,'chargeFrom')">現金</div>
+        <div class="chip" data-val="三井住友" onclick="selectChip(this,'chargeFrom')">三井住友</div>
+        <div class="chip" data-val="ゆうちょ" onclick="selectChip(this,'chargeFrom')">ゆうちょ</div>
+        <div class="chip" data-val="住信SBI" onclick="selectChip(this,'chargeFrom')">住信SBI</div>
+        <div class="chip" data-val="Vポイント" onclick="selectChip(this,'chargeFrom')">Vポイント</div>
+      </div>
+    </div>
+
+    <button class="register-btn" onclick="registerRecord()">登録する</button>
+
+    <!-- 追加登録バー -->
+    <div class="add-more-bar" id="add-more-bar">
+      <p>✓ 登録完了！同じレシートでもう1件ありますか？</p>
+      <div class="btn-row">
+        <button class="btn-more btn-more-yes" onclick="addMore()">＋ もう1件</button>
+        <button class="btn-more btn-more-no" onclick="resetForm()">終わり</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- スキャン -->
-<div class="page active" id="page-scan">
+<div class="page" id="page-scan">
   <div class="camera-area" id="camera-area">
     <div class="icon">📷</div>
     <p>タップしてレシートを撮影<br>または画像を選択</p>
@@ -303,6 +475,150 @@
 </div>
 
 <script>
+// ===== 手入力フォーム =====
+const EMONEY_MAP = {
+  'プリペイド': ['quoカード', 'スタバカード', 'majica', 'Amazonギフトカード', 'VポイントPay', 'PASMO'],
+  'QR決済':    ['PayPay1', 'PayPay2', 'Fami Pay', 'WAON'],
+  'ポイント':   ['Vポイント', 'Amazonポイント', 'Ponta', 'リクルートポイント', 'セブンマイル'],
+};
+
+let fState = {
+  service: '購入',
+  hinmoku: '',
+  shokuhin: '',
+  mise: '',
+  shiharai: '',
+  emoney: '',
+  chargeFrom: '',
+};
+
+// 日付初期化
+document.getElementById('f-date').value = new Date().toLocaleDateString('sv-SE');
+
+function selectService(btn) {
+  document.querySelectorAll('.service-big-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  fState.service = btn.dataset.service;
+  fState.hinmoku = '';
+  fState.mise = '';
+  clearChips('hinmoku'); clearChips('shokuhin'); clearChips('mise');
+
+  const needsHinmoku = ['購入', '立て替え'].includes(fState.service);
+  const needsMise = ['購入', '立て替え', '外食'].includes(fState.service);
+  const needsCharge = fState.service === 'チャージ';
+
+  toggle('f-hinmoku-section', needsHinmoku);
+  toggle('f-shokuhin-section', false);
+  toggle('f-mise-section', needsMise);
+  toggle('f-emoney-section', false);
+  toggle('f-charge-from-section', needsCharge);
+}
+
+function selectChip(chip, group) {
+  const parent = chip.parentElement;
+  parent.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  fState[group] = chip.dataset.val;
+
+  if (group === 'hinmoku') {
+    toggle('f-shokuhin-section', fState.hinmoku === '食料品');
+    if (fState.hinmoku === '食料品') document.getElementById('f-shokuhin-chips').querySelector('.chip')?.focus();
+  }
+
+  if (group === 'mise') {
+    toggle('f-other-mise-section', fState.mise === 'その他');
+    if (fState.mise === 'その他') document.getElementById('f-other-mise').focus();
+  }
+
+  if (group === 'shiharai') {
+    const needsEmoney = ['プリペイド', 'QR決済', 'ポイント'].includes(fState.shiharai);
+    toggle('f-emoney-section', needsEmoney);
+    fState.emoney = '';
+    if (needsEmoney) buildEmoneyChips(fState.shiharai);
+  }
+}
+
+function buildEmoneyChips(type) {
+  const options = EMONEY_MAP[type] || [];
+  const html = options.map(v =>
+    `<div class="chip" data-val="${v}" onclick="selectChip(this,'emoney')">${v}</div>`
+  ).join('');
+  document.getElementById('f-emoney-chips').innerHTML = html;
+}
+
+function clearChips(group) {
+  const map = { hinmoku: 'f-hinmoku-chips', shokuhin: 'f-shokuhin-chips', mise: 'f-mise-chips' };
+  if (map[group]) document.getElementById(map[group])?.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  fState[group] = '';
+}
+
+function toggle(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+}
+
+function registerRecord() {
+  // バリデーション
+  const service = fState.service;
+  const needsHinmoku = ['購入', '立て替え'].includes(service);
+
+  if (needsHinmoku && !fState.hinmoku) { showToast('品目を選択してください', true); return; }
+  if (fState.hinmoku === '食料品' && !fState.shokuhin) { showToast('食料品の種類を選択してください', true); return; }
+  if (['購入', '立て替え'].includes(service) && !fState.mise) { showToast('店を選択してください', true); return; }
+  if (fState.mise === 'その他' && !document.getElementById('f-other-mise').value.trim()) { showToast('店名を入力してください', true); return; }
+  if (!document.getElementById('f-amount').value || Number(document.getElementById('f-amount').value) <= 0) { showToast('金額を入力してください', true); return; }
+  if (!fState.shiharai) { showToast('支払い手段を選択してください', true); return; }
+  if (['プリペイド', 'QR決済', 'ポイント'].includes(fState.shiharai) && !fState.emoney) { showToast('電子マネーを選択してください', true); return; }
+
+  const mise = fState.mise === 'その他' ? document.getElementById('f-other-mise').value.trim() : fState.mise;
+  const payment1 = ['現金', 'クレカ', 'デビット'].includes(fState.shiharai) ? fState.shiharai : fState.emoney;
+
+  const record = {
+    date: document.getElementById('f-date').value,
+    service: service,
+    category1: fState.hinmoku,
+    category2: fState.shokuhin,
+    store: mise,
+    amount: document.getElementById('f-amount').value,
+    payment1: payment1,
+    payment2: fState.chargeFrom,
+  };
+
+  if (!gasUrl) { showToast('設定タブでGAS URLを入力してください', true); return; }
+
+  showLoading('登録中...');
+  const params = new URLSearchParams({ action: 'add', ...record });
+  fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' })
+    .then(() => {
+      hideLoading();
+      document.getElementById('add-more-bar').classList.add('show');
+    })
+    .catch(() => { hideLoading(); showToast('登録に失敗しました', true); });
+}
+
+function addMore() {
+  // 日付・品目・店・支払い手段は引き継ぎ、金額だけリセット
+  document.getElementById('f-amount').value = '';
+  document.getElementById('add-more-bar').classList.remove('show');
+  document.getElementById('f-amount').focus();
+}
+
+function resetForm() {
+  fState = { service: '購入', hinmoku: '', shokuhin: '', mise: '', shiharai: '', emoney: '', chargeFrom: '' };
+  document.getElementById('f-date').value = new Date().toLocaleDateString('sv-SE');
+  document.getElementById('f-amount').value = '';
+  document.getElementById('f-other-mise').value = '';
+  document.querySelectorAll('.service-big-btn').forEach((b,i) => b.classList.toggle('selected', i===0));
+  ['f-hinmoku-chips','f-shokuhin-chips','f-mise-chips','f-shiharai-chips','f-emoney-chips','f-charge-from-chips']
+    .forEach(id => document.getElementById(id)?.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')));
+  toggle('f-shokuhin-section', false);
+  toggle('f-other-mise-section', false);
+  toggle('f-emoney-section', false);
+  toggle('f-charge-from-section', false);
+  document.getElementById('add-more-bar').classList.remove('show');
+  showToast('リセットしました');
+}
+
 // ===== 資産マスター =====
 const ASSETS = [
   { key: '現金', label: '現金', type: '現金' },
