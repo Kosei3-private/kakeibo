@@ -8,6 +8,9 @@
   <meta name="theme-color" content="#10b981">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="家計簿">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -177,6 +180,13 @@
 
 <!-- 手入力 -->
 <div class="page active" id="page-input">
+
+  <!-- 直近記録 -->
+  <div id="recent-records-section" style="margin-bottom:12px; display:none;">
+    <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; padding:0 2px;">直近の記録</div>
+    <div id="recent-records-list"></div>
+  </div>
+
   <div class="card">
 
     <!-- 日付 -->
@@ -198,6 +208,8 @@
         <button class="service-big-btn" data-service="預け入れ" onclick="selectService(this)">預け入れ</button>
         <button class="service-big-btn" data-service="引き出し" onclick="selectService(this)">引き出し</button>
         <button class="service-big-btn" data-service="給与" onclick="selectService(this)">給与</button>
+        <button class="service-big-btn" data-service="売却" onclick="selectService(this)">売却</button>
+        <button class="service-big-btn" data-service="クレカ引き落とし" onclick="selectService(this)">クレカ引き落とし</button>
       </div>
     </div>
 
@@ -213,6 +225,18 @@
         <div class="chip" data-val="医療" onclick="selectChip(this,'hinmoku')">医療</div>
         <div class="chip" data-val="ギフト券類" onclick="selectChip(this,'hinmoku')">ギフト券類</div>
       </div>
+    </div>
+
+    <!-- 品目名（ギフト券類購入・売却のみ） -->
+    <div class="form-section conditional" id="f-itemname-section">
+      <span class="form-label">品目名</span>
+      <input type="text" id="f-itemname" class="text-input-field" placeholder="例：Amazonギフト券、Anker充電器">
+    </div>
+
+    <!-- 数量（ギフト券類購入・売却のみ） -->
+    <div class="form-section conditional" id="f-quantity-section">
+      <span class="form-label">数量（点）</span>
+      <input type="number" id="f-quantity" class="amount-input" placeholder="1" inputmode="numeric" style="font-size:22px;">
     </div>
 
     <!-- 食料品詳細（品目=食料品のみ） -->
@@ -301,7 +325,7 @@
     <div class="form-section conditional" id="f-kyuyo-section">
       <span class="form-label">受取口座</span>
       <div class="chips" id="f-kyuyo-chips">
-        <div class="chip" data-val="ゆうちょ" onclick="selectChip(this,'kyuyo')">ゆうちょ</div>
+        <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'kyuyo')">ゆうちょ銀行</div>
         <div class="chip" data-val="三井住友" onclick="selectChip(this,'kyuyo')">三井住友</div>
         <div class="chip" data-val="住信SBI" onclick="selectChip(this,'kyuyo')">住信SBI</div>
       </div>
@@ -311,12 +335,12 @@
     <div class="form-section conditional" id="f-bank-section">
       <span class="form-label">銀行</span>
       <div class="chips" id="f-bank-chips">
-        <div class="chip" data-val="ゆうちょ" onclick="selectBankChip(this)">ゆうちょ</div>
+        <div class="chip" data-val="ゆうちょ銀行" onclick="selectBankChip(this)">ゆうちょ銀行</div>
         <div class="chip" data-val="三井住友" onclick="selectBankChip(this)">三井住友</div>
         <div class="chip" data-val="住信SBI" onclick="selectBankChip(this)">住信SBI</div>
       </div>
       <div id="yucho-warn" style="display:none; margin-top:6px; font-size:12px; color:#ef4444; font-weight:600;">
-        ⚠️ ゆうちょは引き出しのみ対応
+        ⚠️ ゆうちょ銀行は引き出しのみ対応
       </div>
     </div>
 
@@ -342,7 +366,7 @@
       <div class="chips" id="f-charge-from-chips">
         <div class="chip" data-val="現金" onclick="selectChip(this,'chargeFrom')">現金</div>
         <div class="chip" data-val="三井住友" onclick="selectChip(this,'chargeFrom')">三井住友</div>
-        <div class="chip" data-val="ゆうちょ" onclick="selectChip(this,'chargeFrom')">ゆうちょ</div>
+        <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'chargeFrom')">ゆうちょ銀行</div>
         <div class="chip" data-val="住信SBI" onclick="selectChip(this,'chargeFrom')">住信SBI</div>
         <div class="chip" data-val="Vポイント" onclick="selectChip(this,'chargeFrom')">Vポイント</div>
         <div class="chip" data-val="VポイントPay" onclick="selectChip(this,'chargeFrom')">VポイントPay</div>
@@ -434,7 +458,7 @@
           <option value="Amazonポイント">Amazonポイント</option>
           <option value="Amazonギフトカード">Amazonギフトカード</option>
           <option value="Ponta">Ponta</option>
-          <option value="ゆうちょ">ゆうちょ</option>
+          <option value="ゆうちょ銀行">ゆうちょ銀行</option>
           <option value="住信SBI">住信SBI</option>
           <option value="その他">その他</option>
         </select>
@@ -450,7 +474,7 @@
           <option value="PayPay2">PayPay2</option>
           <option value="Vポイント">Vポイント</option>
           <option value="VポイントPay">VポイントPay</option>
-          <option value="ゆうちょ">ゆうちょ</option>
+          <option value="ゆうちょ銀行">ゆうちょ銀行</option>
           <option value="住信SBI">住信SBI</option>
         </select>
       </div>
@@ -512,8 +536,20 @@
       <canvas id="asset-trend-chart"></canvas>
     </div>
   </div>
+
+  <div class="card" style="border-left:4px solid #ef4444;">
+    <div class="card-title">クレカ月別利用額</div>
+    <div id="credit-monthly-table"></div>
+    <div style="font-size:11px; color:#94a3b8; margin-top:8px;">引き落とし済は「クレカ引き落とし」で登録してください</div>
   </div>
+
+  <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em; padding:8px 4px 4px;">本資産</div>
   <div class="asset-grid" id="asset-grid">
+    <div class="empty-state"><div class="icon">⏳</div><p>読み込み中...</p></div>
+  </div>
+
+  <div style="font-size:12px; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.05em; padding:12px 4px 4px;">準資産（在庫）</div>
+  <div class="asset-grid" id="inventory-grid">
     <div class="empty-state"><div class="icon">⏳</div><p>読み込み中...</p></div>
   </div>
 </div>
@@ -549,6 +585,19 @@
   </div>
 </div>
 
+<!-- 二重登録確認モーダル -->
+<div id="dupe-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:60; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:white; border-radius:16px; padding:20px; width:100%; max-width:360px;">
+    <div style="font-size:16px; font-weight:700; color:#ef4444; margin-bottom:8px;">⚠️ 似た記録があります</div>
+    <div id="dupe-detail" style="font-size:13px; color:#64748b; background:#f8fafc; border-radius:10px; padding:10px; margin-bottom:16px;"></div>
+    <div style="font-size:13px; color:#475569; margin-bottom:16px;">本当に登録しますか？</div>
+    <div style="display:flex; gap:8px;">
+      <button onclick="dupeCancel()" style="flex:1; padding:12px; border-radius:10px; border:none; background:#e2e8f0; color:#64748b; font-size:14px; font-weight:700; cursor:pointer;">キャンセル</button>
+      <button onclick="dupeConfirm()" style="flex:1; padding:12px; border-radius:10px; border:none; background:#ef4444; color:white; font-size:14px; font-weight:700; cursor:pointer;">それでも登録</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div class="loading-overlay" id="loading-overlay">
   <div class="spinner"></div>
@@ -561,6 +610,7 @@ const EMONEY_MAP = {
   'プリペイド': ['quoカード', 'PASMO', 'スタバカード', 'majica', 'Amazonギフトカード', 'VポイントPay'],
   'QR決済':    ['PayPay1', 'PayPay2', 'Fami Pay'],
   'ポイント':   ['Ponta', 'WAON', 'Amazonポイント', 'Vポイント', 'リクルートポイント'],
+  'デビット':   ['住信SBI', '三井住友'],
 };
 
 let fState = {
@@ -576,6 +626,8 @@ let fState = {
   bank: '',
   chargeTo: '',
   chargeFrom: '',
+  itemName: '',
+  quantity: '',
 };
 
 // サービスID管理（同じレシート内の複数登録で共有）
@@ -590,24 +642,26 @@ function selectService(btn) {
   fState.service = btn.dataset.service;
   fState.hinmoku = ''; fState.shokuhin = ''; fState.mise = '';
   fState.shiharai = ''; fState.emoney = ''; fState.uketori = ''; fState.jusho = ''; fState.kyuyo = ''; fState.bank = ''; fState.chargeTo = ''; fState.chargeFrom = '';
+  fState.itemName = ''; fState.quantity = '';
   clearChips('hinmoku'); clearChips('shokuhin'); clearChips('mise');
   clearChips('shiharai'); clearChips('emoney'); clearChips('uketori'); clearChips('jusho'); clearChips('kyuyo'); clearChips('bank'); clearChips('chargeTo'); clearChips('chargeFrom');
+  document.getElementById('f-itemname').value = '';
+  document.getElementById('f-quantity').value = '';
   document.getElementById('yucho-warn').style.display = 'none';
 
   const s = fState.service;
+  const isBuy = ['購入', '立て替え'].includes(s);
+  const isATM = ['預け入れ', '引き出し'].includes(s);
 
   // 各セクションの表示制御
-  toggle('f-hinmoku-section',     ['購入', '立て替え'].includes(s));
+  toggle('f-hinmoku-section',     isBuy);
   toggle('f-shokuhin-section',    false);
-  toggle('f-mise-section',        ['購入', '立て替え'].includes(s));
+  toggle('f-itemname-section',    s === '売却');
+  toggle('f-quantity-section',    s === '売却');
+  toggle('f-mise-section',        isBuy);
   toggle('f-other-mise-section',  false);
-  const isATM = ['預け入れ', '引き出し'].includes(s);
-  toggle('f-hinmoku-section',     ['購入', '立て替え'].includes(s));
-  toggle('f-shokuhin-section',    false);
-  toggle('f-mise-section',        ['購入', '立て替え'].includes(s));
-  toggle('f-other-mise-section',  false);
-  toggle('f-emoney-section',      false);  // 支払い手段選択後に動的に表示
-  toggle('f-uketori-section',     s === 'キャッシュバック');
+  toggle('f-emoney-section',      false);
+  toggle('f-uketori-section',     ['キャッシュバック', '売却'].includes(s));
   toggle('f-jusho-section',       ['もらう', 'あげる'].includes(s));
   toggle('f-kyuyo-section',       s === '給与');
   toggle('f-bank-section',        isATM);
@@ -615,8 +669,10 @@ function selectService(btn) {
   toggle('f-charge-from-section', s === 'チャージ');
 
   // 支払い手段が不要なサービス
-  const needsShiharai = !['チャージ', 'キャッシュバック', 'もらう', 'あげる', '預け入れ', '引き出し', '給与'].includes(s);
+  const needsShiharai = !['チャージ', 'キャッシュバック', 'もらう', 'あげる', '預け入れ', '引き出し', '給与', '売却', 'クレカ引き落とし'].includes(s);
   toggle('f-shiharai-section', needsShiharai);
+  // クレカ引き落とし → 銀行選択
+  toggle('f-bank-section', isATM || s === 'クレカ引き落とし');
 
   // 立て替えはデビット非表示（VBA通り）
   const debitChip = document.getElementById('chip-debit');
@@ -638,6 +694,9 @@ function selectChip(chip, group) {
   if (group === 'hinmoku') {
     toggle('f-shokuhin-section', fState.hinmoku === '食料品');
     if (fState.hinmoku === '食料品') document.getElementById('f-shokuhin-chips').querySelector('.chip')?.focus();
+    const isGift = fState.hinmoku === 'ギフト券類' && ['購入', '立て替え'].includes(fState.service);
+    toggle('f-itemname-section', isGift);
+    toggle('f-quantity-section', isGift);
   }
 
   if (group === 'mise') {
@@ -646,7 +705,7 @@ function selectChip(chip, group) {
   }
 
   if (group === 'shiharai') {
-    const needsEmoney = ['プリペイド', 'QR決済', 'ポイント'].includes(fState.shiharai);
+    const needsEmoney = ['プリペイド', 'QR決済', 'ポイント', 'デビット'].includes(fState.shiharai);
     toggle('f-emoney-section', needsEmoney);
     fState.emoney = '';
     if (needsEmoney) buildEmoneyChips(fState.shiharai);
@@ -669,7 +728,7 @@ function selectBankChip(chip) {
 
   // ゆうちょは引き出しのみ（VBA: Bank1_Click → Deposit.Enabled = False）
   const warn = document.getElementById('yucho-warn');
-  if (fState.bank === 'ゆうちょ' && fState.service === '預け入れ') {
+  if (fState.bank === 'ゆうちょ銀行' && fState.service === '預け入れ') {
     warn.style.display = 'block';
   } else {
     warn.style.display = 'none';
@@ -698,18 +757,22 @@ function registerRecord() {
   // バリデーション
   if (['購入', '立て替え'].includes(service) && !fState.hinmoku) { showToast('品目を選択してください', true); return; }
   if (fState.hinmoku === '食料品' && !fState.shokuhin) { showToast('食料品の種類を選択してください', true); return; }
+  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
+  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
   if (['購入', '立て替え'].includes(service) && !fState.mise) { showToast('店を選択してください', true); return; }
   if (fState.mise === 'その他' && !document.getElementById('f-other-mise').value.trim()) { showToast('店名を入力してください', true); return; }
   if (!amount || Number(amount) <= 0) { showToast('金額を入力してください', true); return; }
   if (service === 'チャージ' && !fState.chargeTo) { showToast('チャージ先を選択してください', true); return; }
   if (service === 'チャージ' && !fState.chargeFrom) { showToast('チャージ元を選択してください', true); return; }
-  if (service === 'キャッシュバック' && !fState.uketori) { showToast('受け取り先を選択してください', true); return; }
+  if (['キャッシュバック', '売却'].includes(service) && !fState.uketori) { showToast('受け取り先を選択してください', true); return; }
+  if (service === '売却' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
+  if (service === '売却' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
   if (['もらう', 'あげる'].includes(service) && !fState.jusho) { showToast('授受先を選択してください', true); return; }
-  if (['預け入れ', '引き出し'].includes(service) && !fState.bank) { showToast('銀行を選択してください', true); return; }
-  if (service === '預け入れ' && fState.bank === 'ゆうちょ') { showToast('ゆうちょは引き出しのみです', true); return; }
+  if (['預け入れ', '引き出し', 'クレカ引き落とし'].includes(service) && !fState.bank) { showToast('銀行を選択してください', true); return; }
+  if (service === '預け入れ' && fState.bank === 'ゆうちょ銀行') { showToast('ゆうちょ銀行は引き出しのみです', true); return; }
   if (service === '給与' && !fState.kyuyo) { showToast('受取口座を選択してください', true); return; }
-  if (!['チャージ', 'キャッシュバック', 'もらう', 'あげる', '預け入れ', '引き出し', '給与'].includes(service) && !fState.shiharai) { showToast('支払い手段を選択してください', true); return; }
-  if (['プリペイド', 'QR決済', 'ポイント'].includes(fState.shiharai) && !fState.emoney) { showToast('電子マネーを選択してください', true); return; }
+  if (!['チャージ', 'キャッシュバック', 'もらう', 'あげる', '預け入れ', '引き出し', '給与', '売却', 'クレカ引き落とし'].includes(service) && !fState.shiharai) { showToast('支払い手段を選択してください', true); return; }
+  if (['プリペイド', 'QR決済', 'ポイント', 'デビット'].includes(fState.shiharai) && !fState.emoney) { showToast('電子マネー／銀行を選択してください', true); return; }
 
   const mise = fState.mise === 'その他' ? document.getElementById('f-other-mise').value.trim() : fState.mise;
 
@@ -717,43 +780,73 @@ function registerRecord() {
   let payment1, payment2;
   if (service === 'チャージ') {
     payment1 = fState.chargeTo; payment2 = fState.chargeFrom;
-  } else if (service === 'キャッシュバック') {
+  } else if (['キャッシュバック', '売却'].includes(service)) {
     payment1 = fState.uketori; payment2 = '';
   } else if (['もらう', 'あげる'].includes(service)) {
     payment1 = fState.jusho; payment2 = '';
-  } else if (['預け入れ', '引き出し'].includes(service)) {
+  } else if (['預け入れ', '引き出し', 'クレカ引き落とし'].includes(service)) {
     payment1 = fState.bank; payment2 = '';
   } else if (service === '給与') {
     payment1 = fState.kyuyo; payment2 = '';
   } else {
-    payment1 = ['現金', 'クレカ', 'デビット'].includes(fState.shiharai) ? fState.shiharai : fState.emoney;
+    payment1 = ['現金', 'クレカ'].includes(fState.shiharai) ? fState.shiharai : fState.emoney;
     payment2 = '';
   }
 
+  const isGiftPurchase = ['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類';
   const record = {
     date: document.getElementById('f-date').value,
     service: service,
     category1: fState.hinmoku,
-    category2: fState.shokuhin,
+    category2: (isGiftPurchase || service === '売却')
+      ? document.getElementById('f-itemname').value.trim()
+      : fState.shokuhin,
     store: mise,
     amount: amount,
     payment1: payment1,
     payment2: payment2,
+    quantity: (isGiftPurchase || service === '売却')
+      ? document.getElementById('f-quantity').value
+      : '',
   };
 
-  // サービスIDを付加（同一レシートの場合は引き継ぐ）
-  if (currentServiceId !== null) record.serviceId = currentServiceId;
+  // サービスIDを付加（新規レシートは連番採番、同一レシートは引き継ぐ）
+  if (currentServiceId === null) {
+    const lastId = Number(localStorage.getItem('kakeibo_lastServiceId') || 0);
+    currentServiceId = lastId + 1;
+    localStorage.setItem('kakeibo_lastServiceId', currentServiceId);
+  }
+  record.serviceId = currentServiceId;
 
   if (!gasUrl) { showToast('設定タブでGAS URLを入力してください', true); return; }
 
+  checkDuplicate(record, () => doRegister(record));
+}
+
+function doRegister(record) {
   showLoading('登録中...');
   const params = new URLSearchParams({ action: 'add', ...record });
   fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' })
     .then(() => {
+      // ギフト券類購入 → 資産追加レコードを自動登録（同じserviceId）
+      const isGiftPurchase = ['購入', '立て替え'].includes(record.service) && record.category1 === 'ギフト券類';
+      if (isGiftPurchase && record.category2 && record.quantity) {
+        const assetParams = new URLSearchParams({
+          action: 'add',
+          date: record.date,
+          service: '資産追加',
+          category1: 'ギフト券類',
+          category2: record.category2,
+          quantity: record.quantity,
+          amount: record.amount,
+          payment1: record.category2,
+          serviceId: currentServiceId,
+        });
+        fetch(gasUrl + '?' + assetParams.toString(), { method: 'GET', mode: 'no-cors' });
+      }
+
       hideLoading();
-      // 1件目の登録後、サービスIDを固定（"もう1件"で同じIDを使う）
-      // no-corsのためレスポンスは取れないので、登録日時をサービスIDの代替として使用
-      if (currentServiceId === null) currentServiceId = Date.now();
+      loadAllData(); // 直近記録を更新
       document.getElementById('add-more-bar').classList.add('show');
     })
     .catch(() => { hideLoading(); showToast('登録に失敗しました', true); });
@@ -767,11 +860,13 @@ function addMore() {
 }
 
 function resetForm() {
-  fState = { service: '購入', hinmoku: '', shokuhin: '', mise: '', shiharai: '', emoney: '', uketori: '', jusho: '', kyuyo: '', bank: '', chargeTo: '', chargeFrom: '' };
-  currentServiceId = null; // 新しいレシート → サービスIDリセット
+  fState = { service: '購入', hinmoku: '', shokuhin: '', mise: '', shiharai: '', emoney: '', uketori: '', jusho: '', kyuyo: '', bank: '', chargeTo: '', chargeFrom: '', itemName: '', quantity: '' };
+  currentServiceId = null;
   document.getElementById('f-date').value = new Date().toLocaleDateString('sv-SE');
   document.getElementById('f-amount').value = '';
   document.getElementById('f-other-mise').value = '';
+  document.getElementById('f-itemname').value = '';
+  document.getElementById('f-quantity').value = '';
   document.querySelectorAll('.service-big-btn').forEach((b,i) => b.classList.toggle('selected', i===0));
   ['f-hinmoku-chips','f-shokuhin-chips','f-mise-chips','f-shiharai-chips','f-emoney-chips','f-uketori-chips','f-jusho-chips','f-kyuyo-chips','f-bank-chips','f-charge-to-chips','f-charge-from-chips']
     .forEach(id => document.getElementById(id)?.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')));
@@ -787,6 +882,8 @@ function resetForm() {
   toggle('f-charge-to-section', false);
   toggle('f-charge-from-section', false);
   toggle('f-shiharai-section', true);
+  toggle('f-itemname-section', false);
+  toggle('f-quantity-section', false);
   document.getElementById('yucho-warn').style.display = 'none';
   document.getElementById('chip-debit').style.display = '';
   document.getElementById('add-more-bar').classList.remove('show');
@@ -797,7 +894,7 @@ function resetForm() {
 const ASSETS = [
   { key: '現金', label: '現金', type: '現金' },
   { key: '三井住友', label: '三井住友', type: '銀行' },
-  { key: 'ゆうちょ', label: 'ゆうちょ', type: '銀行' },
+  { key: 'ゆうちょ銀行', label: 'ゆうちょ銀行', type: '銀行' },
   { key: '住信SBI', label: '住信SBI', type: '銀行' },
   { key: 'PayPay1', label: 'PayPay1', type: 'QR決済' },
   { key: 'PayPay2', label: 'PayPay2', type: 'QR決済' },
@@ -819,6 +916,7 @@ let gasUrl = localStorage.getItem('kakeiboGasUrl') || '';
 let assetInits = JSON.parse(localStorage.getItem('assetInits') || '{}');
 let selectedImageBase64 = null;
 let allRecords = [];
+let inventory = [];
 let monthlyChart, categoryChart, paymentChart, assetTrendChart;
 
 // 初期残高の基準日（2025年8月23日終了時点）
@@ -828,6 +926,7 @@ const INIT_DATE = '2025-08-23';
 document.getElementById('claude-key').value = claudeKey;
 document.getElementById('gas-url').value = gasUrl;
 buildAssetInitList();
+if (gasUrl) loadAllData();
 
 // ===== Tabs =====
 document.querySelectorAll('.tab').forEach(tab => {
@@ -989,9 +1088,15 @@ async function saveRecord() {
 async function loadAllData() {
   if (!gasUrl) return;
   try {
-    const res = await fetch(gasUrl + '?action=list');
-    const data = await res.json();
-    allRecords = data.records || [];
+    const [recordsRes, inventoryRes] = await Promise.all([
+      fetch(gasUrl + '?action=list'),
+      fetch(gasUrl + '?action=inventory'),
+    ]);
+    const recordsData = await recordsRes.json();
+    const inventoryData = await inventoryRes.json();
+    allRecords = recordsData.records || [];
+    inventory = inventoryData.items || [];
+    renderRecentRecords();
     renderDashboard();
     renderAssets();
     renderList();
@@ -1119,6 +1224,12 @@ function calcTotalAssetsAt(records, upToDateStr) {
     } else if (svc === '引き出し') {
       if (balances[p1]) balances[p1].out += amount;
       if (balances['現金']) balances['現金'].in += amount;
+    } else if (svc === '給与') {
+      if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === '売却') {
+      if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === 'クレカ引き落とし') {
+      if (balances[p1]) balances[p1].out += amount;
     }
   });
 
@@ -1222,10 +1333,15 @@ function renderAssets() {
       if (balances[p1]) balances[p1].out += amount;
       if (balances['現金']) balances['現金'].in += amount;
     } else if (svc === '給与') {
-      // 給与は受取口座に入金
       if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === '売却') {
+      if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === 'クレカ引き落とし') {
+      if (balances[p1]) balances[p1].out += amount;
     }
   });
+
+  renderCreditMonthly();
 
   let totalAssets = 0;
   const html = ASSETS.map(a => {
@@ -1250,10 +1366,33 @@ function renderAssets() {
   document.getElementById('total-assets').textContent = '¥' + totalAssets.toLocaleString();
   document.getElementById('asset-grid').innerHTML = html;
   renderAssetTrend();
+  renderInventory();
+}
+
+function renderInventory() {
+  const el = document.getElementById('inventory-grid');
+  if (!el) return;
+  const active = inventory.filter(item => item.quantity > 0);
+  if (active.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>在庫なし</p></div>';
+    return;
+  }
+  el.innerHTML = active.map(item => `
+    <div class="asset-card">
+      <div>
+        <div class="asset-name">${esc(item.name)}</div>
+        <div class="asset-type">在庫品</div>
+      </div>
+      <div class="asset-amount">
+        <div class="asset-current positive">${item.quantity}点</div>
+        <div class="asset-detail">${item.unitCost ? '仕入単価 ¥' + Number(item.unitCost).toLocaleString() : '価値は外部マスター参照'}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 // 貸借判定
-const INCOME_SERVICES  = ['キャッシュバック', 'もらう', '給与', '引き出し', '預け入れ'];
+const INCOME_SERVICES  = ['キャッシュバック', 'もらう', '給与', '引き出し', '預け入れ', '売却'];
 const EXPENSE_SERVICES = ['購入', '立て替え', '外食', 'あげる'];
 
 function getSign(service) {
@@ -1275,6 +1414,8 @@ function renderList() {
     const amountPrefix = sign === 'income' ? '+' : sign === 'expense' ? '-' : '±';
     const name = r.service === '給与' ? '給与'
                : r.service === 'チャージ' ? `チャージ（${esc(r.payment2)}→${esc(r.payment1)}）`
+               : r.service === '売却' ? `売却（${esc(r.category2 || r.category1 || '')}）`
+               : r.service === 'クレカ引き落とし' ? `クレカ引き落とし（${esc(r.payment1)}）`
                : esc(r.store || r.category1 || r.service || '-');
     const meta = [r.service, r.category1, r.payment1].filter(Boolean).map(esc).join(' / ');
     return `
@@ -1317,6 +1458,116 @@ function saveSettings() {
   assetInits = newInits;
   localStorage.setItem('assetInits', JSON.stringify(assetInits));
   showToast('✓ 設定を保存しました');
+}
+
+// ===== クレカ月別利用額 =====
+function renderCreditMonthly() {
+  const el = document.getElementById('credit-monthly-table');
+  if (!el) return;
+
+  // クレカ利用を月別に集計
+  const usageMap = {};
+  allRecords
+    .filter(r => r.payment1 === 'クレカ' && ['購入','立て替え'].includes(r.service))
+    .forEach(r => {
+      const m = String(r.date).slice(0, 7);
+      usageMap[m] = (usageMap[m] || 0) + Number(r.amount || 0);
+    });
+
+  // クレカ引き落とし登録済み額を月別に集計
+  const paidMap = {};
+  allRecords
+    .filter(r => r.service === 'クレカ引き落とし')
+    .forEach(r => {
+      const m = String(r.date).slice(0, 7);
+      paidMap[m] = (paidMap[m] || 0) + Number(r.amount || 0);
+    });
+
+  const months = Object.keys(usageMap).sort().reverse();
+  if (months.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:#94a3b8;padding:8px 0;">クレカ利用記録なし</div>';
+    return;
+  }
+
+  el.innerHTML = months.map(m => {
+    const usage = usageMap[m] || 0;
+    const paid = paidMap[m] || 0;
+    const diff = usage - paid;
+    const isPaid = paid >= usage && usage > 0;
+    const label = m.replace('-', '年') + '月';
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f1f5f9;">
+        <div style="font-size:13px;font-weight:600;color:#475569;">${label}</div>
+        <div style="text-align:right;">
+          <div style="font-size:15px;font-weight:700;color:#ef4444;">¥${usage.toLocaleString()}</div>
+          ${isPaid
+            ? `<div style="font-size:11px;color:#10b981;font-weight:600;">✓ 引き落とし済</div>`
+            : paid > 0
+              ? `<div style="font-size:11px;color:#f59e0b;font-weight:600;">残 ¥${diff.toLocaleString()}</div>`
+              : `<div style="font-size:11px;color:#94a3b8;">未登録</div>`
+          }
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ===== 直近記録 =====
+function renderRecentRecords() {
+  const section = document.getElementById('recent-records-section');
+  const list = document.getElementById('recent-records-list');
+  if (!section || !list || allRecords.length === 0) { if(section) section.style.display='none'; return; }
+  section.style.display = 'block';
+  const recent = allRecords.slice(0, 5);
+  list.innerHTML = recent.map(r => {
+    const sign = getSign(r.service);
+    const color = sign === 'income' ? '#10b981' : sign === 'expense' ? '#ef4444' : '#64748b';
+    const prefix = sign === 'income' ? '+' : sign === 'expense' ? '-' : '±';
+    const label = r.service === 'チャージ' ? `チャージ→${esc(r.payment1)}`
+                : r.service === '売却' ? `売却(${esc(r.category2||'')})`
+                : r.service === '資産追加' ? `資産追加(${esc(r.category2||'')})`
+                : esc(r.store || r.category1 || r.service || '-');
+    return `<div style="background:white;border-radius:10px;padding:10px 12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#1e293b;">${label}</div>
+        <div style="font-size:11px;color:#94a3b8;">${formatDate(r.date)} · ${esc(r.service)} · ${esc(r.payment1||'')}</div>
+      </div>
+      <div style="font-size:15px;font-weight:700;color:${color};white-space:nowrap;margin-left:10px;">${prefix}¥${Number(r.amount||0).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 二重登録チェック =====
+let _pendingRecord = null;
+let _pendingCallback = null;
+
+function checkDuplicate(record, onConfirm) {
+  const dupes = allRecords.filter(r => {
+    const d1 = String(r.date).slice(0,10);
+    const d2 = String(record.date).slice(0,10);
+    return d1 === d2
+      && Number(r.amount) === Number(record.amount)
+      && r.payment1 === record.payment1
+      && r.service === record.service;
+  });
+  if (dupes.length === 0) { onConfirm(); return; }
+  const d = dupes[0];
+  const label = d.store || d.category1 || d.service;
+  document.getElementById('dupe-detail').innerHTML =
+    `${formatDate(d.date)}　${esc(d.service)}　${esc(label)}<br>¥${Number(d.amount).toLocaleString()}　${esc(d.payment1)}`;
+  _pendingRecord = record;
+  _pendingCallback = onConfirm;
+  document.getElementById('dupe-modal').style.display = 'flex';
+}
+
+function dupeCancel() {
+  document.getElementById('dupe-modal').style.display = 'none';
+  _pendingRecord = null; _pendingCallback = null;
+}
+
+function dupeConfirm() {
+  document.getElementById('dupe-modal').style.display = 'none';
+  if (_pendingCallback) _pendingCallback();
+  _pendingRecord = null; _pendingCallback = null;
 }
 
 // ===== Helpers =====
