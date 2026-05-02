@@ -37,6 +37,16 @@
     .summary-card.accent { background: #10b981; color: white; }
     .summary-card.accent .label { color: rgba(255,255,255,0.8); }
 
+    /* Dashboard month bar */
+    .dash-month-bar { display:flex; align-items:center; gap:8px; padding:8px 4px 4px; }
+    .dash-month-label { font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+    .dash-month-bar select { width:auto; padding:6px 10px; font-size:14px; }
+
+    /* Credit details card */
+    .credit-details-card { background:white; border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border:1px solid #e2e8f0; }
+    .credit-details-card summary { font-size:13px; font-weight:700; color:#64748b; cursor:pointer; user-select:none; }
+    .credit-details-card summary::-webkit-details-marker { color:#94a3b8; }
+
     /* Chart */
     .chart-container { position: relative; height: 200px; }
 
@@ -84,6 +94,71 @@
     .record-right { text-align: right; margin-left: 12px; }
     .record-amount { font-size: 16px; font-weight: 700; }
     .record-date { font-size: 11px; color: #94a3b8; }
+
+    /* Grouped records */
+    .record-group { margin-bottom: 8px; }
+    .record-group-header {
+      background: white; border-radius: 12px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .record-group-header:active { background: #f0fdf4; }
+    .record-group-header.expanded { border-radius: 12px 12px 0 0; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .record-group-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #d1fae5; color: #065f46; font-size: 10px; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%; margin-left: 6px; flex-shrink: 0;
+    }
+    .record-group-chevron { font-size: 11px; color: #94a3b8; margin-left: 8px; transition: transform 0.2s; flex-shrink: 0; }
+    .record-group-header.expanded .record-group-chevron { transform: rotate(180deg); }
+    .record-group-children {
+      display: none; background: #f8fafc; border: 1px solid #e2e8f0;
+      border-top: none; border-radius: 0 0 12px 12px; overflow: hidden;
+    }
+    .record-group-children.open { display: block; }
+    .record-child {
+      padding: 11px 14px; border-top: 1px solid #e2e8f0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .record-child-left { flex: 1; }
+    .record-child-name { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 2px; }
+    .record-child-meta { font-size: 11px; color: #94a3b8; }
+    .record-child-right { text-align: right; margin-left: 12px; }
+    .record-child-amount { font-size: 14px; font-weight: 700; }
+    .record-child-label {
+      font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 50px;
+      background: #e0f2fe; color: #0369a1; display: inline-block; margin-bottom: 3px;
+    }
+
+    /* Record action buttons */
+    .record-del-btn  { background: none; border: none; color: #cbd5e1; font-size: 15px; padding: 6px 5px; cursor: pointer; flex-shrink: 0; border-radius: 8px; line-height: 1; }
+    .record-del-btn:active  { color: #ef4444; background: #fee2e2; }
+    .record-edit-btn { background: none; border: none; color: #cbd5e1; font-size: 15px; padding: 6px 5px; cursor: pointer; flex-shrink: 0; border-radius: 8px; line-height: 1; margin-left: 4px; }
+    .record-edit-btn:active { color: #3b82f6; background: #dbeafe; }
+
+    /* Delete confirm modal */
+    .del-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; }
+    .del-modal-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+    .del-modal { background: white; border-radius: 20px 20px 0 0; padding: 24px 20px 32px; width: 100%; max-width: 480px; }
+    .del-modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .del-modal p { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    .del-modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .del-modal-cancel { padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; background: white; font-size: 15px; font-weight: 700; color: #64748b; cursor: pointer; }
+    .del-modal-ok { padding: 14px; border: none; border-radius: 12px; background: #ef4444; font-size: 15px; font-weight: 700; color: white; cursor: pointer; }
+
+    /* Edit modal */
+    .edit-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 210; }
+    .edit-modal-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+    .edit-modal { background: white; border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 92vh; display: flex; flex-direction: column; }
+    .edit-modal-header { padding: 16px 20px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
+    .edit-modal-header span { font-size: 16px; font-weight: 700; }
+    .edit-modal-header button { background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; line-height: 1; }
+    .edit-modal-body { overflow-y: auto; padding: 14px 20px 0; flex: 1; }
+    .edit-field { margin-bottom: 12px; }
+    .edit-field label { display: block; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .edit-field input, .edit-field select { width: 100%; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; background: #f8fafc; color: #1e293b; -webkit-appearance: none; font-family: inherit; }
+    .edit-field input:focus, .edit-field select:focus { outline: none; border-color: #10b981; background: white; }
+    .edit-modal-save { margin: 12px 20px 32px; padding: 15px; background: #10b981; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; width: calc(100% - 40px); }
 
     /* Settings */
     .settings-section { margin-bottom: 20px; }
@@ -152,6 +227,15 @@
     .add-more-bar.show { display: block; }
     .add-more-bar p { font-size: 14px; color: #065f46; font-weight: 600; margin-bottom: 12px; }
     .add-more-bar .btn-row { display: flex; gap: 8px; }
+
+    .furikomi-draft-bar {
+      display: none; background: #eef2ff; border: 2px solid #6366f1; border-radius: 14px;
+      padding: 16px; margin-top: 12px;
+    }
+    .furikomi-draft-bar.show { display: block; }
+    .furikomi-draft-bar p { font-size: 14px; color: #3730a3; font-weight: 600; margin-bottom: 10px; }
+    .furikomi-draft-bar .btn-row { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-more-indigo { background: #6366f1; color: white; }
     .btn-more { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; }
     .btn-more-yes { background: #10b981; color: white; }
     .btn-more-no { background: #e2e8f0; color: #64748b; }
@@ -163,6 +247,94 @@
     }
     .service-big-btn.selected { border-color: #10b981; background: #d1fae5; color: #065f46; }
     .service-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* 資産詳細ボトムシート */
+    .asset-sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 70; }
+    .asset-sheet-overlay.open { display: block; }
+    .asset-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 71;
+      background: white; border-radius: 20px 20px 0 0;
+      max-height: 88vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform 0.3s ease;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+    }
+    .asset-sheet.open { transform: translateY(0); }
+    .asset-sheet-handle { width: 36px; height: 4px; background: #cbd5e1; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
+    .asset-sheet-header { padding: 12px 16px 10px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
+    .asset-sheet-title { font-size: 17px; font-weight: 700; color: #1e293b; }
+    .asset-sheet-balance { font-size: 13px; color: #64748b; margin-top: 2px; }
+    .asset-sheet-close { position: absolute; top: 12px; right: 16px; font-size: 22px; color: #94a3b8; cursor: pointer; line-height: 1; padding: 4px; }
+    .asset-sheet-add-btn { position: absolute; top: 12px; right: 48px; background: #10b981; color: white; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .asset-detail-chart-wrap { height: 130px; padding: 10px 12px 4px; flex-shrink: 0; }
+    .month-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;
+      flex-shrink: 0; background: #fafafa;
+    }
+    .month-nav-btn {
+      width: 36px; height: 36px; border: none; background: #e2e8f0; border-radius: 50%;
+      font-size: 18px; font-weight: 700; color: #475569; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .month-nav-btn:disabled { opacity: 0.25; cursor: default; }
+    .month-nav-center { text-align: center; }
+    .month-nav-label { font-size: 15px; font-weight: 700; color: #1e293b; }
+    .month-nav-summary { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .asset-sheet-body { overflow-y: auto; flex: 1; padding-bottom: 24px; }
+    .asset-tx-item {
+      padding: 11px 16px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .asset-tx-name { font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 2px; }
+    .asset-tx-meta { font-size: 11px; color: #94a3b8; }
+    .asset-tx-amount { font-size: 15px; font-weight: 700; white-space: nowrap; margin-left: 10px; }
+    .asset-card { cursor: pointer; }
+    .asset-card:active { background: #f0fdf4; }
+
+    /* 店別グラフ期間ボタン */
+    .store-period-btn { padding:4px 10px; border-radius:20px; border:1.5px solid #e2e8f0; background:white; font-size:11px; font-weight:700; color:#94a3b8; cursor:pointer; transition:all 0.15s; }
+    .store-period-btn.active { border-color:#10b981; background:#d1fae5; color:#065f46; }
+
+    /* 資産クイック登録フォーム */
+    .asset-quick-form { display:none; background:#f0fdf4; border-bottom:1px solid #d1fae5; padding:14px 16px; flex-shrink:0; }
+    .asset-quick-form.open { display:block; }
+    .aq-chip { padding:6px 13px; border-radius:50px; border:2px solid #d1fae5; background:white; font-size:13px; font-weight:600; color:#64748b; cursor:pointer; transition:all 0.15s; }
+    .aq-chip.selected { border-color:#10b981; background:#d1fae5; color:#065f46; }
+
+    /* 資産スキャンフォーム */
+    .asset-sheet-scan-btn { position:absolute; top:12px; right:116px; background:#6366f1; color:white; border:none; border-radius:20px; padding:6px 11px; font-size:12px; font-weight:700; cursor:pointer; }
+    .asset-scan-form { display:none; background:#f5f3ff; padding:14px 16px; }
+    .asset-scan-form.open { display:flex; flex-direction:column; flex:1; min-height:0; overflow-y:auto; }
+    .asset-scan-upload { border:2px dashed #c4b5fd; border-radius:12px; background:white; text-align:center; padding:18px 12px; cursor:pointer; position:relative; margin-bottom:10px; font-size:13px; color:#7c3aed; font-weight:600; }
+    .asset-scan-upload input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    #asset-scan-img { width:100%; border-radius:10px; display:none; margin-bottom:10px; max-height:180px; object-fit:contain; background:#000; }
+    .scan-record-item { display:flex; align-items:flex-start; gap:8px; padding:8px 0; border-bottom:1px solid #ede9fe; }
+    .scan-record-item:last-child { border-bottom:none; }
+    #asset-scan-list { }
+    .scan-edit-input { border:1px solid #ddd6fe; border-radius:6px; background:white; font-size:12px; padding:3px 6px; box-sizing:border-box; }
+    .scan-edit-input:focus { outline:none; border-color:#818cf8; }
+    .scan-record-item.dupe-warn { background:#fffbeb; border-left:3px solid #f59e0b; padding-left:5px; }
+    .scan-record-item.dupe-ok  { background:#f0fdf4; border-left:3px solid #10b981; padding-left:5px; }
+
+    /* 店別詳細ボトムシート */
+    .store-sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 70; }
+    .store-sheet-overlay.open { display: block; }
+    .store-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 71;
+      background: white; border-radius: 20px 20px 0 0;
+      max-height: 88vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform 0.3s ease;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+    }
+    .store-sheet.open { transform: translateY(0); }
+    .store-quick-form { display:none; background:#eff6ff; border-bottom:1px solid #bfdbfe; padding:14px 16px; flex-shrink:0; }
+    .store-quick-form.open { display:block; }
+    .sq-chip { padding:6px 13px; border-radius:50px; border:2px solid #bfdbfe; background:white; font-size:12px; font-weight:600; color:#64748b; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+    .sq-chip.selected { border-color:#3b82f6; background:#dbeafe; color:#1e40af; }
+    .store-select-wrap { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+    .store-select-wrap select { flex:1; padding:11px 13px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:15px; background:#f8fafc; color:#1e293b; -webkit-appearance:none; }
+    .store-select-wrap select:focus { outline:none; border-color:#3b82f6; }
+    .store-open-btn { padding:11px 18px; background:#3b82f6; color:white; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
   </style>
 </head>
 <body>
@@ -205,10 +377,11 @@
         <button class="service-big-btn" data-service="チャージ" onclick="selectService(this)">チャージ</button>
         <button class="service-big-btn" data-service="もらう" onclick="selectService(this)">もらう</button>
         <button class="service-big-btn" data-service="あげる" onclick="selectService(this)">あげる</button>
-        <button class="service-big-btn" data-service="預け入れ" onclick="selectService(this)">預け入れ</button>
-        <button class="service-big-btn" data-service="引き出し" onclick="selectService(this)">引き出し</button>
+        <button class="service-big-btn" data-service="ATM" onclick="selectService(this)">ATM</button>
+        <button class="service-big-btn" data-service="振込" onclick="selectService(this)">振込</button>
         <button class="service-big-btn" data-service="給与" onclick="selectService(this)">給与</button>
         <button class="service-big-btn" data-service="売却" onclick="selectService(this)">売却</button>
+        <button class="service-big-btn" data-service="資産追加" onclick="selectService(this)">資産追加</button>
         <button class="service-big-btn" data-service="クレカ引き落とし" onclick="selectService(this)">クレカ引き落とし</button>
       </div>
     </div>
@@ -237,6 +410,12 @@
     <div class="form-section conditional" id="f-quantity-section">
       <span class="form-label">数量（点）</span>
       <input type="number" id="f-quantity" class="amount-input" placeholder="1" inputmode="numeric" style="font-size:22px;">
+    </div>
+
+    <!-- 資産名（資産追加のみ） -->
+    <div class="form-section conditional" id="f-shisan-name-section">
+      <span class="form-label">資産名</span>
+      <input type="text" id="f-shisan-name" class="text-input-field" placeholder="例：Amazonギフト券">
     </div>
 
     <!-- 食料品詳細（品目=食料品のみ） -->
@@ -284,12 +463,13 @@
         <div class="chip" data-val="クレカ" onclick="selectChip(this,'shiharai')">クレカ</div>
         <div class="chip" data-val="デビット" id="chip-debit" onclick="selectChip(this,'shiharai')">デビット</div>
         <div class="chip" data-val="ポイント" onclick="selectChip(this,'shiharai')">ポイント</div>
+        <div class="chip" data-val="準資産" id="chip-junshisan" onclick="selectChip(this,'shiharai')">準資産</div>
       </div>
     </div>
 
-    <!-- 電子マネー（プリペイド/QR決済/ポイントのみ） -->
+    <!-- 電子マネー / 準資産アイテム -->
     <div class="form-section conditional" id="f-emoney-section">
-      <span class="form-label">電子マネー</span>
+      <span class="form-label" id="f-emoney-label">電子マネー</span>
       <div class="chips" id="f-emoney-chips"></div>
     </div>
 
@@ -331,9 +511,18 @@
       </div>
     </div>
 
-    <!-- 銀行（預け入れ・引き出しのみ） -->
+    <!-- 方向（ATM・振込のみ） -->
+    <div class="form-section conditional" id="f-direction-section">
+      <span class="form-label" id="f-direction-label">方向</span>
+      <div class="chips" id="f-direction-chips">
+        <div class="chip" data-val="入金" onclick="selectDirectionChip(this)">入金</div>
+        <div class="chip" data-val="出金" onclick="selectDirectionChip(this)">出金</div>
+      </div>
+    </div>
+
+    <!-- 銀行（ATM・振込・クレカ引き落とし） -->
     <div class="form-section conditional" id="f-bank-section">
-      <span class="form-label">銀行</span>
+      <span class="form-label" id="f-bank-label">銀行</span>
       <div class="chips" id="f-bank-chips">
         <div class="chip" data-val="ゆうちょ銀行" onclick="selectBankChip(this)">ゆうちょ銀行</div>
         <div class="chip" data-val="三井住友" onclick="selectBankChip(this)">三井住友</div>
@@ -341,6 +530,16 @@
       </div>
       <div id="yucho-warn" style="display:none; margin-top:6px; font-size:12px; color:#ef4444; font-weight:600;">
         ⚠️ ゆうちょ銀行は引き出しのみ対応
+      </div>
+    </div>
+
+    <!-- 振込先（振込出金のみ） -->
+    <div class="form-section conditional" id="f-furikomi-to-section">
+      <span class="form-label">振込先</span>
+      <div class="chips" id="f-furikomi-to-chips">
+        <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'furikomiTo')">ゆうちょ銀行</div>
+        <div class="chip" data-val="三井住友" onclick="selectChip(this,'furikomiTo')">三井住友</div>
+        <div class="chip" data-val="住信SBI" onclick="selectChip(this,'furikomiTo')">住信SBI</div>
       </div>
     </div>
 
@@ -365,6 +564,7 @@
       <span class="form-label">チャージ元</span>
       <div class="chips" id="f-charge-from-chips">
         <div class="chip" data-val="現金" onclick="selectChip(this,'chargeFrom')">現金</div>
+        <div class="chip" data-val="クレカ" onclick="selectChip(this,'chargeFrom')">クレカ</div>
         <div class="chip" data-val="三井住友" onclick="selectChip(this,'chargeFrom')">三井住友</div>
         <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'chargeFrom')">ゆうちょ銀行</div>
         <div class="chip" data-val="住信SBI" onclick="selectChip(this,'chargeFrom')">住信SBI</div>
@@ -381,6 +581,21 @@
       <div class="btn-row">
         <button class="btn-more btn-more-yes" onclick="addMore()">＋ もう1件</button>
         <button class="btn-more btn-more-no" onclick="resetForm()">終わり</button>
+      </div>
+    </div>
+
+    <!-- 振込入金ドラフトバー -->
+    <div class="furikomi-draft-bar" id="furikomi-draft-bar">
+      <p>振込入金を予定登録しますか？<br>
+        <span style="font-size:12px;font-weight:400;" id="furikomi-draft-info"></span>
+      </p>
+      <div class="field" style="margin-bottom:0;">
+        <label>入金予定日</label>
+        <input type="date" id="furikomi-draft-date" style="font-size:15px;">
+      </div>
+      <div class="btn-row">
+        <button class="btn-more btn-more-indigo" onclick="registerFurikomiDraft()">振込入金を登録</button>
+        <button class="btn-more btn-more-no" onclick="skipFurikomiDraft()">スキップ</button>
       </div>
     </div>
 
@@ -409,24 +624,33 @@
         <label>サービス内容 <span class="ai-badge">AI</span></label>
         <select id="r-service">
           <option value="購入">購入</option>
-          <option value="外食">外食</option>
+          <option value="立て替え">立て替え</option>
           <option value="キャッシュバック">キャッシュバック</option>
           <option value="チャージ">チャージ</option>
           <option value="もらう">もらう</option>
-          <option value="立て替え">立て替え</option>
+          <option value="あげる">あげる</option>
+          <option value="ATM入金">ATM入金</option>
+          <option value="ATM出金">ATM出金</option>
+          <option value="振込入金">振込入金</option>
+          <option value="振込出金">振込出金</option>
+          <option value="給与">給与</option>
+          <option value="売却">売却</option>
+          <option value="クレカ引き落とし">クレカ引き落とし</option>
+          <option value="預け入れ">預け入れ（旧）</option>
+          <option value="引き出し">引き出し（旧）</option>
+          <option value="振込">振込（旧）</option>
         </select>
       </div>
       <div class="field">
         <label>品目1 <span class="ai-badge">AI</span></label>
         <select id="r-cat1">
           <option value="食料品">食料品</option>
+          <option value="趣味">趣味</option>
+          <option value="衣類">衣類</option>
           <option value="日用品">日用品</option>
-          <option value="外食">外食</option>
           <option value="交通費">交通費</option>
           <option value="医療">医療</option>
-          <option value="娯楽">娯楽</option>
-          <option value="衣類">衣類</option>
-          <option value="その他">その他</option>
+          <option value="ギフト券類">ギフト券類</option>
         </select>
       </div>
       <div class="field">
@@ -446,6 +670,7 @@
         <select id="r-payment1">
           <option value="現金">現金</option>
           <option value="クレカ">クレカ</option>
+          <option value="デビット">デビット</option>
           <option value="三井住友">三井住友</option>
           <option value="PayPay1">PayPay1</option>
           <option value="PayPay2">PayPay2</option>
@@ -485,17 +710,22 @@
 
 <!-- ダッシュボード -->
 <div class="page" id="page-dashboard">
+  <div class="dash-month-bar">
+    <span class="dash-month-label">対象月</span>
+    <select id="dash-month-select" onchange="onDashMonthChange(this.value)"></select>
+  </div>
+
   <div class="summary-grid">
     <div class="summary-card accent" style="grid-column: span 2;">
-      <div class="label">今月の支出</div>
+      <div class="label" id="dash-total-label">支出</div>
       <div class="value" id="dash-month-total">¥-</div>
     </div>
     <div class="summary-card">
-      <div class="label">今月の件数</div>
+      <div class="label">件数</div>
       <div class="value" id="dash-month-count">-件</div>
     </div>
     <div class="summary-card">
-      <div class="label">今月の収入</div>
+      <div class="label">収入</div>
       <div class="value" id="dash-month-income">¥-</div>
     </div>
   </div>
@@ -508,17 +738,28 @@
   </div>
 
   <div class="card">
-    <div class="card-title">カテゴリ別支出</div>
+    <div class="card-title" id="cat-chart-title">カテゴリ別支出</div>
     <div class="chart-container">
       <canvas id="category-chart"></canvas>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">支払い手段別</div>
+    <div class="card-title" id="pay-chart-title">支払い手段別</div>
     <div class="chart-container">
       <canvas id="payment-chart"></canvas>
     </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">店別詳細</div>
+    <div class="store-select-wrap">
+      <select id="store-select">
+        <option value="">-- 店を選択 --</option>
+      </select>
+      <button class="store-open-btn" onclick="openStoreDetail()">詳細 ›</button>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;">記録のある店舗 · 月別グラフ・一覧・クイック登録</div>
   </div>
 </div>
 
@@ -537,21 +778,21 @@
     </div>
   </div>
 
-  <div class="card" style="border-left:4px solid #ef4444;">
-    <div class="card-title">クレカ月別利用額</div>
-    <div id="credit-monthly-table"></div>
-    <div style="font-size:11px; color:#94a3b8; margin-top:8px;">引き落とし済は「クレカ引き落とし」で登録してください</div>
-  </div>
-
   <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em; padding:8px 4px 4px;">本資産</div>
   <div class="asset-grid" id="asset-grid">
     <div class="empty-state"><div class="icon">⏳</div><p>読み込み中...</p></div>
   </div>
 
-  <div style="font-size:12px; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.05em; padding:12px 4px 4px;">準資産（在庫）</div>
+  <div style="font-size:12px; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.05em; padding:12px 4px 4px;">準資産</div>
   <div class="asset-grid" id="inventory-grid">
     <div class="empty-state"><div class="icon">⏳</div><p>読み込み中...</p></div>
   </div>
+
+  <details class="credit-details-card">
+    <summary>クレカ月別利用額</summary>
+    <div id="credit-monthly-table"></div>
+    <div style="font-size:11px; color:#94a3b8; margin-top:8px;">引き落とし済は「クレカ引き落とし」で登録してください</div>
+  </details>
 </div>
 
 <!-- 一覧 -->
@@ -585,6 +826,147 @@
   </div>
 </div>
 
+<!-- 資産詳細ボトムシート -->
+<div class="asset-sheet-overlay" id="asset-sheet-overlay" onclick="closeAssetDetail()"></div>
+<div class="asset-sheet" id="asset-sheet">
+  <div class="asset-sheet-handle"></div>
+  <div class="asset-sheet-header">
+    <div class="asset-sheet-title" id="asset-sheet-title"></div>
+    <div class="asset-sheet-balance" id="asset-sheet-balance"></div>
+    <div class="asset-sheet-close" onclick="closeAssetDetail()">×</div>
+  <button class="asset-sheet-add-btn" onclick="openRegisterForAsset()">＋ 登録</button>
+  <button class="asset-sheet-scan-btn" onclick="openScanForAsset()">📷</button>
+  </div>
+  <!-- クイック登録フォーム -->
+  <div class="asset-quick-form" id="asset-quick-form">
+    <div style="font-size:11px;font-weight:700;color:#065f46;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">✚ クイック登録</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="aq-service-chips"></div>
+    <div id="aq-hinmoku-row" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;">品目</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="aq-hinmoku-chips"></div>
+    </div>
+    <div id="aq-category2-row" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;" id="aq-category2-label">詳細</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="aq-shokuhin-chips"></div>
+      <input type="text" id="aq-itemname" class="text-input-field" placeholder="品目名（例：Amazonギフト券）" style="display:none;padding:10px 12px;font-size:15px;margin-top:6px;">
+      <input type="number" id="aq-quantity" class="amount-input" placeholder="数量（点）" inputmode="numeric" style="display:none;font-size:18px;padding:10px 12px;margin-top:6px;width:100%;">
+    </div>
+    <div id="aq-chargefrom-row" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;">チャージ元</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="aq-chargefrom-chips"></div>
+    </div>
+    <div id="aq-jusho-row" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;">授受先</div>
+      <input type="text" id="aq-jusho" class="text-input-field" placeholder="相手の名前や手段" style="padding:10px 12px;font-size:15px;">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+      <input type="date" id="aq-date" style="flex:1;padding:10px 12px;border:1.5px solid #d1fae5;border-radius:10px;font-size:14px;background:#f8fafc;">
+      <input type="number" id="aq-amount" class="amount-input" placeholder="金額" inputmode="numeric" style="width:120px;font-size:20px;padding:10px 12px;">
+    </div>
+    <div style="margin-bottom:10px;">
+      <input type="text" id="aq-store" class="text-input-field" placeholder="店名・メモ（任意）" style="padding:10px 12px;font-size:15px;">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="font-size:12px;color:#065f46;font-weight:600;flex:1;" id="aq-payment-label"></div>
+      <button onclick="registerQuick()" style="padding:10px 20px;background:#10b981;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">登録</button>
+      <button onclick="closeQuickForm()" style="padding:10px 14px;background:#d1fae5;color:#065f46;border:none;border-radius:10px;font-size:14px;cursor:pointer;">✕</button>
+    </div>
+  </div>
+
+  <!-- スクショ明細スキャンフォーム -->
+  <div class="asset-scan-form" id="asset-scan-form">
+    <div style="font-size:11px;font-weight:700;color:#4f46e5;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;">📷 明細スキャン</div>
+    <div class="asset-scan-upload" id="asset-scan-upload-area">
+      <div style="font-size:28px;margin-bottom:4px;">🖼️</div>
+      <div>スクショを選択</div>
+      <input type="file" accept="image/*" id="asset-scan-input" onchange="handleAssetScanImage(this)">
+    </div>
+    <img id="asset-scan-img">
+    <button id="asset-scan-btn" class="btn btn-green" onclick="scanAssetStatement()" style="display:none;margin-bottom:10px;font-size:13px;padding:10px;">✨ AIで読み取る</button>
+    <div id="asset-scan-results" style="display:none;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;">読み取り結果（登録する項目にチェック）</div>
+      <div id="asset-scan-list"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <button onclick="registerBatchFromScan()" style="flex:1;padding:10px;background:#10b981;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">選択した項目を登録</button>
+        <button onclick="checkScanDuplicates()" style="padding:10px 12px;background:#fef3c7;color:#92400e;border:1.5px solid #fcd34d;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">重複チェック</button>
+        <button onclick="closeScanForm()" style="padding:10px 14px;background:#e2e8f0;color:#475569;border:none;border-radius:10px;font-size:13px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div id="asset-scan-close-row" style="text-align:right;margin-top:6px;">
+      <button onclick="closeScanForm()" style="padding:6px 14px;background:#e2e8f0;color:#475569;border:none;border-radius:8px;font-size:12px;cursor:pointer;">閉じる</button>
+    </div>
+  </div>
+
+  <div class="asset-detail-chart-wrap">
+    <canvas id="asset-detail-chart"></canvas>
+  </div>
+  <div id="asset-balance-chart-wrap" style="height:90px;padding:4px 12px 2px;flex-shrink:0;border-top:1px solid #f1f5f9;">
+    <div style="font-size:10px;color:#6366f1;font-weight:700;margin-bottom:2px;">残高推移</div>
+    <canvas id="asset-balance-chart"></canvas>
+  </div>
+  <div id="asset-month-nav" class="month-nav">
+    <button class="month-nav-btn" id="asset-month-prev" onclick="assetMonthNav(-1)">‹</button>
+    <div class="month-nav-center">
+      <div class="month-nav-label" id="month-nav-label"></div>
+      <div class="month-nav-summary" id="month-nav-summary"></div>
+    </div>
+    <button class="month-nav-btn" id="asset-month-next" onclick="assetMonthNav(+1)">›</button>
+  </div>
+  <div class="asset-sheet-body" id="asset-sheet-body"></div>
+</div>
+
+<!-- 店別詳細ボトムシート -->
+<div class="store-sheet-overlay" id="store-sheet-overlay" onclick="closeStoreDetail()"></div>
+<div class="store-sheet" id="store-sheet">
+  <div class="asset-sheet-handle"></div>
+  <div class="asset-sheet-header">
+    <div class="asset-sheet-title" id="store-sheet-title"></div>
+    <div class="asset-sheet-balance" id="store-sheet-balance"></div>
+    <div class="asset-sheet-close" onclick="closeStoreDetail()">×</div>
+    <button class="asset-sheet-add-btn" onclick="openStoreQuickForm()">＋ 登録</button>
+  </div>
+  <!-- クイック登録フォーム -->
+  <div class="store-quick-form" id="store-quick-form">
+    <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">✚ クイック登録</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="sq-service-chips"></div>
+    <div id="sq-hinmoku-row" style="margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;">品目</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="sq-hinmoku-chips"></div>
+    </div>
+    <div id="sq-category2-row" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;" id="sq-category2-label">詳細</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="sq-shokuhin-chips"></div>
+      <input type="text" id="sq-itemname" class="text-input-field" placeholder="品目名（例：Amazonギフト券）" style="display:none;padding:10px 12px;font-size:15px;margin-top:6px;">
+      <input type="number" id="sq-quantity" class="amount-input" placeholder="数量（点）" inputmode="numeric" style="display:none;font-size:18px;padding:10px 12px;margin-top:6px;width:100%;">
+    </div>
+    <div id="sq-payment-row" style="margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;">支払い手段</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="sq-payment-chips"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+      <input type="date" id="sq-date" style="flex:1;padding:10px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:14px;background:#f8fafc;">
+      <input type="number" id="sq-amount" class="amount-input" placeholder="金額" inputmode="numeric" style="width:130px;font-size:20px;padding:10px 12px;border-color:#bfdbfe;">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="font-size:12px;color:#1e40af;font-weight:600;flex:1;" id="sq-store-label"></div>
+      <button onclick="registerStoreQuick()" style="padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">登録</button>
+      <button onclick="closeStoreQuickForm()" style="padding:10px 14px;background:#dbeafe;color:#1e40af;border:none;border-radius:10px;font-size:14px;cursor:pointer;">✕</button>
+    </div>
+  </div>
+  <div class="asset-detail-chart-wrap">
+    <canvas id="store-detail-chart"></canvas>
+  </div>
+  <div class="month-nav">
+    <button class="month-nav-btn" id="store-month-prev" onclick="storeMonthNav(-1)">‹</button>
+    <div class="month-nav-center">
+      <div class="month-nav-label" id="store-month-nav-label"></div>
+      <div class="month-nav-summary" id="store-month-nav-summary"></div>
+    </div>
+    <button class="month-nav-btn" id="store-month-next" onclick="storeMonthNav(+1)">›</button>
+  </div>
+  <div class="asset-sheet-body" id="store-sheet-body"></div>
+</div>
+
 <!-- 二重登録確認モーダル -->
 <div id="dupe-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:60; align-items:center; justify-content:center; padding:20px;">
   <div style="background:white; border-radius:16px; padding:20px; width:100%; max-width:360px;">
@@ -604,6 +986,49 @@
   <div id="loading-text">処理中...</div>
 </div>
 
+<div class="edit-modal-overlay" id="edit-modal-overlay" onclick="closeEditModal()">
+  <div class="edit-modal" onclick="event.stopPropagation()">
+    <div class="edit-modal-header">
+      <span>記録を編集</span>
+      <button onclick="closeEditModal()">×</button>
+    </div>
+    <div class="edit-modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="edit-field"><label>日付</label><input type="date" id="edit-date"></div>
+      <div class="edit-field"><label>サービス内容</label>
+        <select id="edit-service">
+          <option value="購入">購入</option><option value="立て替え">立て替え</option>
+          <option value="キャッシュバック">キャッシュバック</option><option value="チャージ">チャージ</option>
+          <option value="もらう">もらう</option><option value="あげる">あげる</option>
+          <option value="ATM入金">ATM入金</option><option value="ATM出金">ATM出金</option>
+          <option value="振込入金">振込入金</option><option value="振込出金">振込出金</option>
+          <option value="給与">給与</option><option value="売却">売却</option>
+          <option value="資産追加">資産追加</option><option value="クレカ引き落とし">クレカ引き落とし</option>
+        </select>
+      </div>
+      <div class="edit-field"><label>品目1</label><input type="text" id="edit-cat1" placeholder="食料品、趣味…"></div>
+      <div class="edit-field"><label>品目2</label><input type="text" id="edit-cat2" placeholder="昼飯、Amazonギフト券…"></div>
+      <div class="edit-field"><label>店名</label><input type="text" id="edit-store" placeholder="コンビニ、Amazon…"></div>
+      <div class="edit-field"><label>金額（円）</label><input type="number" id="edit-amount" inputmode="numeric"></div>
+      <div class="edit-field"><label>支払い手段1</label><input type="text" id="edit-p1" placeholder="現金、クレカ、PayPay1…"></div>
+      <div class="edit-field"><label>支払い手段2</label><input type="text" id="edit-p2" placeholder="チャージ元など（任意）"></div>
+      <div class="edit-field"><label>数量</label><input type="number" id="edit-qty" inputmode="numeric" placeholder="（任意）"></div>
+    </div>
+    <button class="edit-modal-save" onclick="saveEdit()">保存する</button>
+  </div>
+</div>
+
+<div class="del-modal-overlay" id="del-modal-overlay" onclick="closeDeleteModal()">
+  <div class="del-modal" onclick="event.stopPropagation()">
+    <h3 id="del-modal-title">このデータを削除しますか？</h3>
+    <p id="del-modal-desc">削除したデータは元に戻せません。</p>
+    <div class="del-modal-btns">
+      <button class="del-modal-cancel" onclick="closeDeleteModal()">キャンセル</button>
+      <button class="del-modal-ok" onclick="confirmDelete()">削除する</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== 手入力フォーム =====
 const EMONEY_MAP = {
@@ -615,6 +1040,8 @@ const EMONEY_MAP = {
 
 let fState = {
   service: '購入',
+  serviceGroup: '購入',
+  direction: '',
   hinmoku: '',
   shokuhin: '',
   mise: '',
@@ -624,6 +1051,7 @@ let fState = {
   jusho: '',
   kyuyo: '',
   bank: '',
+  furikomiTo: '',
   chargeTo: '',
   chargeFrom: '',
   itemName: '',
@@ -639,49 +1067,85 @@ document.getElementById('f-date').value = new Date().toLocaleDateString('sv-SE')
 function selectService(btn) {
   document.querySelectorAll('.service-big-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  fState.service = btn.dataset.service;
+  const s = btn.dataset.service;
+  fState.service = s;
+  fState.serviceGroup = s;
+  fState.direction = '';
   fState.hinmoku = ''; fState.shokuhin = ''; fState.mise = '';
-  fState.shiharai = ''; fState.emoney = ''; fState.uketori = ''; fState.jusho = ''; fState.kyuyo = ''; fState.bank = ''; fState.chargeTo = ''; fState.chargeFrom = '';
+  fState.shiharai = ''; fState.emoney = ''; fState.uketori = ''; fState.jusho = '';
+  fState.kyuyo = ''; fState.bank = ''; fState.furikomiTo = ''; fState.chargeTo = ''; fState.chargeFrom = '';
   fState.itemName = ''; fState.quantity = '';
   clearChips('hinmoku'); clearChips('shokuhin'); clearChips('mise');
-  clearChips('shiharai'); clearChips('emoney'); clearChips('uketori'); clearChips('jusho'); clearChips('kyuyo'); clearChips('bank'); clearChips('chargeTo'); clearChips('chargeFrom');
+  clearChips('shiharai'); clearChips('emoney'); clearChips('uketori'); clearChips('jusho');
+  clearChips('kyuyo'); clearChips('bank'); clearChips('furikomiTo'); clearChips('chargeTo');
+  clearChips('chargeFrom'); clearChips('direction');
   document.getElementById('f-itemname').value = '';
   document.getElementById('f-quantity').value = '';
+  document.getElementById('f-shisan-name').value = '';
   document.getElementById('yucho-warn').style.display = 'none';
 
-  const s = fState.service;
-  const isBuy = ['購入', '立て替え'].includes(s);
-  const isATM = ['預け入れ', '引き出し'].includes(s);
+  const isGroupBtn = s === 'ATM' || s === '振込';
+  toggle('f-direction-section', isGroupBtn);
+  if (s === 'ATM') document.getElementById('f-direction-label').textContent = 'ATM操作';
+  if (s === '振込') document.getElementById('f-direction-label').textContent = '振込の方向';
 
-  // 各セクションの表示制御
-  toggle('f-hinmoku-section',     isBuy);
+  if (isGroupBtn) {
+    ['f-hinmoku-section','f-shokuhin-section','f-itemname-section','f-quantity-section',
+     'f-shisan-name-section','f-mise-section','f-other-mise-section','f-emoney-section','f-uketori-section',
+     'f-jusho-section','f-kyuyo-section','f-bank-section','f-furikomi-to-section',
+     'f-charge-to-section','f-charge-from-section','f-shiharai-section'].forEach(id => toggle(id, false));
+    return;
+  }
+  updateFormSections(s);
+}
+
+function selectDirectionChip(chip) {
+  document.getElementById('f-direction-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  fState.direction = chip.dataset.val;
+  fState.service = fState.serviceGroup + fState.direction; // 例: 'ATM入金', '振込出金'
+  fState.bank = ''; fState.furikomiTo = '';
+  clearChips('bank'); clearChips('furikomiTo');
+
+  const bankLabel = document.getElementById('f-bank-label');
+  if (bankLabel) {
+    if (fState.serviceGroup === '振込') {
+      bankLabel.textContent = fState.direction === '出金' ? '振込元' : '振込先（入金先）';
+    } else {
+      bankLabel.textContent = '銀行';
+    }
+  }
+  updateFormSections(fState.service);
+}
+
+function updateFormSections(s) {
+  const isATM = ['ATM入金', 'ATM出金', '振込入金', '振込出金'].includes(s);
+  toggle('f-hinmoku-section',     s === '購入');
   toggle('f-shokuhin-section',    false);
   toggle('f-itemname-section',    s === '売却');
   toggle('f-quantity-section',    s === '売却');
-  toggle('f-mise-section',        isBuy);
+  toggle('f-shisan-name-section', s === '資産追加');
+  toggle('f-mise-section',        s === '購入');
   toggle('f-other-mise-section',  false);
   toggle('f-emoney-section',      false);
   toggle('f-uketori-section',     ['キャッシュバック', '売却'].includes(s));
   toggle('f-jusho-section',       ['もらう', 'あげる'].includes(s));
   toggle('f-kyuyo-section',       s === '給与');
-  toggle('f-bank-section',        isATM);
+  toggle('f-bank-section',        isATM || s === 'クレカ引き落とし');
+  toggle('f-furikomi-to-section', s === '振込出金');
   toggle('f-charge-to-section',   s === 'チャージ');
   toggle('f-charge-from-section', s === 'チャージ');
 
-  // 支払い手段が不要なサービス
-  const needsShiharai = !['チャージ', 'キャッシュバック', 'もらう', 'あげる', '預け入れ', '引き出し', '給与', '売却', 'クレカ引き落とし'].includes(s);
+  const needsShiharai = !['チャージ','キャッシュバック','もらう','あげる',
+    'ATM入金','ATM出金','振込入金','振込出金',
+    '給与','売却','クレカ引き落とし','資産追加'].includes(s);
   toggle('f-shiharai-section', needsShiharai);
-  // クレカ引き落とし → 銀行選択
-  toggle('f-bank-section', isATM || s === 'クレカ引き落とし');
 
-  // 立て替えはデビット非表示（VBA通り）
   const debitChip = document.getElementById('chip-debit');
   if (debitChip) debitChip.style.display = s === '立て替え' ? 'none' : '';
   if (s === '立て替え' && fState.shiharai === 'デビット') {
     fState.shiharai = ''; clearChips('shiharai'); toggle('f-emoney-section', false);
   }
-
-  // ゆうちょ警告リセット
   document.getElementById('yucho-warn').style.display = 'none';
 }
 
@@ -694,7 +1158,7 @@ function selectChip(chip, group) {
   if (group === 'hinmoku') {
     toggle('f-shokuhin-section', fState.hinmoku === '食料品');
     if (fState.hinmoku === '食料品') document.getElementById('f-shokuhin-chips').querySelector('.chip')?.focus();
-    const isGift = fState.hinmoku === 'ギフト券類' && ['購入', '立て替え'].includes(fState.service);
+    const isGift = fState.hinmoku === 'ギフト券類' && fState.service === '購入';
     toggle('f-itemname-section', isGift);
     toggle('f-quantity-section', isGift);
   }
@@ -705,15 +1169,26 @@ function selectChip(chip, group) {
   }
 
   if (group === 'shiharai') {
-    const needsEmoney = ['プリペイド', 'QR決済', 'ポイント', 'デビット'].includes(fState.shiharai);
+    const needsEmoney = ['プリペイド', 'QR決済', 'ポイント', 'デビット', '準資産'].includes(fState.shiharai);
     toggle('f-emoney-section', needsEmoney);
     fState.emoney = '';
     if (needsEmoney) buildEmoneyChips(fState.shiharai);
+    const label = document.getElementById('f-emoney-label');
+    if (label) label.textContent = fState.shiharai === '準資産' ? '使用アイテム' : '電子マネー';
   }
 }
 
 function buildEmoneyChips(type) {
-  const options = EMONEY_MAP[type] || [];
+  let options;
+  if (type === '準資産') {
+    options = getInventoryFromRecords().map(item => item.name);
+    if (options.length === 0) {
+      document.getElementById('f-emoney-chips').innerHTML = '<div style="font-size:12px;color:#94a3b8;">準資産がありません</div>';
+      return;
+    }
+  } else {
+    options = EMONEY_MAP[type] || [];
+  }
   const html = options.map(v =>
     `<div class="chip" data-val="${v}" onclick="selectChip(this,'emoney')">${v}</div>`
   ).join('');
@@ -726,9 +1201,8 @@ function selectBankChip(chip) {
   chip.classList.add('selected');
   fState.bank = chip.dataset.val;
 
-  // ゆうちょは引き出しのみ（VBA: Bank1_Click → Deposit.Enabled = False）
   const warn = document.getElementById('yucho-warn');
-  if (fState.bank === 'ゆうちょ銀行' && fState.service === '預け入れ') {
+  if (fState.bank === 'ゆうちょ銀行' && fState.service === 'ATM入金') {
     warn.style.display = 'block';
   } else {
     warn.style.display = 'none';
@@ -739,7 +1213,10 @@ function clearChips(group) {
   const map = {
     hinmoku: 'f-hinmoku-chips', shokuhin: 'f-shokuhin-chips', mise: 'f-mise-chips',
     shiharai: 'f-shiharai-chips', emoney: 'f-emoney-chips', uketori: 'f-uketori-chips',
-    jusho: 'f-jusho-chips', kyuyo: 'f-kyuyo-chips', bank: 'f-bank-chips', chargeTo: 'f-charge-to-chips', chargeFrom: 'f-charge-from-chips'
+    jusho: 'f-jusho-chips', kyuyo: 'f-kyuyo-chips', bank: 'f-bank-chips',
+    furikomiTo: 'f-furikomi-to-chips',
+    chargeTo: 'f-charge-to-chips', chargeFrom: 'f-charge-from-chips',
+    direction: 'f-direction-chips'
   };
   if (map[group]) document.getElementById(map[group])?.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
   fState[group] = '';
@@ -755,11 +1232,11 @@ function registerRecord() {
   const amount = document.getElementById('f-amount').value;
 
   // バリデーション
-  if (['購入', '立て替え'].includes(service) && !fState.hinmoku) { showToast('品目を選択してください', true); return; }
-  if (fState.hinmoku === '食料品' && !fState.shokuhin) { showToast('食料品の種類を選択してください', true); return; }
-  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
-  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
-  if (['購入', '立て替え'].includes(service) && !fState.mise) { showToast('店を選択してください', true); return; }
+  if (service === '購入' && !fState.hinmoku) { showToast('品目を選択してください', true); return; }
+  if (service === '購入' && fState.hinmoku === '食料品' && !fState.shokuhin) { showToast('食料品の種類を選択してください', true); return; }
+  if (service === '購入' && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
+  if (service === '購入' && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
+  if (service === '購入' && !fState.mise) { showToast('店を選択してください', true); return; }
   if (fState.mise === 'その他' && !document.getElementById('f-other-mise').value.trim()) { showToast('店名を入力してください', true); return; }
   if (!amount || Number(amount) <= 0) { showToast('金額を入力してください', true); return; }
   if (service === 'チャージ' && !fState.chargeTo) { showToast('チャージ先を選択してください', true); return; }
@@ -767,12 +1244,16 @@ function registerRecord() {
   if (['キャッシュバック', '売却'].includes(service) && !fState.uketori) { showToast('受け取り先を選択してください', true); return; }
   if (service === '売却' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
   if (service === '売却' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
+  if (service === '資産追加' && !document.getElementById('f-shisan-name').value.trim()) { showToast('資産名を入力してください', true); return; }
+  if (service === '資産追加' && (!amount || Number(amount) <= 0)) { showToast('数量（金額欄）を入力してください', true); return; }
   if (['もらう', 'あげる'].includes(service) && !fState.jusho) { showToast('授受先を選択してください', true); return; }
-  if (['預け入れ', '引き出し', 'クレカ引き落とし'].includes(service) && !fState.bank) { showToast('銀行を選択してください', true); return; }
-  if (service === '預け入れ' && fState.bank === 'ゆうちょ銀行') { showToast('ゆうちょ銀行は引き出しのみです', true); return; }
+  if (['ATM', '振込'].includes(service)) { showToast('入金・出金を選択してください', true); return; }
+  if (['ATM入金', 'ATM出金', '振込入金', '振込出金', 'クレカ引き落とし'].includes(service) && !fState.bank) { showToast('銀行を選択してください', true); return; }
+  if (service === 'ATM入金' && fState.bank === 'ゆうちょ銀行') { showToast('ゆうちょ銀行は引き出しのみです', true); return; }
+  if (service === '振込出金' && !fState.furikomiTo) { showToast('振込先を選択してください', true); return; }
   if (service === '給与' && !fState.kyuyo) { showToast('受取口座を選択してください', true); return; }
-  if (!['チャージ', 'キャッシュバック', 'もらう', 'あげる', '預け入れ', '引き出し', '給与', '売却', 'クレカ引き落とし'].includes(service) && !fState.shiharai) { showToast('支払い手段を選択してください', true); return; }
-  if (['プリペイド', 'QR決済', 'ポイント', 'デビット'].includes(fState.shiharai) && !fState.emoney) { showToast('電子マネー／銀行を選択してください', true); return; }
+  if (!['チャージ', 'キャッシュバック', 'もらう', 'あげる', 'ATM入金', 'ATM出金', '振込入金', '振込出金', '給与', '売却', 'クレカ引き落とし', '資産追加'].includes(service) && !fState.shiharai) { showToast('支払い手段を選択してください', true); return; }
+  if (['プリペイド', 'QR決済', 'ポイント', 'デビット', '準資産'].includes(fState.shiharai) && !fState.emoney) { showToast('電子マネー／アイテムを選択してください', true); return; }
 
   const mise = fState.mise === 'その他' ? document.getElementById('f-other-mise').value.trim() : fState.mise;
 
@@ -784,23 +1265,28 @@ function registerRecord() {
     payment1 = fState.uketori; payment2 = '';
   } else if (['もらう', 'あげる'].includes(service)) {
     payment1 = fState.jusho; payment2 = '';
-  } else if (['預け入れ', '引き出し', 'クレカ引き落とし'].includes(service)) {
+  } else if (['ATM入金', 'ATM出金', '振込入金', 'クレカ引き落とし'].includes(service)) {
     payment1 = fState.bank; payment2 = '';
+  } else if (service === '振込出金') {
+    payment1 = fState.bank; payment2 = fState.furikomiTo;
+  } else if (service === '資産追加') {
+    payment1 = document.getElementById('f-shisan-name').value.trim(); payment2 = '';
   } else if (service === '給与') {
     payment1 = fState.kyuyo; payment2 = '';
   } else {
-    payment1 = ['現金', 'クレカ'].includes(fState.shiharai) ? fState.shiharai : fState.emoney;
+    payment1 = ['現金', 'クレカ', 'デビット'].includes(fState.shiharai) ? fState.shiharai : fState.emoney;
     payment2 = '';
   }
 
-  const isGiftPurchase = ['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類';
+  const isGiftPurchase = service === '購入' && fState.hinmoku === 'ギフト券類';
+  const isAssetAdd = service === '資産追加';
   const record = {
     date: document.getElementById('f-date').value,
     service: service,
-    category1: fState.hinmoku,
+    category1: isAssetAdd ? '' : fState.hinmoku,
     category2: (isGiftPurchase || service === '売却')
       ? document.getElementById('f-itemname').value.trim()
-      : fState.shokuhin,
+      : (isAssetAdd ? '' : fState.shokuhin),
     store: mise,
     amount: amount,
     payment1: payment1,
@@ -820,14 +1306,31 @@ function registerRecord() {
 
   if (!gasUrl) { showToast('設定タブでGAS URLを入力してください', true); return; }
 
-  checkDuplicate(record, () => doRegister(record));
+  const inventoryItemUsed = fState.shiharai === '準資産' ? fState.emoney : null;
+  checkDuplicate(record, () => doRegister(record, inventoryItemUsed));
 }
 
-function doRegister(record) {
+function doRegister(record, inventoryItemUsed = null) {
   showLoading('登録中...');
   const params = new URLSearchParams({ action: 'add', ...record });
   fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' })
     .then(() => {
+      // 準資産支払い → 資産使用レコードを自動登録
+      if (inventoryItemUsed) {
+        const usageParams = new URLSearchParams({
+          action: 'add',
+          date: record.date,
+          service: '資産使用',
+          category1: '準資産',
+          category2: inventoryItemUsed,
+          quantity: 1,
+          amount: record.amount,
+          payment1: inventoryItemUsed,
+          serviceId: currentServiceId,
+        });
+        fetch(gasUrl + '?' + usageParams.toString(), { method: 'GET', mode: 'no-cors' });
+      }
+
       // ギフト券類購入 → 資産追加レコードを自動登録（同じserviceId）
       const isGiftPurchase = ['購入', '立て替え'].includes(record.service) && record.category1 === 'ギフト券類';
       if (isGiftPurchase && record.category2 && record.quantity) {
@@ -846,30 +1349,81 @@ function doRegister(record) {
       }
 
       hideLoading();
-      loadAllData(); // 直近記録を更新
-      document.getElementById('add-more-bar').classList.add('show');
+      loadAllData();
+      if (record.service === '振込出金' && record.payment2) {
+        showFurikomiDraft(record);
+      } else {
+        document.getElementById('add-more-bar').classList.add('show');
+      }
     })
     .catch(() => { hideLoading(); showToast('登録に失敗しました', true); });
 }
 
 function addMore() {
-  // 同じレシートの次の品目 → サービスIDは引き継ぎ、金額だけリセット
   document.getElementById('f-amount').value = '';
   document.getElementById('add-more-bar').classList.remove('show');
   document.getElementById('f-amount').focus();
 }
 
+let pendingFurikomiDraft = null;
+
+function showFurikomiDraft(record) {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toLocaleDateString('sv-SE');
+  pendingFurikomiDraft = {
+    date: tomorrowStr,
+    service: '振込入金',
+    amount: record.amount,
+    payment1: record.payment2,
+    payment2: '',
+    serviceId: record.serviceId,
+  };
+  document.getElementById('furikomi-draft-date').value = tomorrowStr;
+  document.getElementById('furikomi-draft-info').textContent =
+    `${record.payment1} → ${record.payment2}  ¥${Number(record.amount).toLocaleString()}`;
+  document.getElementById('furikomi-draft-bar').classList.add('show');
+}
+
+async function registerFurikomiDraft() {
+  if (!pendingFurikomiDraft || !gasUrl) return;
+  const draft = { ...pendingFurikomiDraft };
+  draft.date = document.getElementById('furikomi-draft-date').value;
+  showLoading('振込入金を登録中...');
+  try {
+    const params = new URLSearchParams({ action: 'add', ...draft });
+    await fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    hideLoading();
+    loadAllData();
+    skipFurikomiDraft();
+    showToast('✓ 振込入金も登録しました');
+  } catch(e) {
+    hideLoading();
+    showToast('登録に失敗しました', true);
+  }
+}
+
+function skipFurikomiDraft() {
+  pendingFurikomiDraft = null;
+  document.getElementById('furikomi-draft-bar').classList.remove('show');
+  document.getElementById('add-more-bar').classList.add('show');
+}
+
 function resetForm() {
-  fState = { service: '購入', hinmoku: '', shokuhin: '', mise: '', shiharai: '', emoney: '', uketori: '', jusho: '', kyuyo: '', bank: '', chargeTo: '', chargeFrom: '', itemName: '', quantity: '' };
+  fState = { service: '購入', serviceGroup: '購入', direction: '', hinmoku: '', shokuhin: '', mise: '', shiharai: '', emoney: '', uketori: '', jusho: '', kyuyo: '', bank: '', furikomiTo: '', chargeTo: '', chargeFrom: '', itemName: '', quantity: '' };
   currentServiceId = null;
+  pendingFurikomiDraft = null;
   document.getElementById('f-date').value = new Date().toLocaleDateString('sv-SE');
   document.getElementById('f-amount').value = '';
   document.getElementById('f-other-mise').value = '';
   document.getElementById('f-itemname').value = '';
   document.getElementById('f-quantity').value = '';
+  document.getElementById('f-shisan-name').value = '';
   document.querySelectorAll('.service-big-btn').forEach((b,i) => b.classList.toggle('selected', i===0));
-  ['f-hinmoku-chips','f-shokuhin-chips','f-mise-chips','f-shiharai-chips','f-emoney-chips','f-uketori-chips','f-jusho-chips','f-kyuyo-chips','f-bank-chips','f-charge-to-chips','f-charge-from-chips']
+  ['f-hinmoku-chips','f-shokuhin-chips','f-mise-chips','f-shiharai-chips','f-emoney-chips','f-uketori-chips',
+   'f-jusho-chips','f-kyuyo-chips','f-bank-chips','f-furikomi-to-chips','f-charge-to-chips','f-charge-from-chips','f-direction-chips']
     .forEach(id => document.getElementById(id)?.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')));
+  toggle('f-direction-section', false);
   toggle('f-hinmoku-section', true);
   toggle('f-shokuhin-section', false);
   toggle('f-mise-section', true);
@@ -879,6 +1433,7 @@ function resetForm() {
   toggle('f-jusho-section', false);
   toggle('f-kyuyo-section', false);
   toggle('f-bank-section', false);
+  toggle('f-furikomi-to-section', false);
   toggle('f-charge-to-section', false);
   toggle('f-charge-from-section', false);
   toggle('f-shiharai-section', true);
@@ -887,6 +1442,7 @@ function resetForm() {
   document.getElementById('yucho-warn').style.display = 'none';
   document.getElementById('chip-debit').style.display = '';
   document.getElementById('add-more-bar').classList.remove('show');
+  document.getElementById('furikomi-draft-bar').classList.remove('show');
   showToast('リセットしました');
 }
 
@@ -916,7 +1472,6 @@ let gasUrl = localStorage.getItem('kakeiboGasUrl') || '';
 let assetInits = JSON.parse(localStorage.getItem('assetInits') || '{}');
 let selectedImageBase64 = null;
 let allRecords = [];
-let inventory = [];
 let monthlyChart, categoryChart, paymentChart, assetTrendChart;
 
 // 初期残高の基準日（2025年8月23日終了時点）
@@ -977,25 +1532,27 @@ async function scanReceipt() {
   if (!selectedImageBase64) return;
   showLoading('AIで読み取り中...');
   try {
-    const prompt = `このレシートを読み取って、必ず以下のJSON形式のみで返してください：
+    const prompt = `このレシートを読み取って、必ず以下のJSON形式のみで返してください。JSON以外のテキストは一切出力しないこと：
 {
   "date": "YYYY-MM-DD",
   "service": "購入",
   "category1": "食料品",
   "category2": "一般",
-  "store": "店名",
+  "store": "コンビニ",
   "amount": 1234,
   "payment1": "現金",
   "payment2": ""
 }
-ルール：
-- service: 購入/外食/キャッシュバック/チャージ/もらう/立て替え
-- category1: 食料品/日用品/外食/交通費/医療/娯楽/衣類/その他
-- category2: 昼飯/エナドリ/一般/百均など
-- store: レシートの店名（短く）
-- amount: 合計金額（数字のみ）
-- payment1: 現金/クレカ/三井住友/PayPay1/PayPay2/majica/Fami Pay/WAON/quoカード/その他
-- payment2: チャージ元があれば、なければ空文字`;
+ルール（必ず以下の選択肢の中から選ぶこと。選択肢外の値は絶対に使わないこと）：
+- service: 購入/立て替え/キャッシュバック/チャージ/もらう/あげる/ATM入金/ATM出金/振込入金/振込出金/給与/売却/クレカ引き落とし（通常のレシートは「購入」）
+- category1: 購入の場合のみ「食料品/趣味/衣類/日用品/交通費/医療/ギフト券類」から1つ選ぶ。それ以外は空文字「""」（外食・コンビニ飯は「食料品」、雑貨・洗剤等は「日用品」）
+- category2: category1が「食料品」の場合のみ「昼飯/エナドリ/一般」から1つ選ぶ。エナジードリンクは「エナドリ」、それ以外は「一般」。category1が食料品以外なら空文字「""」
+- store: 購入の場合のみ「コンビニ/スーパー/ドンキ/クリエイト/マック/自販機/Amazon/その他」から1つ選ぶ。立て替えの場合は空文字「""」
+  【店名マッピング例】ファミリーマート・ファミマ・FamilyMart→コンビニ、セブンイレブン・7-Eleven→コンビニ、ローソン・Lawson→コンビニ、ミニストップ→コンビニ、デイリーヤマザキ→コンビニ、ドン・キホーテ・ドンキホーテ→ドンキ、マクドナルド・McDonald's→マック、イオン・イトーヨーカドー・オーケー・西友・ライフ→スーパー
+- amount: 合計金額（数字のみ、円記号なし）
+- payment1: 「現金/クレカ/デビット/quoカード/PASMO/スタバカード/majica/Amazonギフトカード/VポイントPay/PayPay1/PayPay2/Fami Pay/Ponta/WAON/Amazonポイント/Vポイント/リクルートポイント/住信SBI/三井住友/ゆうちょ銀行」から1つ選ぶ
+  【支払い方法マッピング例】ファミペイ・FamiPay→Fami Pay、PayPay→PayPay1、WAONポイント→WAON、デビットカード・debit→デビット
+- payment2: チャージ元があれば上記payment1の選択肢から選ぶ、なければ空文字「""」`;
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1024,7 +1581,7 @@ async function scanReceipt() {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('解析失敗');
     const parsed = JSON.parse(jsonMatch[0]);
-    fillForm(parsed);
+    fillForm(normalizeAiOutput(parsed));
     hideLoading();
     document.getElementById('result-section').classList.add('show');
     showToast('✓ 読み取り完了！内容を確認してください');
@@ -1033,6 +1590,59 @@ async function scanReceipt() {
     alert('エラー詳細:\n' + e.message);
     showToast('読み取りに失敗しました', true);
   }
+}
+
+const STORE_NORMALIZE = {
+  'ファミリーマート': 'コンビニ', 'ファミマ': 'コンビニ', 'familymart': 'コンビニ', 'family mart': 'コンビニ',
+  'セブンイレブン': 'コンビニ', 'セブン-イレブン': 'コンビニ', '7-eleven': 'コンビニ', '7eleven': 'コンビニ', 'セブン': 'コンビニ',
+  'ローソン': 'コンビニ', 'lawson': 'コンビニ',
+  'ミニストップ': 'コンビニ', 'ministop': 'コンビニ',
+  'デイリーヤマザキ': 'コンビニ', 'daily yamazaki': 'コンビニ',
+  'ドン・キホーテ': 'ドンキ', 'ドンキホーテ': 'ドンキ', 'don quijote': 'ドンキ',
+  'マクドナルド': 'マック', "mcdonald's": 'マック', 'mcdonalds': 'マック',
+  'イオン': 'スーパー', 'aeon': 'スーパー',
+  'イトーヨーカドー': 'スーパー', 'ito yokado': 'スーパー',
+  'オーケー': 'スーパー', 'ok': 'スーパー',
+  '西友': 'スーパー', 'seiyu': 'スーパー',
+  'ライフ': 'スーパー', 'マルエツ': 'スーパー', 'ヨークマート': 'スーパー',
+};
+const VALID_STORES = ['コンビニ','スーパー','ドンキ','クリエイト','マック','自販機','Amazon','その他'];
+const VALID_CAT1 = ['食料品','趣味','衣類','日用品','交通費','医療','ギフト券類'];
+const VALID_CAT2 = ['昼飯','エナドリ','一般'];
+const VALID_SERVICES = ['購入','立て替え','キャッシュバック','チャージ','もらう','あげる','ATM入金','ATM出金','振込入金','振込出金','給与','売却','クレカ引き落とし','預け入れ','引き出し','振込'];
+const VALID_PAYMENT = ['現金','クレカ','デビット','quoカード','PASMO','スタバカード','majica','Amazonギフトカード','VポイントPay','PayPay1','PayPay2','Fami Pay','Ponta','WAON','Amazonポイント','Vポイント','リクルートポイント','住信SBI','三井住友','ゆうちょ銀行'];
+const PAYMENT_NORMALIZE = {
+  'ファミペイ': 'Fami Pay', 'famipay': 'Fami Pay', 'famiPay': 'Fami Pay',
+  'paypay': 'PayPay1', 'PayPay': 'PayPay1',
+  'waonポイント': 'WAON',
+};
+
+function normalizeAiOutput(d) {
+  const out = Object.assign({}, d);
+
+  if (!VALID_SERVICES.includes(out.service)) out.service = '購入';
+
+  if (!VALID_CAT1.includes(out.category1)) out.category1 = '';
+  if (out.category1 !== '食料品') out.category2 = '';
+  if (out.category2 && !VALID_CAT2.includes(out.category2)) out.category2 = '一般';
+
+  const storeRaw = String(out.store || '');
+  const storeLower = storeRaw.toLowerCase().trim();
+  if (STORE_NORMALIZE[storeRaw]) {
+    out.store = STORE_NORMALIZE[storeRaw];
+  } else if (STORE_NORMALIZE[storeLower]) {
+    out.store = STORE_NORMALIZE[storeLower];
+  } else if (!VALID_STORES.includes(storeRaw)) {
+    out.store = storeRaw ? 'その他' : '';
+  }
+
+  const p1Raw = String(out.payment1 || '');
+  out.payment1 = PAYMENT_NORMALIZE[p1Raw] || PAYMENT_NORMALIZE[p1Raw.toLowerCase()] || (VALID_PAYMENT.includes(p1Raw) ? p1Raw : '現金');
+
+  const p2Raw = String(out.payment2 || '');
+  out.payment2 = PAYMENT_NORMALIZE[p2Raw] || PAYMENT_NORMALIZE[p2Raw.toLowerCase()] || (VALID_PAYMENT.includes(p2Raw) ? p2Raw : '');
+
+  return out;
 }
 
 function fillForm(data) {
@@ -1088,14 +1698,17 @@ async function saveRecord() {
 async function loadAllData() {
   if (!gasUrl) return;
   try {
-    const [recordsRes, inventoryRes] = await Promise.all([
-      fetch(gasUrl + '?action=list'),
-      fetch(gasUrl + '?action=inventory'),
-    ]);
+    const recordsRes = await fetch(gasUrl + '?action=list');
     const recordsData = await recordsRes.json();
-    const inventoryData = await inventoryRes.json();
     allRecords = recordsData.records || [];
-    inventory = inventoryData.items || [];
+
+    // ローカルのserviceId採番をシートの実績最大値に合わせる
+    if (allRecords.length > 0) {
+      const maxId = allRecords.reduce((max, r) => Math.max(max, Number(r.serviceId) || 0), 0);
+      const localId = Number(localStorage.getItem('kakeibo_lastServiceId') || 0);
+      if (maxId > localId) localStorage.setItem('kakeibo_lastServiceId', maxId);
+    }
+
     renderRecentRecords();
     renderDashboard();
     renderAssets();
@@ -1106,67 +1719,99 @@ async function loadAllData() {
 }
 
 // ===== Dashboard =====
+let dashSelectedMonth = '';
+
+function buildDashMonthSelector() {
+  const sel = document.getElementById('dash-month-select');
+  if (!sel) return;
+  const now = new Date();
+  const currentKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  // データに存在する月を収集（直近24ヶ月の範囲で）
+  const monthSet = new Set();
+  allRecords.forEach(r => {
+    const m = String(r.date).slice(0, 7);
+    if (m && m.length === 7) monthSet.add(m);
+  });
+  // 直近24ヶ月を候補として生成（データがなくても今月は含める）
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    monthSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  const months = [...monthSet].filter(m => m <= currentKey).sort().reverse();
+
+  const prev = sel.value || dashSelectedMonth || currentKey;
+  sel.innerHTML = months.map(m => {
+    const [y, mo] = m.split('-');
+    return `<option value="${m}"${m === prev ? ' selected' : ''}>${y}年${Number(mo)}月</option>`;
+  }).join('');
+  dashSelectedMonth = sel.value || currentKey;
+}
+
+function onDashMonthChange(val) {
+  dashSelectedMonth = val;
+  renderDashboard();
+}
+
 function renderDashboard() {
   const now = new Date();
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const currentKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  if (!dashSelectedMonth) dashSelectedMonth = currentKey;
 
-  const thisMonthRecords = allRecords.filter(r => String(r.date).startsWith(thisMonth));
-  const purchases = thisMonthRecords.filter(r => ['購入','外食','立て替え','あげる'].includes(r.service));
-  const income = thisMonthRecords.filter(r => ['キャッシュバック','もらう','給与'].includes(r.service));
+  buildDashMonthSelector();
 
-  const monthTotal = purchases.reduce((s,r) => s + Number(r.amount||0), 0);
-  const monthIncome = income.reduce((s,r) => s + Number(r.amount||0), 0);
+  const sel = document.getElementById('dash-month-select');
+  const selectedMonth = sel ? sel.value : dashSelectedMonth;
+  const [sy, sm] = selectedMonth.split('-');
+  const monthLabel = `${Number(sy)}年${Number(sm)}月`;
 
-  document.getElementById('dash-month-total').textContent = '¥' + monthTotal.toLocaleString();
+  document.getElementById('dash-total-label').textContent = `${monthLabel}の支出`;
+
+  const selRecords = allRecords.filter(r => String(r.date).startsWith(selectedMonth));
+  const purchases = selRecords.filter(r => ['購入','外食','立て替え','あげる'].includes(r.service));
+  const income = selRecords.filter(r => ['キャッシュバック','もらう','給与'].includes(r.service));
+
+  document.getElementById('dash-month-total').textContent = '¥' + purchases.reduce((s,r) => s + Number(r.amount||0), 0).toLocaleString();
   document.getElementById('dash-month-count').textContent = purchases.length + '件';
-  document.getElementById('dash-month-income').textContent = '¥' + monthIncome.toLocaleString();
+  document.getElementById('dash-month-income').textContent = '¥' + income.reduce((s,r) => s + Number(r.amount||0), 0).toLocaleString();
 
-  // 月別グラフ（直近6ヶ月）
-  const months = [];
-  const monthTotals = [];
+  // 月別棒グラフ（直近6ヶ月・固定）
+  const barMonths = [], barTotals = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    const label = `${d.getMonth()+1}月`;
-    months.push(label);
-    const total = allRecords
+    barMonths.push(`${d.getMonth()+1}月`);
+    barTotals.push(allRecords
       .filter(r => String(r.date).startsWith(key) && ['購入','外食','立て替え'].includes(r.service))
-      .reduce((s,r) => s + Number(r.amount||0), 0);
-    monthTotals.push(total);
+      .reduce((s,r) => s + Number(r.amount||0), 0));
   }
-
   if (monthlyChart) monthlyChart.destroy();
   monthlyChart = new Chart(document.getElementById('monthly-chart'), {
     type: 'bar',
-    data: {
-      labels: months,
-      datasets: [{ label: '支出', data: monthTotals, backgroundColor: '#10b981', borderRadius: 6 }]
-    },
+    data: { labels: barMonths, datasets: [{ label: '支出', data: barTotals, backgroundColor: '#10b981', borderRadius: 6 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: {
-        y: { ticks: { callback: v => '¥' + v.toLocaleString() } }
-      }
+      scales: { y: { ticks: { callback: v => '¥' + v.toLocaleString() } } }
     }
   });
 
-  // カテゴリ別
+  const catColors = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16'];
+
+  // カテゴリ別円グラフ（選択月）
+  document.getElementById('cat-chart-title').textContent = `カテゴリ別支出（${monthLabel}）`;
   const catMap = {};
-  allRecords.filter(r => ['購入','外食'].includes(r.service)).forEach(r => {
+  selRecords.filter(r => ['購入','外食'].includes(r.service)).forEach(r => {
     const k = r.category1 || 'その他';
     catMap[k] = (catMap[k]||0) + Number(r.amount||0);
   });
-  const catLabels = Object.keys(catMap);
-  const catValues = Object.values(catMap);
-  const catColors = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16'];
-
+  const catEntries = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
   if (categoryChart) categoryChart.destroy();
   categoryChart = new Chart(document.getElementById('category-chart'), {
-    type: 'doughnut',
+    type: 'pie',
     data: {
-      labels: catLabels,
-      datasets: [{ data: catValues, backgroundColor: catColors, borderWidth: 2 }]
+      labels: catEntries.map(e => e[0]),
+      datasets: [{ data: catEntries.map(e => e[1]), backgroundColor: catColors, borderWidth: 2 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -1174,27 +1819,318 @@ function renderDashboard() {
     }
   });
 
-  // 支払い手段別
+  // 支払い手段別（選択月）
+  document.getElementById('pay-chart-title').textContent = `支払い手段別（${monthLabel}）`;
   const payMap = {};
-  allRecords.filter(r => ['購入','外食','立て替え'].includes(r.service)).forEach(r => {
+  selRecords.filter(r => ['購入','外食','立て替え'].includes(r.service)).forEach(r => {
     const k = r.payment1 || 'その他';
     payMap[k] = (payMap[k]||0) + Number(r.amount||0);
   });
-  const payLabels = Object.keys(payMap);
-  const payValues = Object.values(payMap);
-
+  const payEntries = Object.entries(payMap).sort((a,b) => b[1]-a[1]);
   if (paymentChart) paymentChart.destroy();
   paymentChart = new Chart(document.getElementById('payment-chart'), {
-    type: 'doughnut',
+    type: 'pie',
     data: {
-      labels: payLabels,
-      datasets: [{ data: payValues, backgroundColor: catColors, borderWidth: 2 }]
+      labels: payEntries.map(e => e[0]),
+      datasets: [{ data: payEntries.map(e => e[1]), backgroundColor: catColors, borderWidth: 2 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
     }
   });
+
+  buildStoreDropdown();
+}
+
+// ===== 店別ドロップダウン =====
+function buildStoreDropdown() {
+  const storeSet = new Set();
+  allRecords.forEach(r => {
+    if (r.store && ['購入','立て替え','外食'].includes(r.service)) storeSet.add(r.store);
+  });
+  const stores = [...storeSet].sort();
+  const sel = document.getElementById('store-select');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">-- 店を選択 --</option>' +
+    stores.map(s => `<option value="${esc(s)}"${s === current ? ' selected' : ''}>${esc(s)}</option>`).join('');
+}
+
+function openStoreDetail() {
+  const storeName = document.getElementById('store-select').value;
+  if (!storeName) { showToast('店を選択してください', true); return; }
+  showStoreDetail(storeName);
+}
+
+// ===== 店別詳細ボトムシート =====
+let storeDetailMonths = [];
+let storeDetailMonthIdx = 0;
+let storeDetailTxsByMonth = {};
+let storeDetailChart = null;
+let storeDetailCurrentStore = null;
+let sqHinmoku = '';
+let sqCategory2 = '';
+let sqPayment = '';
+let sqService = '購入';
+
+const SQ_SHOKUHIN_LIST = ['昼飯', 'エナドリ', '一般'];
+const SQ_HINMOKU_LIST = ['食料品','趣味','衣類','日用品','交通費','医療','ギフト券類'];
+const SQ_PAYMENT_LIST = ['現金','クレカ','PayPay1','PayPay2','majica','Fami Pay','WAON','VポイントPay','quoカード','Amazonギフトカード','住信SBI','三井住友','Vポイント','Amazonポイント','Ponta'];
+const SQ_SERVICE_LIST = ['購入', 'もらう', 'あげる'];
+
+function showStoreDetail(storeName) {
+  storeDetailCurrentStore = storeName;
+  const txs = allRecords.filter(r => r.store === storeName && ['購入','立て替え','外食'].includes(r.service));
+
+  storeDetailTxsByMonth = {};
+  txs.forEach(r => {
+    const m = String(r.date).slice(0, 7);
+    if (!storeDetailTxsByMonth[m]) storeDetailTxsByMonth[m] = [];
+    storeDetailTxsByMonth[m].push(r);
+  });
+  storeDetailMonths = Object.keys(storeDetailTxsByMonth).sort();
+  storeDetailMonthIdx = storeDetailMonths.length - 1;
+
+  const total = txs.reduce((s, r) => s + Number(r.amount || 0), 0);
+  document.getElementById('store-sheet-title').textContent = storeName + ' の明細';
+  document.getElementById('store-sheet-balance').textContent = `累計 ¥${total.toLocaleString()} · ${txs.length}件`;
+
+  renderStoreDetailChart();
+  renderStoreMonthTxs();
+
+  document.getElementById('store-sheet-overlay').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('store-sheet').classList.add('open'));
+}
+
+function closeStoreDetail() {
+  document.getElementById('store-sheet').classList.remove('open');
+  document.getElementById('store-sheet-overlay').classList.remove('open');
+  closeStoreQuickForm();
+  if (storeDetailChart) { storeDetailChart.destroy(); storeDetailChart = null; }
+}
+
+function renderStoreDetailChart() {
+  const labels = storeDetailMonths.map(m => {
+    const [y, mo] = m.split('-');
+    return `${String(y).slice(2)}/${Number(mo)}月`;
+  });
+  const data = storeDetailMonths.map(m =>
+    (storeDetailTxsByMonth[m] || []).reduce((s, r) => s + Number(r.amount || 0), 0));
+  const colors = storeDetailMonths.map((_, i) => i === storeDetailMonthIdx ? '#3b82f6' : 'rgba(59,130,246,0.3)');
+
+  const canvas = document.getElementById('store-detail-chart');
+  if (storeDetailChart) storeDetailChart.destroy();
+  storeDetailChart = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: '支出', data, backgroundColor: colors, borderRadius: 3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => '¥' + ctx.raw.toLocaleString() } }
+      },
+      scales: {
+        y: { ticks: { callback: v => '¥' + (v/1000).toFixed(0) + 'k', font: { size: 10 } }, grid: { color: '#f1f5f9' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      },
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          storeDetailMonthIdx = elements[0].index;
+          renderStoreDetailChart();
+          renderStoreMonthTxs();
+        }
+      }
+    }
+  });
+}
+
+function renderStoreMonthTxs() {
+  const prevBtn = document.getElementById('store-month-prev');
+  const nextBtn = document.getElementById('store-month-next');
+  if (storeDetailMonths.length === 0) {
+    document.getElementById('store-month-nav-label').textContent = 'データなし';
+    document.getElementById('store-month-nav-summary').textContent = '';
+    prevBtn.disabled = true; nextBtn.disabled = true;
+    document.getElementById('store-sheet-body').innerHTML =
+      '<div class="empty-state"><div class="icon">📭</div><p>取引記録なし</p></div>';
+    return;
+  }
+  const month = storeDetailMonths[storeDetailMonthIdx];
+  const [y, m] = month.split('-');
+  const records = (storeDetailTxsByMonth[month] || []).slice().sort((a, b) => {
+    const d = String(a.date).localeCompare(String(b.date));
+    return d !== 0 ? d : String(a.service).localeCompare(String(b.service));
+  });
+  const total = records.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+  document.getElementById('store-month-nav-label').textContent = `${y}年${Number(m)}月`;
+  document.getElementById('store-month-nav-summary').innerHTML =
+    `<span style="color:#3b82f6;font-weight:700;">¥${total.toLocaleString()}</span>　${records.length}件`;
+  prevBtn.disabled = storeDetailMonthIdx === 0;
+  nextBtn.disabled = storeDetailMonthIdx === storeDetailMonths.length - 1;
+
+  document.getElementById('store-sheet-body').innerHTML = records.map(r => {
+    const d = new Date(r.date);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const cat = [r.category1, r.category2].filter(Boolean).map(esc).join(' · ');
+    return `
+      <div class="asset-tx-item">
+        <div style="flex:1;min-width:0;">
+          <div class="asset-tx-name">${cat || esc(r.service)}</div>
+          <div class="asset-tx-meta">${dateStr} · ${esc(r.service)} · ${esc(r.payment1 || '')}</div>
+        </div>
+        <div class="asset-tx-amount" style="color:#ef4444;">-¥${Number(r.amount||0).toLocaleString()}</div>
+        <button class="record-edit-btn" onclick="showEditModal(${Number(r.id)})" title="編集">✏️</button>
+        <button class="record-del-btn" onclick="showDeleteConfirm(${Number(r.id)},null,false)" title="削除">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+function storeMonthNav(delta) {
+  const next = storeDetailMonthIdx + delta;
+  if (next < 0 || next >= storeDetailMonths.length) return;
+  storeDetailMonthIdx = next;
+  renderStoreDetailChart();
+  renderStoreMonthTxs();
+}
+
+function openStoreQuickForm() {
+  sqHinmoku = ''; sqCategory2 = ''; sqPayment = ''; sqService = '購入';
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  let defaultDate = todayStr;
+  if (storeDetailMonths.length > 0) {
+    const selMonth = storeDetailMonths[storeDetailMonthIdx];
+    defaultDate = selMonth === todayStr.slice(0, 7) ? todayStr : selMonth + '-01';
+  }
+  document.getElementById('sq-date').value = defaultDate;
+  document.getElementById('sq-amount').value = '';
+  document.getElementById('sq-store-label').textContent = `店：${storeDetailCurrentStore}`;
+  document.getElementById('sq-service-chips').innerHTML = SQ_SERVICE_LIST.map(v =>
+    `<div class="sq-chip${v === '購入' ? ' selected' : ''}" data-val="${v}" onclick="selectSqService(this)">${v}</div>`
+  ).join('');
+  document.getElementById('sq-hinmoku-chips').innerHTML = SQ_HINMOKU_LIST.map(v =>
+    `<div class="sq-chip" data-val="${v}" onclick="selectSqChip(this,'hinmoku')">${v}</div>`
+  ).join('');
+  document.getElementById('sq-payment-chips').innerHTML = SQ_PAYMENT_LIST.map(v =>
+    `<div class="sq-chip" data-val="${v}" onclick="selectSqChip(this,'payment')">${v}</div>`
+  ).join('');
+  document.getElementById('sq-category2-row').style.display = 'none';
+  document.getElementById('sq-shokuhin-chips').innerHTML = '';
+  document.getElementById('sq-itemname').value = '';
+  document.getElementById('sq-quantity').value = '';
+  updateSqFormVisibility();
+  document.getElementById('store-quick-form').classList.add('open');
+  setTimeout(() => document.getElementById('sq-amount').focus(), 100);
+}
+
+function selectSqService(chip) {
+  chip.parentElement.querySelectorAll('.sq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  sqService = chip.dataset.val;
+  sqHinmoku = ''; sqCategory2 = ''; sqPayment = '';
+  document.getElementById('sq-hinmoku-chips').querySelectorAll('.sq-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('sq-payment-chips').querySelectorAll('.sq-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('sq-category2-row').style.display = 'none';
+  document.getElementById('sq-shokuhin-chips').innerHTML = '';
+  document.getElementById('sq-itemname').value = '';
+  document.getElementById('sq-quantity').value = '';
+  updateSqFormVisibility();
+}
+
+function updateSqFormVisibility() {
+  const needsDetail = ['購入', 'あげる'].includes(sqService);
+  document.getElementById('sq-hinmoku-row').style.display = needsDetail ? '' : 'none';
+  document.getElementById('sq-payment-row').style.display = needsDetail ? '' : 'none';
+  if (!needsDetail) document.getElementById('sq-category2-row').style.display = 'none';
+}
+
+function updateSqCategory2Row() {
+  const row = document.getElementById('sq-category2-row');
+  const shokuhinChips = document.getElementById('sq-shokuhin-chips');
+  const itemnameInput = document.getElementById('sq-itemname');
+  const quantityInput = document.getElementById('sq-quantity');
+  sqCategory2 = '';
+  if (sqHinmoku === '食料品') {
+    row.style.display = '';
+    document.getElementById('sq-category2-label').textContent = '食料品の種類';
+    shokuhinChips.innerHTML = SQ_SHOKUHIN_LIST.map(v =>
+      `<div class="sq-chip" data-val="${v}" onclick="selectSqCategory2(this)">${v}</div>`
+    ).join('');
+    itemnameInput.style.display = 'none';
+    quantityInput.style.display = 'none';
+  } else if (sqHinmoku === 'ギフト券類') {
+    row.style.display = '';
+    document.getElementById('sq-category2-label').textContent = '品目名・数量';
+    shokuhinChips.innerHTML = '';
+    itemnameInput.style.display = '';
+    quantityInput.style.display = '';
+  } else {
+    row.style.display = 'none';
+    shokuhinChips.innerHTML = '';
+    itemnameInput.style.display = 'none';
+    quantityInput.style.display = 'none';
+  }
+}
+
+function selectSqCategory2(chip) {
+  chip.parentElement.querySelectorAll('.sq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  sqCategory2 = chip.dataset.val;
+}
+
+function closeStoreQuickForm() {
+  document.getElementById('store-quick-form').classList.remove('open');
+}
+
+function selectSqChip(chip, type) {
+  chip.parentElement.querySelectorAll('.sq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  if (type === 'hinmoku') { sqHinmoku = chip.dataset.val; updateSqCategory2Row(); }
+  else sqPayment = chip.dataset.val;
+}
+
+async function registerStoreQuick() {
+  const needsDetail = ['購入', 'あげる'].includes(sqService);
+  const isGift = needsDetail && sqHinmoku === 'ギフト券類';
+  if (needsDetail && !sqHinmoku) { showToast('品目を選択してください', true); return; }
+  if (needsDetail && sqHinmoku === '食料品' && !sqCategory2) { showToast('食料品の種類を選択してください', true); return; }
+  if (isGift && !document.getElementById('sq-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
+  if (isGift && !document.getElementById('sq-quantity').value) { showToast('数量を入力してください', true); return; }
+  if (needsDetail && !sqPayment) { showToast('支払い手段を選択してください', true); return; }
+  const amount = document.getElementById('sq-amount').value;
+  if (!amount || Number(amount) <= 0) { showToast('金額を入力してください', true); return; }
+  if (!gasUrl) { showToast('GAS URLを設定してください', true); return; }
+
+  let cat2 = '';
+  if (isGift) cat2 = document.getElementById('sq-itemname').value.trim();
+  else if (needsDetail) cat2 = sqCategory2;
+
+  const record = {
+    date: document.getElementById('sq-date').value,
+    service: sqService,
+    category1: needsDetail ? sqHinmoku : '',
+    category2: cat2,
+    store: storeDetailCurrentStore,
+    amount,
+    payment1: needsDetail ? sqPayment : '',
+    payment2: '',
+    quantity: isGift ? document.getElementById('sq-quantity').value : '',
+  };
+
+  showLoading('登録中...');
+  try {
+    const params = new URLSearchParams({ action: 'add', ...record });
+    await fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    await loadAllData();
+    hideLoading();
+    closeStoreQuickForm();
+    showToast('✓ 登録しました！');
+    showStoreDetail(storeDetailCurrentStore);
+  } catch(e) {
+    hideLoading();
+    showToast('登録に失敗しました', true);
+  }
 }
 
 // ===== 指定日時点の総資産を計算 =====
@@ -1218,12 +2154,16 @@ function calcTotalAssetsAt(records, upToDateStr) {
     } else if (svc === 'チャージ') {
       if (balances[p1]) balances[p1].in += amount;
       if (p2 && balances[p2]) balances[p2].out += amount;
-    } else if (svc === '預け入れ') {
+    } else if (svc === '預け入れ' || svc === 'ATM入金') {
       if (balances[p1]) balances[p1].in += amount;
       if (balances['現金']) balances['現金'].out += amount;
-    } else if (svc === '引き出し') {
+    } else if (svc === '引き出し' || svc === 'ATM出金') {
       if (balances[p1]) balances[p1].out += amount;
       if (balances['現金']) balances['現金'].in += amount;
+    } else if (svc === '振込入金') {
+      if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === '振込出金' || svc === '振込') {
+      if (balances[p1]) balances[p1].out += amount;
     } else if (svc === '給与') {
       if (balances[p1]) balances[p1].in += amount;
     } else if (svc === '売却') {
@@ -1326,12 +2266,16 @@ function renderAssets() {
     } else if (svc === 'チャージ') {
       if (balances[p1]) balances[p1].in += amount;
       if (p2 && balances[p2]) balances[p2].out += amount;
-    } else if (svc === '預け入れ') {
+    } else if (svc === '預け入れ' || svc === 'ATM入金') {
       if (balances[p1]) balances[p1].in += amount;
       if (balances['現金']) balances['現金'].out += amount;
-    } else if (svc === '引き出し') {
+    } else if (svc === '引き出し' || svc === 'ATM出金') {
       if (balances[p1]) balances[p1].out += amount;
       if (balances['現金']) balances['現金'].in += amount;
+    } else if (svc === '振込入金') {
+      if (balances[p1]) balances[p1].in += amount;
+    } else if (svc === '振込出金' || svc === '振込') {
+      if (balances[p1]) balances[p1].out += amount;
     } else if (svc === '給与') {
       if (balances[p1]) balances[p1].in += amount;
     } else if (svc === '売却') {
@@ -1350,10 +2294,10 @@ function renderAssets() {
     totalAssets += current;
     const colorClass = current >= 0 ? 'positive' : 'negative';
     return `
-      <div class="asset-card">
+      <div class="asset-card" onclick="showAssetDetail('${a.key}', '${a.label}', ${current})">
         <div>
           <div class="asset-name">${a.label}</div>
-          <div class="asset-type">${a.type}</div>
+          <div class="asset-type">${a.type} · タップで明細</div>
         </div>
         <div class="asset-amount">
           <div class="asset-current ${colorClass}">¥${current.toLocaleString()}</div>
@@ -1369,31 +2313,58 @@ function renderAssets() {
   renderInventory();
 }
 
+function getInventoryFromRecords() {
+  const map = {};
+  allRecords.forEach(r => {
+    if (r.service === '資産追加') {
+      const name = r.payment1 || r.category2 || r.category1;
+      if (!name) return;
+      if (!map[name]) map[name] = { qty: 0 };
+      const qty = Number(r.payment1 ? r.amount : r.quantity) || 0;
+      map[name].qty += qty || 1;
+    } else if (r.service === '資産使用') {
+      const name = r.category2 || r.category1;
+      if (!name) return;
+      if (!map[name]) map[name] = { qty: 0 };
+      map[name].qty -= Number(r.quantity) || 1;
+    } else if (r.service === '売却') {
+      const name = r.category2 || r.category1;
+      if (!name) return;
+      if (map[name]) map[name].qty -= Number(r.quantity) || 1;
+    }
+  });
+  return Object.entries(map)
+    .map(([name, data]) => ({ name, quantity: Math.max(0, data.qty) }))
+    .filter(item => item.quantity > 0);
+}
+
 function renderInventory() {
   const el = document.getElementById('inventory-grid');
   if (!el) return;
-  const active = inventory.filter(item => item.quantity > 0);
+
+  const active = getInventoryFromRecords();
+
   if (active.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>在庫なし</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>準資産なし</p></div>';
     return;
   }
+
   el.innerHTML = active.map(item => `
     <div class="asset-card">
       <div>
         <div class="asset-name">${esc(item.name)}</div>
-        <div class="asset-type">在庫品</div>
+        <div class="asset-type">準資産</div>
       </div>
       <div class="asset-amount">
         <div class="asset-current positive">${item.quantity}点</div>
-        <div class="asset-detail">${item.unitCost ? '仕入単価 ¥' + Number(item.unitCost).toLocaleString() : '価値は外部マスター参照'}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`
+  ).join('');
 }
 
 // 貸借判定
-const INCOME_SERVICES  = ['キャッシュバック', 'もらう', '給与', '引き出し', '預け入れ', '売却'];
-const EXPENSE_SERVICES = ['購入', '立て替え', '外食', 'あげる'];
+const INCOME_SERVICES  = ['キャッシュバック', 'もらう', '給与', '引き出し', '預け入れ', 'ATM入金', 'ATM出金', '売却', '振込入金'];
+const EXPENSE_SERVICES = ['購入', '立て替え', '外食', 'あげる', '振込出金'];
 
 function getSign(service) {
   if (INCOME_SERVICES.includes(service)) return 'income';
@@ -1402,34 +2373,111 @@ function getSign(service) {
 }
 
 // ===== List =====
+function recordDisplayName(r) {
+  return r.service === '給与' ? '給与'
+       : r.service === 'チャージ' ? `チャージ（${esc(r.payment2)}→${esc(r.payment1)}）`
+       : r.service === '売却' ? `売却（${esc(r.category2 || r.category1 || '')}）`
+       : r.service === 'クレカ引き落とし' ? `クレカ引き落とし（${esc(r.payment1)}）`
+       : r.service === 'ATM入金' ? `ATM入金（${esc(r.payment1)}）`
+       : r.service === 'ATM出金' ? `ATM出金（${esc(r.payment1)}）`
+       : r.service === '振込入金' ? `振込入金（${esc(r.payment1)}）`
+       : r.service === '振込出金' ? `振込出金（${esc(r.payment1)}→${esc(r.payment2)}）`
+       : esc(r.store || r.category1 || r.service || '-');
+}
+
+function renderRecordSingle(r) {
+  const sign = getSign(r.service);
+  const amountColor = sign === 'income' ? 'positive' : sign === 'expense' ? 'negative' : '';
+  const amountPrefix = sign === 'income' ? '+' : sign === 'expense' ? '-' : '±';
+  const meta = [r.service, r.category1, r.payment1].filter(Boolean).map(esc).join(' / ');
+  return `
+  <div class="record-item">
+    <div class="record-left">
+      <div class="record-name">${recordDisplayName(r)}</div>
+      <div class="record-meta">${meta}</div>
+    </div>
+    <div class="record-right">
+      <div class="record-amount ${amountColor}">${amountPrefix}¥${Number(r.amount||0).toLocaleString()}</div>
+      <div class="record-date">${formatDate(r.date)}</div>
+    </div>
+    <button class="record-edit-btn" onclick="showEditModal(${Number(r.id)})" title="編集">✏️</button>
+    <button class="record-del-btn" onclick="showDeleteConfirm(${Number(r.id)},null,false)" title="削除">🗑</button>
+  </div>`;
+}
+
+function renderRecordGroup(primary, children, groupId) {
+  const sign = getSign(primary.service);
+  const amountColor = sign === 'income' ? 'positive' : sign === 'expense' ? 'negative' : '';
+  const amountPrefix = sign === 'income' ? '+' : sign === 'expense' ? '-' : '±';
+  const meta = [primary.service, primary.category1, primary.payment1].filter(Boolean).map(esc).join(' / ');
+  const childrenHtml = children.map(c => {
+    const cs = getSign(c.service);
+    const cc = cs === 'income' ? 'positive' : cs === 'expense' ? 'negative' : '';
+    const cp = cs === 'income' ? '+' : cs === 'expense' ? '-' : '±';
+    const cmeta = [c.category1, c.payment1].filter(Boolean).map(esc).join(' / ');
+    return `
+    <div class="record-child">
+      <div class="record-child-left">
+        <div class="record-child-label">${esc(c.service)}</div>
+        <div class="record-child-name">${recordDisplayName(c)}</div>
+        <div class="record-child-meta">${cmeta}</div>
+      </div>
+      <div class="record-child-right">
+        <div class="record-child-amount ${cc}">${cp}¥${Number(c.amount||0).toLocaleString()}</div>
+      </div>
+      <button class="record-edit-btn" onclick="showEditModal(${Number(c.id)})" title="編集">✏️</button>
+      <button class="record-del-btn" onclick="showDeleteConfirm(${Number(c.id)},null,false)" title="削除">🗑</button>
+    </div>`;
+  }).join('');
+  return `
+  <div class="record-group">
+    <div class="record-group-header" onclick="toggleGroup('${groupId}')">
+      <div class="record-left">
+        <div class="record-name">${recordDisplayName(primary)}<span class="record-group-badge">${children.length + 1}</span></div>
+        <div class="record-meta">${meta}</div>
+      </div>
+      <div class="record-right" style="display:flex;align-items:center;">
+        <div>
+          <div class="record-amount ${amountColor}">${amountPrefix}¥${Number(primary.amount||0).toLocaleString()}</div>
+          <div class="record-date">${formatDate(primary.date)}</div>
+        </div>
+        <span class="record-group-chevron">▼</span>
+        <button class="record-edit-btn" onclick="event.stopPropagation();showEditModal(${Number(primary.id)})" title="編集">✏️</button>
+        <button class="record-del-btn" onclick="event.stopPropagation();showDeleteConfirm(${Number(primary.id)},${Number(primary.serviceId)},true)" title="グループ削除">🗑</button>
+      </div>
+    </div>
+    <div class="record-group-children" id="group-${groupId}">${childrenHtml}</div>
+  </div>`;
+}
+
+function toggleGroup(groupId) {
+  const children = document.getElementById('group-' + groupId);
+  const header = children.previousElementSibling;
+  children.classList.toggle('open');
+  header.classList.toggle('expanded');
+}
+
 function renderList() {
   if (allRecords.length === 0) {
     document.getElementById('records-container').innerHTML =
       '<div class="empty-state"><div class="icon">📭</div><p>記録がありません</p></div>';
     return;
   }
-  const html = allRecords.slice(0, 100).map(r => {
-    const sign = getSign(r.service);
-    const amountColor = sign === 'income' ? 'positive' : sign === 'expense' ? 'negative' : '';
-    const amountPrefix = sign === 'income' ? '+' : sign === 'expense' ? '-' : '±';
-    const name = r.service === '給与' ? '給与'
-               : r.service === 'チャージ' ? `チャージ（${esc(r.payment2)}→${esc(r.payment1)}）`
-               : r.service === '売却' ? `売却（${esc(r.category2 || r.category1 || '')}）`
-               : r.service === 'クレカ引き落とし' ? `クレカ引き落とし（${esc(r.payment1)}）`
-               : esc(r.store || r.category1 || r.service || '-');
-    const meta = [r.service, r.category1, r.payment1].filter(Boolean).map(esc).join(' / ');
-    return `
-    <div class="record-item">
-      <div class="record-left">
-        <div class="record-name">${name}</div>
-        <div class="record-meta">${meta}</div>
-      </div>
-      <div class="record-right">
-        <div class="record-amount ${amountColor}">${amountPrefix}¥${Number(r.amount||0).toLocaleString()}</div>
-        <div class="record-date">${formatDate(r.date)}</div>
-      </div>
-    </div>`;
+
+  // serviceIdでグループ化（表示順を維持しつつ先頭レコードを代表とする）
+  const grouped = new Map();
+  allRecords.slice(0, 150).forEach(r => {
+    const key = r.serviceId != null && r.serviceId !== '' ? String(r.serviceId) : null;
+    if (!key) { grouped.set('solo_' + r.id, { primary: r, children: [] }); return; }
+    if (!grouped.has(key)) { grouped.set(key, { primary: r, children: [] }); }
+    else { grouped.get(key).children.push(r); }
+  });
+
+  const html = Array.from(grouped.entries()).map(([key, { primary, children }]) => {
+    if (children.length === 0) return renderRecordSingle(primary);
+    return renderRecordGroup(primary, children, key);
   }).join('');
+
   document.getElementById('records-container').innerHTML = html;
 }
 
@@ -1526,12 +2574,14 @@ function renderRecentRecords() {
                 : r.service === '売却' ? `売却(${esc(r.category2||'')})`
                 : r.service === '資産追加' ? `資産追加(${esc(r.category2||'')})`
                 : esc(r.store || r.category1 || r.service || '-');
-    return `<div style="background:white;border-radius:10px;padding:10px 12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;">
-      <div>
+    return `<div style="background:white;border-radius:10px;padding:10px 12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,0.07);display:flex;align-items:center;gap:4px;">
+      <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;color:#1e293b;">${label}</div>
         <div style="font-size:11px;color:#94a3b8;">${formatDate(r.date)} · ${esc(r.service)} · ${esc(r.payment1||'')}</div>
       </div>
-      <div style="font-size:15px;font-weight:700;color:${color};white-space:nowrap;margin-left:10px;">${prefix}¥${Number(r.amount||0).toLocaleString()}</div>
+      <div style="font-size:15px;font-weight:700;color:${color};white-space:nowrap;">${prefix}¥${Number(r.amount||0).toLocaleString()}</div>
+      <button class="record-edit-btn" onclick="showEditModal(${Number(r.id)})" title="編集">✏️</button>
+      <button class="record-del-btn" onclick="showDeleteConfirm(${Number(r.id)},null,false)" title="削除">🗑</button>
     </div>`;
   }).join('');
 }
@@ -1570,6 +2620,765 @@ function dupeConfirm() {
   _pendingRecord = null; _pendingCallback = null;
 }
 
+// ===== 資産別取引ボトムシート =====
+let assetDetailMonths = []; // ascending (oldest→newest)
+let assetDetailMonthIdx = 0;
+let assetDetailTxsByMonth = {};
+let assetDetailChart = null;
+let assetBalanceChart = null;
+let assetDetailCurrentKey = null;
+let assetScanImageBase64 = null;
+let assetScanPreviewRecords = [];
+let assetScanSelected = [];
+
+function showAssetDetail(key, label, current) {
+  assetDetailCurrentKey = key;
+  const txs = getAssetTransactions(key);
+
+  assetDetailTxsByMonth = {};
+  txs.forEach(r => {
+    const m = String(r.date).slice(0, 7);
+    if (!assetDetailTxsByMonth[m]) assetDetailTxsByMonth[m] = [];
+    assetDetailTxsByMonth[m].push(r);
+  });
+  assetDetailMonths = Object.keys(assetDetailTxsByMonth).sort();
+  assetDetailMonthIdx = assetDetailMonths.length - 1; // 最新月から開始
+
+  document.getElementById('asset-sheet-title').textContent = label + ' の明細';
+  const colorClass = current >= 0 ? 'positive' : 'negative';
+  document.getElementById('asset-sheet-balance').innerHTML =
+    `現在残高 <span class="${colorClass}" style="font-weight:700;">¥${current.toLocaleString()}</span>`;
+
+  renderAssetDetailChart();
+  renderAssetBalanceChart();
+  renderAssetMonthTxs();
+
+  document.getElementById('asset-sheet-overlay').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('asset-sheet').classList.add('open'));
+}
+
+function closeAssetDetail() {
+  document.getElementById('asset-sheet').classList.remove('open');
+  document.getElementById('asset-sheet-overlay').classList.remove('open');
+  if (assetDetailChart) { assetDetailChart.destroy(); assetDetailChart = null; }
+  if (assetBalanceChart) { assetBalanceChart.destroy(); assetBalanceChart = null; }
+}
+
+function renderAssetBalanceChart() {
+  const key = assetDetailCurrentKey;
+  const init = Number(assetInits[key] || 0);
+  const months = Object.keys(assetDetailTxsByMonth).sort();
+
+  const canvas = document.getElementById('asset-balance-chart');
+  if (assetBalanceChart) { assetBalanceChart.destroy(); assetBalanceChart = null; }
+  if (months.length === 0) return;
+
+  const labels = months.map(m => {
+    const [y, mo] = m.split('-');
+    return `${String(y).slice(2)}/${Number(mo)}月`;
+  });
+
+  let running = init;
+  const balances = months.map(m => {
+    const recs = assetDetailTxsByMonth[m] || [];
+    running += recs.filter(r => r.dir === 'in').reduce((s, r) => s + r.amt, 0);
+    running -= recs.filter(r => r.dir === 'out').reduce((s, r) => s + r.amt, 0);
+    return running;
+  });
+
+  const selectedIdx = assetDetailMonthIdx;
+  const pointColors = months.map((_, i) => i === selectedIdx ? '#6366f1' : 'rgba(99,102,241,0.5)');
+  const pointSizes  = months.map((_, i) => i === selectedIdx ? 5 : 3);
+
+  assetBalanceChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: balances,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.08)',
+        borderWidth: 2,
+        pointRadius: pointSizes,
+        pointBackgroundColor: pointColors,
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => '¥' + ctx.raw.toLocaleString() } }
+      },
+      scales: {
+        y: { ticks: { callback: v => '¥' + Math.round(v / 1000) + 'k', font: { size: 9 } }, grid: { color: '#f8fafc' } },
+        x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+      },
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          assetDetailMonthIdx = elements[0].index;
+          renderAssetDetailChart();
+          renderAssetBalanceChart();
+          renderAssetMonthTxs();
+        }
+      }
+    }
+  });
+}
+
+let aqHinmoku = '';
+let aqCategory2 = '';
+let aqChargeFrom = '';
+let aqService = '購入';
+const AQ_SHOKUHIN_LIST = ['昼飯', 'エナドリ', '一般'];
+const AQ_CHARGE_FROM_LIST = ['現金', 'クレカ', '三井住友', 'ゆうちょ銀行', '住信SBI', 'Vポイント', 'VポイントPay', 'PayPay1', 'PayPay2'];
+const AQ_HINMOKU_LIST = ['食料品', '趣味', '衣類', '日用品', '交通費', '医療', 'ギフト券類'];
+const AQ_SERVICE_LIST = ['購入', 'もらう', 'あげる', 'キャッシュバック', 'チャージ'];
+
+function openRegisterForAsset() {
+  const key = assetDetailCurrentKey;
+  aqHinmoku = ''; aqCategory2 = ''; aqChargeFrom = '';
+  aqService = '購入';
+  document.getElementById('aq-store').value = '';
+  document.getElementById('aq-amount').value = '';
+  document.getElementById('aq-jusho').value = '';
+  document.getElementById('aq-itemname').value = '';
+  document.getElementById('aq-quantity').value = '';
+  document.getElementById('aq-category2-row').style.display = 'none';
+  document.getElementById('aq-shokuhin-chips').innerHTML = '';
+
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  let defaultDate = todayStr;
+  if (assetDetailMonths.length > 0) {
+    const selMonth = assetDetailMonths[assetDetailMonthIdx];
+    defaultDate = selMonth === todayStr.slice(0, 7) ? todayStr : selMonth + '-01';
+  }
+  document.getElementById('aq-date').value = defaultDate;
+
+  document.getElementById('aq-service-chips').innerHTML = AQ_SERVICE_LIST.map(v =>
+    `<div class="aq-chip${v === '購入' ? ' selected' : ''}" data-val="${v}" onclick="selectAqService(this)">${v}</div>`
+  ).join('');
+
+  document.getElementById('aq-hinmoku-chips').innerHTML = AQ_HINMOKU_LIST.map(v =>
+    `<div class="aq-chip" data-val="${v}" onclick="selectAqChip(this)">${v}</div>`
+  ).join('');
+
+  // チャージ元（自分以外のASSETS）
+  const chargeFromOptions = AQ_CHARGE_FROM_LIST.filter(v => v !== key);
+  document.getElementById('aq-chargefrom-chips').innerHTML = chargeFromOptions.map(v =>
+    `<div class="aq-chip" data-val="${v}" onclick="selectAqChargeFrom(this)">${v}</div>`
+  ).join('');
+
+  updateAqFormVisibility();
+
+  const asset = ASSETS.find(a => a.key === key);
+  document.getElementById('aq-payment-label').textContent = `資産：${asset ? asset.label : key}`;
+
+  const form = document.getElementById('asset-quick-form');
+  form.classList.add('open');
+  setTimeout(() => document.getElementById('aq-amount').focus(), 100);
+}
+
+function selectAqService(chip) {
+  chip.parentElement.querySelectorAll('.aq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  aqService = chip.dataset.val;
+  aqHinmoku = ''; aqCategory2 = ''; aqChargeFrom = '';
+  document.getElementById('aq-hinmoku-chips').querySelectorAll('.aq-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('aq-shokuhin-chips').innerHTML = '';
+  document.getElementById('aq-itemname').value = '';
+  document.getElementById('aq-quantity').value = '';
+  document.getElementById('aq-chargefrom-chips').querySelectorAll('.aq-chip').forEach(c => c.classList.remove('selected'));
+  updateAqFormVisibility();
+}
+
+function updateAqFormVisibility() {
+  const needsHinmoku = ['購入', 'あげる'].includes(aqService);
+  const needsJusho = ['もらう', 'あげる'].includes(aqService);
+  const needsChargeFrom = aqService === 'チャージ';
+  document.getElementById('aq-hinmoku-row').style.display = needsHinmoku ? '' : 'none';
+  document.getElementById('aq-jusho-row').style.display = needsJusho ? '' : 'none';
+  document.getElementById('aq-chargefrom-row').style.display = needsChargeFrom ? '' : 'none';
+  // category2は hinmoku変更時に制御するので、hinmokuリセット時は非表示に
+  if (!needsHinmoku) document.getElementById('aq-category2-row').style.display = 'none';
+}
+
+function updateAqCategory2Row() {
+  const row = document.getElementById('aq-category2-row');
+  const shokuhinChips = document.getElementById('aq-shokuhin-chips');
+  const itemnameInput = document.getElementById('aq-itemname');
+  const quantityInput = document.getElementById('aq-quantity');
+  aqCategory2 = '';
+  if (aqHinmoku === '食料品') {
+    row.style.display = '';
+    document.getElementById('aq-category2-label').textContent = '食料品の種類';
+    shokuhinChips.innerHTML = AQ_SHOKUHIN_LIST.map(v =>
+      `<div class="aq-chip" data-val="${v}" onclick="selectAqCategory2(this)">${v}</div>`
+    ).join('');
+    itemnameInput.style.display = 'none';
+    quantityInput.style.display = 'none';
+  } else if (aqHinmoku === 'ギフト券類') {
+    row.style.display = '';
+    document.getElementById('aq-category2-label').textContent = '品目名・数量';
+    shokuhinChips.innerHTML = '';
+    itemnameInput.style.display = '';
+    quantityInput.style.display = '';
+  } else {
+    row.style.display = 'none';
+    shokuhinChips.innerHTML = '';
+    itemnameInput.style.display = 'none';
+    quantityInput.style.display = 'none';
+  }
+}
+
+function selectAqCategory2(chip) {
+  chip.parentElement.querySelectorAll('.aq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  aqCategory2 = chip.dataset.val;
+}
+
+function selectAqChargeFrom(chip) {
+  chip.parentElement.querySelectorAll('.aq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  aqChargeFrom = chip.dataset.val;
+}
+
+function closeQuickForm() {
+  document.getElementById('asset-quick-form').classList.remove('open');
+}
+
+function selectAqChip(chip) {
+  chip.parentElement.querySelectorAll('.aq-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  aqHinmoku = chip.dataset.val;
+  updateAqCategory2Row();
+}
+
+function calcBalanceForAsset(key) {
+  const init = Number(assetInits[key] || 0);
+  let inAmt = 0, outAmt = 0;
+  allRecords.forEach(r => {
+    const amt = Number(r.amount || 0);
+    const svc = r.service;
+    const p1 = r.payment1;
+    const p2 = r.payment2;
+    if (!p1) return;
+    if (['購入','外食','立て替え','あげる'].includes(svc)) { if (p1 === key) outAmt += amt; }
+    else if (['キャッシュバック','もらう'].includes(svc)) { if (p1 === key) inAmt += amt; }
+    else if (svc === 'チャージ') { if (p1 === key) inAmt += amt; else if (p2 === key) outAmt += amt; }
+    else if (svc === '預け入れ') { if (p1 === key) inAmt += amt; else if (key === '現金') outAmt += amt; }
+    else if (svc === '引き出し') { if (p1 === key) outAmt += amt; else if (key === '現金') inAmt += amt; }
+    else if (svc === 'ATM入金') { if (p1 === key) inAmt += amt; else if (key === '現金') outAmt += amt; }
+    else if (svc === 'ATM出金') { if (p1 === key) outAmt += amt; else if (key === '現金') inAmt += amt; }
+    else if (svc === '振込入金') { if (p1 === key) inAmt += amt; }
+    else if (svc === '振込出金' || svc === '振込') { if (p1 === key) outAmt += amt; }
+    else if (svc === '給与') { if (p1 === key) inAmt += amt; }
+    else if (svc === '売却') { if (p1 === key) inAmt += amt; }
+    else if (svc === 'クレカ引き落とし') { if (p1 === key) outAmt += amt; }
+  });
+  return init + inAmt - outAmt;
+}
+
+async function registerQuick() {
+  const key = assetDetailCurrentKey;
+  const store = document.getElementById('aq-store').value.trim();
+  const amount = document.getElementById('aq-amount').value;
+  const jusho = document.getElementById('aq-jusho').value.trim();
+
+  const needsHinmoku = ['購入', 'あげる'].includes(aqService);
+  const isCharge = aqService === 'チャージ';
+  const isGift = needsHinmoku && aqHinmoku === 'ギフト券類';
+
+  if (needsHinmoku && !aqHinmoku) { showToast('品目を選択してください', true); return; }
+  if (needsHinmoku && aqHinmoku === '食料品' && !aqCategory2) { showToast('食料品の種類を選択してください', true); return; }
+  if (isGift && !document.getElementById('aq-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
+  if (isGift && !document.getElementById('aq-quantity').value) { showToast('数量を入力してください', true); return; }
+  if (isCharge && !aqChargeFrom) { showToast('チャージ元を選択してください', true); return; }
+  if (!amount || Number(amount) <= 0) { showToast('金額を入力してください', true); return; }
+  if (!gasUrl) { showToast('GAS URLを設定してください', true); return; }
+
+  let cat2 = '';
+  if (isGift) cat2 = document.getElementById('aq-itemname').value.trim();
+  else if (needsHinmoku) cat2 = aqCategory2;
+
+  const record = {
+    date: document.getElementById('aq-date').value || new Date().toLocaleDateString('sv-SE'),
+    service: aqService,
+    category1: needsHinmoku ? aqHinmoku : '',
+    category2: cat2,
+    store: store || jusho,
+    amount: amount,
+    payment1: isCharge ? key : key,
+    payment2: isCharge ? aqChargeFrom : '',
+    quantity: isGift ? document.getElementById('aq-quantity').value : '',
+  };
+
+  showLoading('登録中...');
+  try {
+    const params = new URLSearchParams({ action: 'add', ...record });
+    await fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    await loadAllData();
+    hideLoading();
+    closeQuickForm();
+    showToast('✓ 登録しました！');
+    // ボトムシートの残高・明細を更新
+    const newBalance = calcBalanceForAsset(key);
+    const asset = ASSETS.find(a => a.key === key);
+    if (asset) showAssetDetail(key, asset.label, newBalance);
+  } catch(e) {
+    hideLoading();
+    showToast('登録に失敗しました', true);
+  }
+}
+
+// ===== 資産明細スキャン =====
+
+function openScanForAsset() {
+  if (!claudeKey) { showToast('設定タブでClaude APIキーを入力してください', true); return; }
+  document.getElementById('asset-quick-form').classList.remove('open');
+  assetScanImageBase64 = null;
+  assetScanPreviewRecords = [];
+  assetScanSelected = [];
+  document.getElementById('asset-scan-upload-area').style.display = 'block';
+  const img = document.getElementById('asset-scan-img');
+  img.style.display = 'none'; img.src = '';
+  document.getElementById('asset-scan-btn').style.display = 'none';
+  document.getElementById('asset-scan-results').style.display = 'none';
+  document.getElementById('asset-scan-close-row').style.display = 'block';
+  document.getElementById('asset-scan-input').value = '';
+  // スキャンフォームを唯一のスクロール領域にするため、他の要素を隠す
+  document.querySelector('.asset-detail-chart-wrap').style.display = 'none';
+  document.getElementById('asset-balance-chart-wrap').style.display = 'none';
+  document.getElementById('asset-month-nav').style.display = 'none';
+  document.getElementById('asset-sheet-body').style.display = 'none';
+  document.getElementById('asset-scan-form').classList.add('open');
+}
+
+function closeScanForm() {
+  document.getElementById('asset-scan-form').classList.remove('open');
+  document.querySelector('.asset-detail-chart-wrap').style.display = '';
+  document.getElementById('asset-balance-chart-wrap').style.display = '';
+  document.getElementById('asset-month-nav').style.display = '';
+  document.getElementById('asset-sheet-body').style.display = '';
+}
+
+function handleAssetScanImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const image = new Image();
+    image.onload = () => {
+      const MAX = 1200;
+      let w = image.width, h = image.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(image, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.75);
+      assetScanImageBase64 = compressed.split(',')[1];
+      const previewImg = document.getElementById('asset-scan-img');
+      previewImg.src = compressed;
+      previewImg.style.display = 'block';
+      document.getElementById('asset-scan-upload-area').style.display = 'none';
+      document.getElementById('asset-scan-btn').style.display = 'block';
+    };
+    image.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function scanAssetStatement() {
+  if (!claudeKey || !assetScanImageBase64) return;
+  const key = assetDetailCurrentKey;
+  const asset = ASSETS.find(a => a.key === key);
+  const assetType = asset ? asset.type : '';
+  const serviceHint = {
+    '現金':     'キャッシュバック/チャージ/もらう/あげる/購入',
+    '銀行':     'ATM入金/ATM出金/振込入金/振込出金/給与/クレカ引き落とし/チャージ/キャッシュバック',
+    'QR決済':   'キャッシュバック/チャージ/購入',
+    'プリペイド':'チャージ/購入/キャッシュバック',
+    'ポイント': 'キャッシュバック/あげる',
+  }[assetType] || 'キャッシュバック/チャージ/購入';
+
+  const prompt = `この画像は「${key}」（${assetType}型資産）の明細スクリーンショットです。
+明細の各行を全て読み取り、必ず以下のJSON配列のみを返してください（配列以外のテキスト不要）：
+[{"date":"YYYY-MM-DD","service":"キャッシュバック","amount":500,"store":"","chargeFrom":""}]
+ルール：
+- service は ${serviceHint} のどれかを選ぶ
+- amount は数字のみ（円・ポイント記号なし）
+- date は明細の日付（YYYY-MM-DD形式、不明なら今月1日）
+- store は常に空文字 ""
+- chargeFrom はチャージの場合のみチャージ元の名前、それ以外は空文字
+- ポイント付与・入金・還元は必ず「キャッシュバック」を使用すること。「もらう」は人から現金を受け取った場合のみ使用する`;
+
+  showLoading('AIで読み取り中...');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': claudeKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 2048,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: assetScanImageBase64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.content[0].text;
+    const arrMatch = text.match(/\[[\s\S]*\]/);
+    if (!arrMatch) throw new Error('解析失敗');
+    const parsed = JSON.parse(arrMatch[0]);
+    hideLoading();
+    assetScanPreviewRecords = parsed.map(r => ({
+      ...r,
+      service: r.service === 'もらう' ? 'キャッシュバック' : r.service
+    }));
+    renderScanPreview(assetScanPreviewRecords);
+  } catch(e) {
+    hideLoading();
+    showToast('読み取りに失敗しました: ' + e.message, true);
+  }
+}
+
+const SCAN_ALL_SERVICES = ['キャッシュバック','チャージ','もらう','給与','ATM入金','ATM出金','振込入金','振込出金','購入','あげる','クレカ引き落とし','売却'];
+const SCAN_IN_SERVICES = new Set(['キャッシュバック','もらう','給与','売却','ATM入金','チャージ','振込入金']);
+
+function editScanRecord(idx, field, value) {
+  assetScanPreviewRecords[idx][field] = field === 'amount' ? Number(value) : value;
+}
+
+function checkScanDuplicates() {
+  const key = assetDetailCurrentKey;
+  let dupeCount = 0;
+  assetScanPreviewRecords.forEach((r, i) => {
+    const el = document.getElementById('scan-item-' + i);
+    if (!el) return;
+    const isDupe = allRecords.some(ex =>
+      String(ex.date).slice(0, 10) === String(r.date).slice(0, 10) &&
+      Number(ex.amount) === Number(r.amount) &&
+      ex.payment1 === key &&
+      ex.service === r.service
+    );
+    el.classList.toggle('dupe-warn', isDupe);
+    el.classList.toggle('dupe-ok', !isDupe);
+    if (isDupe) dupeCount++;
+  });
+  const total = assetScanPreviewRecords.length;
+  if (dupeCount === 0) {
+    showToast(`全${total}件、重複なし`);
+  } else {
+    showToast(`${total}件中 ${dupeCount}件が重複の可能性あり（黄色）`, true);
+  }
+}
+
+function renderScanPreview(records) {
+  assetScanSelected = records.map(() => true);
+  const list = document.getElementById('asset-scan-list');
+  list.innerHTML = records.map((r, i) => {
+    const isIn = SCAN_IN_SERVICES.has(r.service);
+    const amtColor = isIn ? '#10b981' : '#ef4444';
+    const svcOptions = SCAN_ALL_SERVICES.map(s =>
+      `<option value="${s}"${s === r.service ? ' selected' : ''}>${s}</option>`
+    ).join('');
+    const showChargeFrom = r.service === 'チャージ' || (r.chargeFrom && r.chargeFrom.trim());
+    return `<div class="scan-record-item" id="scan-item-${i}">
+      <div id="scan-chk-${i}" onclick="toggleScanItem(${i})"
+        style="width:28px;height:28px;border-radius:7px;border:2px solid #10b981;background:#10b981;
+        display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        cursor:pointer;margin-top:2px;touch-action:manipulation;user-select:none;">
+        <span style="color:white;font-size:17px;line-height:1;pointer-events:none;">✓</span>
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <input type="date" value="${r.date || ''}" onchange="editScanRecord(${i},'date',this.value)"
+            class="scan-edit-input" style="font-size:11px;flex:1;min-width:110px;">
+          <select onchange="editScanRecord(${i},'service',this.value)"
+            class="scan-edit-input" style="font-size:11px;">${svcOptions}</select>
+        </div>
+        <input type="text" value="${esc(r.store || '')}" placeholder="メモ・店名（任意）"
+          oninput="editScanRecord(${i},'store',this.value)"
+          class="scan-edit-input" style="width:100%;font-size:12px;">
+        ${showChargeFrom ? `<input type="text" value="${esc(r.chargeFrom || '')}" placeholder="チャージ元"
+          oninput="editScanRecord(${i},'chargeFrom',this.value)"
+          class="scan-edit-input" style="width:100%;font-size:11px;color:#6366f1;">` : ''}
+      </div>
+      <input type="number" value="${Number(r.amount || 0)}" onchange="editScanRecord(${i},'amount',this.value)"
+        class="scan-edit-input" style="width:72px;font-size:13px;font-weight:700;color:${amtColor};text-align:right;flex-shrink:0;">
+    </div>`;
+  }).join('');
+  document.getElementById('asset-scan-results').style.display = 'block';
+  document.getElementById('asset-scan-close-row').style.display = 'none';
+}
+
+function toggleScanItem(i) {
+  assetScanSelected[i] = !assetScanSelected[i];
+  const chk = document.getElementById('scan-chk-' + i);
+  if (assetScanSelected[i]) {
+    chk.style.background = '#10b981';
+    chk.style.borderColor = '#10b981';
+    chk.innerHTML = '<span style="color:white;font-size:17px;line-height:1;pointer-events:none;">✓</span>';
+  } else {
+    chk.style.background = 'white';
+    chk.style.borderColor = '#cbd5e1';
+    chk.innerHTML = '';
+  }
+}
+
+async function registerBatchFromScan() {
+  const key = assetDetailCurrentKey;
+  if (!gasUrl) { showToast('GAS URLを設定してください', true); return; }
+  const selected = assetScanPreviewRecords.filter((_, i) => assetScanSelected[i]);
+  if (selected.length === 0) { showToast('登録する項目を選択してください', true); return; }
+
+  const lastId = Number(localStorage.getItem('kakeibo_lastServiceId') || 0);
+  const today = new Date().toLocaleDateString('sv-SE');
+  const records = selected.map((r, i) => ({
+    date: r.date || today,
+    service: r.service,
+    category1: '',
+    category2: '',
+    store: r.store || '',
+    amount: Number(r.amount) || 0,
+    payment1: key,
+    payment2: r.service === 'チャージ' ? (r.chargeFrom || '') : '',
+    quantity: '',
+    serviceId: lastId + 1 + i,
+  }));
+  localStorage.setItem('kakeibo_lastServiceId', lastId + selected.length);
+
+  showLoading('登録中...');
+  try {
+    await fetch(gasUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'batchAdd', records }),
+    });
+    await loadAllData();
+    hideLoading();
+    closeScanForm();
+    showToast(`✓ ${records.length}件を登録しました！`);
+    const newBalance = calcBalanceForAsset(key);
+    const asset = ASSETS.find(a => a.key === key);
+    if (asset) showAssetDetail(key, asset.label, newBalance);
+  } catch(e) {
+    hideLoading();
+    showToast('登録に失敗しました', true);
+  }
+}
+
+function prefillPaymentForAsset(key) {
+  const DEBIT   = ['三井住友', '住信SBI'];
+  const QR      = ['PayPay1', 'PayPay2', 'Fami Pay'];
+  const PREPAID = ['majica', 'WAON', 'VポイントPay', 'quoカード', 'Amazonギフトカード', 'PASMO', 'スタバカード'];
+  const POINT   = ['Vポイント', 'Amazonポイント', 'Ponta', 'リクルートポイント'];
+
+  let shiharaiVal = null, emoneyVal = null;
+  if (key === '現金' || key === '貯金箱') {
+    shiharaiVal = '現金';
+  } else if (DEBIT.includes(key)) {
+    shiharaiVal = 'デビット'; emoneyVal = key;
+  } else if (QR.includes(key)) {
+    shiharaiVal = 'QR決済'; emoneyVal = key;
+  } else if (PREPAID.includes(key)) {
+    shiharaiVal = 'プリペイド'; emoneyVal = key;
+  } else if (POINT.includes(key)) {
+    shiharaiVal = 'ポイント'; emoneyVal = key;
+  }
+
+  if (!shiharaiVal) return;
+
+  const shiharaiChip = document.querySelector(`#f-shiharai-chips .chip[data-val="${shiharaiVal}"]`);
+  if (shiharaiChip) shiharaiChip.click();
+
+  if (emoneyVal) {
+    setTimeout(() => {
+      const emoneyChip = document.querySelector(`#f-emoney-chips .chip[data-val="${emoneyVal}"]`);
+      if (emoneyChip) emoneyChip.click();
+    }, 50);
+  }
+}
+
+function assetMonthNav(delta) {
+  const next = assetDetailMonthIdx + delta;
+  if (next < 0 || next >= assetDetailMonths.length) return;
+  assetDetailMonthIdx = next;
+  renderAssetDetailChart();
+  renderAssetBalanceChart();
+  renderAssetMonthTxs();
+}
+
+function renderAssetDetailChart() {
+  if (assetDetailMonths.length === 0) {
+    if (assetDetailChart) { assetDetailChart.destroy(); assetDetailChart = null; }
+    return;
+  }
+  const selectedMonth = assetDetailMonths[assetDetailMonthIdx];
+  const labels = assetDetailMonths.map(m => {
+    const [y, mo] = m.split('-');
+    return `${String(y).slice(2)}/${Number(mo)}月`;
+  });
+  const inData  = assetDetailMonths.map(m =>
+    (assetDetailTxsByMonth[m] || []).filter(r => r.dir === 'in').reduce((s,r) => s + r.amt, 0));
+  const outData = assetDetailMonths.map(m =>
+    (assetDetailTxsByMonth[m] || []).filter(r => r.dir === 'out').reduce((s,r) => s + r.amt, 0));
+  const selectedIdx = assetDetailMonthIdx;
+
+  const inColors  = assetDetailMonths.map((m, i) => i === selectedIdx ? '#10b981' : 'rgba(16,185,129,0.35)');
+  const outColors = assetDetailMonths.map((m, i) => i === selectedIdx ? '#ef4444' : 'rgba(239,68,68,0.35)');
+
+  const canvas = document.getElementById('asset-detail-chart');
+  if (assetDetailChart) assetDetailChart.destroy();
+  assetDetailChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '入金', data: inData,  backgroundColor: inColors,  borderRadius: 3 },
+        { label: '出金', data: outData, backgroundColor: outColors, borderRadius: 3 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => (ctx.datasetIndex === 0 ? '+' : '-') + '¥' + ctx.raw.toLocaleString() } }
+      },
+      scales: {
+        y: { ticks: { callback: v => '¥' + (v/1000).toFixed(0) + 'k', font: { size: 10 } }, grid: { color: '#f1f5f9' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      },
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          assetDetailMonthIdx = elements[0].index;
+          renderAssetDetailChart();
+          renderAssetMonthTxs();
+        }
+      }
+    }
+  });
+}
+
+function renderAssetMonthTxs() {
+  if (assetDetailMonths.length === 0) {
+    document.getElementById('month-nav-label').textContent = '取引なし';
+    document.getElementById('month-nav-summary').innerHTML = '';
+    document.getElementById('asset-month-prev').disabled = true;
+    document.getElementById('asset-month-next').disabled = true;
+    document.getElementById('asset-sheet-body').innerHTML =
+      '<div class="empty-state"><div class="icon">📭</div><p>まだ取引がありません</p></div>';
+    return;
+  }
+  const month = assetDetailMonths[assetDetailMonthIdx];
+  const [y, m] = month.split('-');
+  const records = (assetDetailTxsByMonth[month] || []).slice().sort((a, b) => {
+    const d = String(a.date).localeCompare(String(b.date));
+    return d !== 0 ? d : String(a.service).localeCompare(String(b.service));
+  });
+
+  const netIn  = records.filter(r => r.dir === 'in').reduce((s,r) => s + r.amt, 0);
+  const netOut = records.filter(r => r.dir === 'out').reduce((s,r) => s + r.amt, 0);
+  const net = netIn - netOut;
+
+  document.getElementById('month-nav-label').textContent = `${y}年${Number(m)}月`;
+  document.getElementById('month-nav-summary').innerHTML =
+    `<span style="color:#10b981;">+¥${netIn.toLocaleString()}</span>　` +
+    `<span style="color:#ef4444;">-¥${netOut.toLocaleString()}</span>　` +
+    `<span style="color:${net>=0?'#10b981':'#ef4444'};font-weight:700;">${net>=0?'':''}¥${net.toLocaleString()}</span>`;
+  document.getElementById('asset-month-prev').disabled = assetDetailMonthIdx === 0;
+  document.getElementById('asset-month-next').disabled = assetDetailMonthIdx === assetDetailMonths.length - 1;
+
+  if (records.length === 0) {
+    document.getElementById('asset-sheet-body').innerHTML =
+      '<div class="empty-state"><div class="icon">📭</div><p>この月の取引なし</p></div>';
+    return;
+  }
+
+  document.getElementById('asset-sheet-body').innerHTML = records.map(r => {
+    const color = r.dir === 'in' ? '#10b981' : '#ef4444';
+    const prefix = r.dir === 'in' ? '+' : '-';
+    const name = r.service === 'チャージ'        ? `チャージ（${esc(r.payment2)}→${esc(r.payment1)}）`
+               : r.service === '売却'             ? `売却（${esc(r.category2 || r.category1 || '')}）`
+               : r.service === '預け入れ'         ? `預け入れ（${esc(r.payment1)}）`
+               : r.service === '引き出し'         ? `引き出し（${esc(r.payment1)}）`
+               : r.service === 'クレカ引き落とし' ? `クレカ引き落とし（${esc(r.payment1)}）`
+               : esc(r.store || r.category1 || r.service || '-');
+    const d = new Date(r.date);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const meta = [r.service, r.category1 || r.category2].filter(Boolean).map(esc).join(' · ');
+    return `
+      <div class="asset-tx-item">
+        <div style="flex:1;min-width:0;">
+          <div class="asset-tx-name">${name}</div>
+          <div class="asset-tx-meta">${dateStr} · ${meta}</div>
+        </div>
+        <div class="asset-tx-amount" style="color:${color}">${prefix}¥${r.amt.toLocaleString()}</div>
+        <button class="record-edit-btn" onclick="showEditModal(${Number(r.id)})" title="編集">✏️</button>
+        <button class="record-del-btn" onclick="showDeleteConfirm(${Number(r.id)},null,false)" title="削除">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+function getAssetTransactions(assetKey) {
+  return allRecords.map(r => {
+    const svc = r.service;
+    const p1 = r.payment1;
+    const p2 = r.payment2;
+    const amt = Number(r.amount || 0);
+    let dir = null;
+
+    if (['購入','外食','立て替え','あげる'].includes(svc)) {
+      if (p1 === assetKey) dir = 'out';
+    } else if (['キャッシュバック','もらう'].includes(svc)) {
+      if (p1 === assetKey) dir = 'in';
+    } else if (svc === 'チャージ') {
+      if (p1 === assetKey) dir = 'in';
+      else if (p2 === assetKey) dir = 'out';
+    } else if (svc === '預け入れ') {
+      if (p1 === assetKey) dir = 'in';
+      else if (assetKey === '現金') dir = 'out';
+    } else if (svc === '引き出し') {
+      if (p1 === assetKey) dir = 'out';
+      else if (assetKey === '現金') dir = 'in';
+    } else if (svc === 'ATM入金') {
+      if (p1 === assetKey) dir = 'in';
+      else if (assetKey === '現金') dir = 'out';
+    } else if (svc === 'ATM出金') {
+      if (p1 === assetKey) dir = 'out';
+      else if (assetKey === '現金') dir = 'in';
+    } else if (svc === '振込入金') {
+      if (p1 === assetKey) dir = 'in';
+    } else if (svc === '振込出金' || svc === '振込') {
+      if (p1 === assetKey) dir = 'out';
+    } else if (svc === '給与') {
+      if (p1 === assetKey) dir = 'in';
+    } else if (svc === '売却') {
+      if (p1 === assetKey) dir = 'in';
+    } else if (svc === 'クレカ引き落とし') {
+      if (p1 === assetKey) dir = 'out';
+    }
+
+    if (!dir) return null;
+    return { ...r, dir, amt };
+  }).filter(Boolean);
+}
+
 // ===== Helpers =====
 function today() { return new Date().toLocaleDateString('sv-SE'); }
 function formatDate(d) {
@@ -1580,6 +3389,148 @@ function formatDate(d) {
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+// ===== 全画面リフレッシュ =====
+function refreshAll() {
+  renderRecentRecords();
+  renderDashboard();
+  renderAssets();
+  renderList();
+  // 資産詳細シートが開いていれば再描画
+  if (assetDetailCurrentKey && document.getElementById('asset-sheet').classList.contains('open')) {
+    const txs = getAssetTransactions(assetDetailCurrentKey);
+    assetDetailTxsByMonth = {};
+    txs.forEach(r => {
+      const m = String(r.date).slice(0, 7);
+      if (!assetDetailTxsByMonth[m]) assetDetailTxsByMonth[m] = [];
+      assetDetailTxsByMonth[m].push(r);
+    });
+    assetDetailMonths = Object.keys(assetDetailTxsByMonth).sort();
+    assetDetailMonthIdx = Math.min(assetDetailMonthIdx, Math.max(0, assetDetailMonths.length - 1));
+    renderAssetDetailChart();
+    renderAssetBalanceChart();
+    renderAssetMonthTxs();
+  }
+  // 店別詳細シートが開いていれば再描画
+  if (storeDetailCurrentStore && document.getElementById('store-sheet').classList.contains('open')) {
+    const txs = allRecords.filter(r => r.store === storeDetailCurrentStore && ['購入','立て替え','外食'].includes(r.service));
+    storeDetailTxsByMonth = {};
+    txs.forEach(r => {
+      const m = String(r.date).slice(0, 7);
+      if (!storeDetailTxsByMonth[m]) storeDetailTxsByMonth[m] = [];
+      storeDetailTxsByMonth[m].push(r);
+    });
+    storeDetailMonths = Object.keys(storeDetailTxsByMonth).sort();
+    storeDetailMonthIdx = Math.min(storeDetailMonthIdx, Math.max(0, storeDetailMonths.length - 1));
+    renderStoreDetailChart();
+    renderStoreMonthTxs();
+  }
+}
+
+// ===== 編集 =====
+function showEditModal(id) {
+  const r = allRecords.find(rec => Number(rec.id) === Number(id));
+  if (!r) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-date').value = String(r.date || '').slice(0, 10);
+  document.getElementById('edit-service').value = r.service || '購入';
+  document.getElementById('edit-cat1').value = r.category1 || '';
+  document.getElementById('edit-cat2').value = r.category2 || '';
+  document.getElementById('edit-store').value = r.store || '';
+  document.getElementById('edit-amount').value = r.amount || '';
+  document.getElementById('edit-p1').value = r.payment1 || '';
+  document.getElementById('edit-p2').value = r.payment2 || '';
+  document.getElementById('edit-qty').value = r.quantity || '';
+  document.getElementById('edit-modal-overlay').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal-overlay').classList.remove('open');
+}
+
+async function saveEdit() {
+  const id = Number(document.getElementById('edit-id').value);
+  const fields = {
+    date:      document.getElementById('edit-date').value,
+    service:   document.getElementById('edit-service').value,
+    category1: document.getElementById('edit-cat1').value,
+    category2: document.getElementById('edit-cat2').value,
+    store:     document.getElementById('edit-store').value,
+    amount:    document.getElementById('edit-amount').value,
+    payment1:  document.getElementById('edit-p1').value,
+    payment2:  document.getElementById('edit-p2').value,
+    quantity:  document.getElementById('edit-qty').value,
+  };
+  closeEditModal();
+  if (!gasUrl) { showToast('GAS URLが設定されていません', true); return; }
+  showLoading('保存中...');
+  try {
+    const params = new URLSearchParams({ action: 'update', id, ...fields });
+    await fetch(gasUrl + '?' + params.toString());
+    const idx = allRecords.findIndex(r => Number(r.id) === id);
+    if (idx !== -1) {
+      allRecords[idx] = { ...allRecords[idx],
+        date: fields.date, service: fields.service,
+        category1: fields.category1, category2: fields.category2,
+        store: fields.store, amount: Number(fields.amount) || 0,
+        payment1: fields.payment1, payment2: fields.payment2,
+        quantity: fields.quantity,
+      };
+    }
+    hideLoading();
+    refreshAll();
+    showToast('保存しました');
+  } catch(e) {
+    hideLoading();
+    showToast('保存に失敗しました', true);
+  }
+}
+
+// ===== 削除 =====
+let _deleteTarget = null;
+
+function showDeleteConfirm(id, serviceId, isGroup) {
+  _deleteTarget = { id, serviceId, isGroup };
+  if (isGroup) {
+    document.getElementById('del-modal-title').textContent = 'このグループを全削除しますか？';
+    document.getElementById('del-modal-desc').textContent = 'グループ内の全データ（' + (allRecords.filter(r => Number(r.serviceId) === Number(serviceId)).length) + '件）が削除されます。元に戻せません。';
+  } else {
+    document.getElementById('del-modal-title').textContent = 'このデータを削除しますか？';
+    document.getElementById('del-modal-desc').textContent = '削除したデータは元に戻せません。';
+  }
+  document.getElementById('del-modal-overlay').classList.add('open');
+}
+
+function closeDeleteModal() {
+  document.getElementById('del-modal-overlay').classList.remove('open');
+  _deleteTarget = null;
+}
+
+async function confirmDelete() {
+  if (!_deleteTarget) return;
+  const { id, serviceId, isGroup } = _deleteTarget;
+  closeDeleteModal();
+  if (!gasUrl) { showToast('GAS URLが設定されていません', true); return; }
+  showLoading('削除中...');
+  try {
+    if (isGroup && serviceId != null) {
+      const targets = allRecords.filter(r => Number(r.serviceId) === Number(serviceId));
+      for (const r of targets) {
+        await fetch(gasUrl + '?action=delete&id=' + Number(r.id));
+      }
+      allRecords = allRecords.filter(r => Number(r.serviceId) !== Number(serviceId));
+    } else {
+      await fetch(gasUrl + '?action=delete&id=' + Number(id));
+      allRecords = allRecords.filter(r => Number(r.id) !== Number(id));
+    }
+    hideLoading();
+    refreshAll();
+    showToast('削除しました');
+  } catch(e) {
+    hideLoading();
+    showToast('削除に失敗しました', true);
+  }
+}
+
 function showToast(msg, isError=false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
