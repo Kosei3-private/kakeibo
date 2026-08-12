@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>開発管理 — 家計簿スキャナー</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
+
+    header {
+      background: #10b981; color: white;
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+      position: sticky; top: 0; z-index: 100;
+    }
+    header h1 { font-size: 18px; font-weight: 700; }
+    header span { font-size: 12px; opacity: 0.8; }
+
+    .toolbar {
+      padding: 14px 24px;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    .btn-add {
+      background: #10b981; color: white; border: none;
+      padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background 0.15s;
+    }
+    .btn-add:hover { background: #059669; }
+
+    .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-chip {
+      padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 600;
+      border: 1.5px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.15s;
+      color: #64748b;
+    }
+    .filter-chip.active, .filter-chip:hover { border-color: #10b981; color: #10b981; background: #f0fdf4; }
+
+    /* Board */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 24px 40px;
+    }
+
+    .column {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+      min-height: 400px;
+      display: flex; flex-direction: column;
+    }
+    .column-header {
+      padding: 14px 16px 12px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .column-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .col-urgent .column-dot { background: #ef4444; }
+    .col-normal .column-dot { background: #f59e0b; }
+    .col-someday .column-dot { background: #10b981; }
+
+    .column-title { font-size: 13px; font-weight: 700; flex: 1; }
+    .column-count {
+      font-size: 11px; font-weight: 700; color: white;
+      background: #cbd5e1; border-radius: 50px; padding: 1px 7px;
+      min-width: 22px; text-align: center;
+    }
+    .col-urgent .column-count { background: #ef4444; }
+    .col-normal .column-count { background: #f59e0b; }
+    .col-someday .column-count { background: #10b981; }
+
+    .card-list {
+      padding: 10px;
+      flex: 1;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .card-list.drag-over { background: #f0fdf4; border-radius: 10px; }
+
+    /* Cards */
+    .card {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 13px;
+      cursor: grab;
+      transition: box-shadow 0.15s, transform 0.15s;
+      position: relative;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.10); transform: translateY(-1px); }
+    .card.dragging { opacity: 0.4; }
+
+    .card-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+    .card-title { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.4; }
+    .card-menu-btn {
+      background: none; border: none; cursor: pointer; color: #94a3b8;
+      font-size: 16px; padding: 0 2px; line-height: 1; flex-shrink: 0;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .card:hover .card-menu-btn { opacity: 1; }
+
+    .card-body { font-size: 11px; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+
+    .card-footer { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+    .tag {
+      font-size: 10px; font-weight: 600; padding: 2px 7px;
+      border-radius: 50px;
+    }
+    .tag-ui    { background: #dbeafe; color: #1d4ed8; }
+    .tag-data  { background: #fce7f3; color: #9d174d; }
+    .tag-gas   { background: #d1fae5; color: #065f46; }
+    .tag-ux    { background: #fef3c7; color: #92400e; }
+    .tag-bug   { background: #fee2e2; color: #991b1b; }
+    .tag-idea  { background: #ede9fe; color: #5b21b6; }
+    .tag-eco   { background: #d1fae5; color: #065f46; }
+    .tag-other { background: #f1f5f9; color: #475569; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 20px; padding: 24px;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #e2e8f0;
+      border-radius: 10px; font-size: 14px; font-family: inherit;
+      background: #f8fafc; color: #1e293b;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: none; border-color: #10b981; background: white;
+    }
+    .field textarea { resize: vertical; min-height: 70px; }
+    .modal-btns { display: flex; gap: 8px; margin-top: 18px; }
+    .btn-save {
+      flex: 1; background: #10b981; color: white; border: none;
+      padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .btn-save:hover { background: #059669; }
+    .btn-cancel {
+      background: #f1f5f9; color: #64748b; border: none;
+      padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .btn-cancel:hover { background: #e2e8f0; }
+    .btn-delete {
+      background: #fee2e2; color: #ef4444; border: none;
+      padding: 12px 14px; border-radius: 10px; font-size: 14px; cursor: pointer;
+    }
+    .btn-delete:hover { background: #fecaca; }
+
+    /* Context menu */
+    .ctx-menu {
+      position: fixed; background: white; border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 6px;
+      z-index: 300; display: none; min-width: 140px;
+    }
+    .ctx-menu.open { display: block; }
+    .ctx-item {
+      padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ctx-item:hover { background: #f1f5f9; }
+    .ctx-item.danger { color: #ef4444; }
+    .ctx-item.danger:hover { background: #fee2e2; }
+
+    /* View tab bar */
+    .view-bar {
+      display: flex; background: white; border-bottom: 2px solid #e2e8f0;
+      position: sticky; top: 57px; z-index: 99;
+    }
+    .view-tab {
+      padding: 12px 22px; font-size: 13px; font-weight: 700; color: #94a3b8;
+      cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .view-tab.active { color: #10b981; border-bottom-color: #10b981; }
+
+    /* Overview page */
+    .overview-page { display: none; padding: 20px 24px 60px; }
+    .overview-page.active { display: block; }
+    .kanban-page { display: none; }
+    .kanban-page.active { display: block; }
+
+    /* Overview sections */
+    .ov-section { margin-bottom: 28px; }
+    .ov-section-title {
+      font-size: 11px; font-weight: 700; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 12px; padding-left: 2px;
+    }
+    .ov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .ov-card {
+      background: white; border-radius: 14px;
+      padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border-left: 4px solid #e2e8f0;
+    }
+    .ov-card.c-input  { border-left-color: #10b981; }
+    .ov-card.c-scan   { border-left-color: #6366f1; }
+    .ov-card.c-dash   { border-left-color: #f59e0b; }
+    .ov-card.c-assets { border-left-color: #3b82f6; }
+    .ov-card.c-list   { border-left-color: #ec4899; }
+    .ov-card.c-settings { border-left-color: #64748b; }
+    .ov-card.c-gas    { border-left-color: #10b981; }
+    .ov-card.c-data   { border-left-color: #f59e0b; }
+
+    .ov-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .ov-card-icon { font-size: 18px; }
+    .ov-card-title { font-size: 14px; font-weight: 700; }
+
+    .ov-items { display: flex; flex-direction: column; gap: 5px; }
+    .ov-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #475569; line-height: 1.4; }
+    .ov-item::before { content: '✓'; color: #10b981; font-weight: 700; flex-shrink: 0; margin-top: 0px; }
+
+    .ov-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .ov-chip {
+      font-size: 11px; font-weight: 600; padding: 2px 9px;
+      border-radius: 50px; background: #f1f5f9; color: #475569;
+    }
+    .ov-chip.green  { background: #d1fae5; color: #065f46; }
+    .ov-chip.indigo { background: #e0e7ff; color: #3730a3; }
+    .ov-chip.amber  { background: #fef3c7; color: #92400e; }
+    .ov-chip.blue   { background: #dbeafe; color: #1e40af; }
+    .ov-chip.pink   { background: #fce7f3; color: #9d174d; }
+
+    /* Data model table */
+    .ov-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 4px; }
+    .ov-table th { background: #f1f5f9; padding: 7px 10px; text-align: left; font-weight: 700; color: #64748b; }
+    .ov-table td { padding: 7px 10px; border-top: 1px solid #f1f5f9; color: #475569; vertical-align: top; }
+    .ov-table tr:hover td { background: #fafafa; }
+    .col-num { color: #94a3b8; font-size: 11px; }
+
+    @media (max-width: 640px) {
+      .board { grid-template-columns: 1fr; padding: 0 12px 40px; }
+      header h1 { font-size: 16px; }
+      .overview-page { padding: 16px 12px 60px; }
+      .ov-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗂 開発管理</h1>
+  <span>家計簿スキャナー</span>
+</header>
+
+<div class="view-bar">
+  <div class="view-tab active" onclick="switchView('overview')">🗺 現状まとめ</div>
+  <div class="view-tab" onclick="switchView('kanban')">📋 タスクボード</div>
+</div>
+
+<!-- ===== 現状まとめ ===== -->
+<div class="overview-page active" id="view-overview">
+
+  <div class="ov-section">
+    <div class="ov-section-title">タブ構成</div>
+    <div class="ov-grid">
+
+      <div class="ov-card c-input">
+        <div class="ov-card-head"><div class="ov-card-icon">✏️</div><div class="ov-card-title">手入力</div></div>
+        <div class="ov-items">
+          <div class="ov-item">サービス内容を12種類から選択</div>
+          <div class="ov-item">サービスに応じてフィールドが動的切り替え</div>
+          <div class="ov-item">品目チップ（食料品・趣味・衣類・日用品・交通費・医療・ギフト券類）</div>
+          <div class="ov-item">食料品 → さらに詳細（昼飯・エナドリ・一般）</div>
+          <div class="ov-item">店チップ（コンビニ・スーパー・ドンキ・マック・Amazon 等）</div>
+          <div class="ov-item">支払い手段 → サブ選択（QR→PayPay1/2/FamiPay 等）</div>
+          <div class="ov-item">ATM/振込：入出金方向 ＋ 銀行選択</div>
+          <div class="ov-item">チャージ：チャージ先 ＋ チャージ元</div>
+          <div class="ov-item">登録後「もう1件」バー（同一サービスIDで連続登録）</div>
+          <div class="ov-item">振込出金後 → 振込入金の予定登録プロンプト</div>
+          <div class="ov-item">重複チェックモーダル（類似記録があると警告）</div>
+          <div class="ov-item">直近の記録を上部に表示</div>
+        </div>
+        <div class="ov-chips" style="margin-top:10px;">
+          <span class="ov-chip green">購入</span><span class="ov-chip green">立て替え</span><span class="ov-chip green">キャッシュバック</span><span class="ov-chip green">チャージ</span><span class="ov-chip green">もらう</span><span class="ov-chip green">あげる</span><span class="ov-chip green">ATM</span><span class="ov-chip green">振込</span><span class="ov-chip green">給与</span><span class="ov-chip green">売却</span><span class="ov-chip green">資産追加</span><span class="ov-chip green">クレカ引き落とし</span>
+        </div>
+      </div>
+
+      <div class="ov-card c-scan">
+        <div class="ov-card-head"><div class="ov-card-icon">📷</div><div class="ov-card-title">スキャン</div></div>
+        <div class="ov-items">
+          <div class="ov-item">カメラ撮影 or 画像選択</div>
+          <div class="ov-item">Claude API でレシートを読み取り → フィールド自動入力</div>
+          <div class="ov-item">AI読み取り結果を確認・修正してから保存</div>
+        </div>
+        <div class="ov-chips" style="margin-top:10px;">
+          <span class="ov-chip indigo">Claude API</span><span class="ov-chip indigo">AIバッジ表示</span>
+        </div>
+      </div>
+
+      <div class="ov-card c-dash">
+        <div class="ov-card-head"><div class="ov-card-icon">📊</div><div class="ov-card-title">ダッシュボード</div></div>
+        <div class="ov-items">
+          <div class="ov-item">対象月セレクター</div>
+          <div class="ov-item">サマリーカード（支出合計・件数・収入）</div>
+          <div class="ov-item">月別支出グラフ（直近6ヶ月・棒グラフ）</div>
+          <div class="ov-item">カテゴリ別支出（円グラフ）</div>
+          <div class="ov-item">支払い手段別（円グラフ）</div>
+          <div class="ov-item">店別詳細 → ボトムシートで月別グラフ＋取引一覧</div>
+          <div class="ov-item">店からのクイック登録フォーム</div>
+        </div>
+        <div class="ov-chips" style="margin-top:10px;">
+          <span class="ov-chip amber">Chart.js</span>
+        </div>
+      </div>
+
+      <div class="ov-card c-assets">
+        <div class="ov-card-head"><div class="ov-card-icon">💰</div><div class="ov-card-title">資産</div></div>
+        <div class="ov-items">
+          <div class="ov-item">本資産 ／ 準資産 を分けて表示</div>
+          <div class="ov-item">総資産（本資産合計）バー</div>
+          <div class="ov-item">総資産推移グラフ（2025年8月〜）</div>
+          <div class="ov-item">各資産カードタップ → 詳細ボトムシート</div>
+          <div class="ov-item">&nbsp;&nbsp;残高推移グラフ（月次・残高2本）</div>
+          <div class="ov-item">&nbsp;&nbsp;月ナビゲーション（前月・翌月）</div>
+          <div class="ov-item">&nbsp;&nbsp;取引一覧</div>
+          <div class="ov-item">&nbsp;&nbsp;クイック登録フォーム</div>
+          <div class="ov-item">&nbsp;&nbsp;スクショスキャン（AIで明細一括読み取り）</div>
+          <div class="ov-item">&nbsp;&nbsp;スキャン時の重複チェック機能</div>
+          <div class="ov-item">クレカ月別利用額（折り畳みカード）</div>
+        </div>
+        <div class="ov-chips" style="margin-top:10px;">
+          <span class="ov-chip blue">本資産</span><span class="ov-chip indigo">準資産</span>
+        </div>
+      </div>
+
+      <div class="ov-card c-list">
+        <div class="ov-card-head"><div class="ov-card-icon">📋</div><div class="ov-card-title">一覧</div></div>
+        <div class="ov-items">
+          <div class="ov-item">全取引一覧（サービスIDでグループ表示）</div>
+          <div class="ov-item">各レコードに編集ボタン・削除ボタン</div>
+          <div class="ov-item">編集モーダル（ボトムシート形式）</div>
+          <div class="ov-item">削除確認モーダル</div>
+        </div>
+      </div>
+
+      <div class="ov-card c-settings">
+        <div class="ov-card-head"><div class="ov-card-icon">⚙️</div><div class="ov-card-title">設定</div></div>
+        <div class="ov-items">
+          <div class="ov-item">Claude API キー</div>
+          <div class="ov-item">Google Apps Script URL</div>
+          <div class="ov-item">各資産の初期残高（残高計算の基準値）</div>
+        </div>
+      </div>
+
+      <div class="ov-card" style="border-left-color:#10b981;">
+        <div class="ov-card-head"><div class="ov-card-icon">🌿</div><div class="ov-card-title">生態系</div></div>
+        <div class="ov-items">
+          <div class="ov-item">月単位スライダー（legacy-memo準拠: 月単位にしましょうか）</div>
+          <div class="ov-item">🌧 収入=天気（給与月に雨・空の明るさが変化）</div>
+          <div class="ov-item">🐝 蜂の数=月間キャッシュバック量に比例</div>
+          <div class="ov-item">🌱 土地の豊かさ=月間収支（荒れた大地→緑）</div>
+          <div class="ov-item">🦟 蚊=クレカ負債ライフサイクル（egg→larva→adult）</div>
+          <div class="ov-item">🐜 蟻=銀行残高に応じて増殖・行進</div>
+          <div class="ov-item">🐞 天道虫=ポイント資産</div>
+          <div class="ov-item">資産ノード: 銀行=湖・現金=草山・QR/プリペイド=バブル・ポイント=光</div>
+        </div>
+        <div class="ov-chips" style="margin-top:10px;">
+          <span class="ov-chip green">月単位 ✅</span>
+          <span class="ov-chip green">荒れた大地→緑 ✅</span>
+          <span class="ov-chip green">蜂=キャッシュバック量 ✅</span>
+          <span class="ov-chip green">資産追加バグ修正 ✅</span>
+        </div>
+        <div style="margin-top:10px; font-size:11px; color:#94a3b8; line-height:1.6;">
+          将来: 世界観選択 / 年期が入るオブジェクト / Suica準資産追加
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="ov-section">
+    <div class="ov-section-title">バックエンド（GAS）</div>
+    <div class="ov-grid">
+      <div class="ov-card c-gas">
+        <div class="ov-card-head"><div class="ov-card-icon">⚡</div><div class="ov-card-title">API エンドポイント</div></div>
+        <div class="ov-items">
+          <div class="ov-item">add — レコード1件追加（GET）</div>
+          <div class="ov-item">list — 全レコード取得（GET・逆順）</div>
+          <div class="ov-item">update — レコード更新（GET）</div>
+          <div class="ov-item">delete — レコード削除（GET）</div>
+          <div class="ov-item">info — スプレッドシート情報取得（GET）</div>
+          <div class="ov-item">batchAdd — 複数レコード一括追加（POST）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ov-section">
+    <div class="ov-section-title">データモデル（スプレッドシート「全データ」）</div>
+    <div style="background:white; border-radius:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+      <table class="ov-table">
+        <thead>
+          <tr>
+            <th>列</th><th>項目</th><th>内容</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="col-num">A</td><td>取引ID</td><td>行番号ベースの連番</td></tr>
+          <tr><td class="col-num">B</td><td>サービスID</td><td>同一レシート内の複数行を束ねるID</td></tr>
+          <tr><td class="col-num">C</td><td>日付</td><td>yyyy-MM-dd</td></tr>
+          <tr><td class="col-num">D</td><td>サービス内容</td><td>購入・チャージ・ATM入金 など</td></tr>
+          <tr><td class="col-num">E</td><td>品目1</td><td>食料品・趣味・ギフト券類 など</td></tr>
+          <tr><td class="col-num">F</td><td>品目2</td><td>昼飯・エナドリ・資産名 など</td></tr>
+          <tr><td class="col-num">G</td><td>店</td><td>コンビニ・Amazon など</td></tr>
+          <tr><td class="col-num">H</td><td>金額</td><td>円（数値）</td></tr>
+          <tr><td class="col-num">I</td><td>支払い手段1</td><td>現金・クレカ・PayPay1 など</td></tr>
+          <tr><td class="col-num">J</td><td>支払い手段2</td><td>チャージ元・振込先 など（任意）</td></tr>
+          <tr><td class="col-num">K</td><td>記録日時</td><td>自動記録（Date型）</td></tr>
+          <tr><td class="col-num">L</td><td>数量</td><td>件数（ギフト券類など）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== タスクボード ===== -->
+<div class="kanban-page" id="view-kanban">
+
+<div class="toolbar">
+  <button class="btn-add" onclick="openModal()">＋ タスク追加</button>
+  <div class="filter-bar">
+    <div class="filter-chip active" data-tag="all" onclick="setFilter(this,'all')">すべて</div>
+    <div class="filter-chip" data-tag="ui"    onclick="setFilter(this,'ui')">UI</div>
+    <div class="filter-chip" data-tag="data"  onclick="setFilter(this,'data')">データ</div>
+    <div class="filter-chip" data-tag="gas"   onclick="setFilter(this,'gas')">GAS</div>
+    <div class="filter-chip" data-tag="ux"    onclick="setFilter(this,'ux')">UX</div>
+    <div class="filter-chip" data-tag="bug"   onclick="setFilter(this,'bug')">バグ</div>
+    <div class="filter-chip" data-tag="idea"  onclick="setFilter(this,'idea')">アイデア</div>
+    <div class="filter-chip" data-tag="eco"   onclick="setFilter(this,'eco')">🌿 生態系</div>
+  </div>
+</div>
+
+<div class="board">
+  <div class="column col-urgent">
+    <div class="column-header">
+      <div class="column-dot"></div>
+      <div class="column-title">🔴 急務</div>
+      <div class="column-count" id="count-urgent">0</div>
+    </div>
+    <div class="card-list" id="col-urgent" ondragover="onDragOver(event)" ondrop="onDrop(event,'urgent')" ondragleave="onDragLeave(event)"></div>
+  </div>
+  <div class="column col-normal">
+    <div class="column-header">
+      <div class="column-dot"></div>
+      <div class="column-title">🟡 通常</div>
+      <div class="column-count" id="count-normal">0</div>
+    </div>
+    <div class="card-list" id="col-normal" ondragover="onDragOver(event)" ondrop="onDrop(event,'normal')" ondragleave="onDragLeave(event)"></div>
+  </div>
+  <div class="column col-someday">
+    <div class="column-header">
+      <div class="column-dot"></div>
+      <div class="column-title">🟢 いつか</div>
+      <div class="column-count" id="count-someday">0</div>
+    </div>
+    <div class="card-list" id="col-someday" ondragover="onDragOver(event)" ondrop="onDrop(event,'someday')" ondragleave="onDragLeave(event)"></div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2 id="modal-title">タスクを追加</h2>
+    <div class="field">
+      <label>タイトル</label>
+      <input id="f-title" type="text" placeholder="例：ダッシュボードの月切り替えを改善">
+    </div>
+    <div class="field">
+      <label>詳細（任意）</label>
+      <textarea id="f-body" placeholder="背景・要件・メモなど"></textarea>
+    </div>
+    <div class="field">
+      <label>優先度</label>
+      <select id="f-priority">
+        <option value="urgent">🔴 急務</option>
+        <option value="normal" selected>🟡 通常</option>
+        <option value="someday">🟢 いつか</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>タグ</label>
+      <select id="f-tag">
+        <option value="ui">UI</option>
+        <option value="data">データ</option>
+        <option value="gas">GAS</option>
+        <option value="ux">UX</option>
+        <option value="bug">バグ</option>
+        <option value="idea">アイデア</option>
+        <option value="eco">🌿 生態系</option>
+        <option value="other">その他</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-delete" id="btn-delete" style="display:none" onclick="deleteCard()">🗑</button>
+      <button class="btn-save" onclick="saveCard()">保存</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /kanban-page -->
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" onclick="ctxEdit()">✏️ 編集</div>
+  <div class="ctx-item" onclick="ctxMove('urgent')">🔴 急務へ移動</div>
+  <div class="ctx-item" onclick="ctxMove('normal')">🟡 通常へ移動</div>
+  <div class="ctx-item" onclick="ctxMove('someday')">🟢 いつかへ移動</div>
+  <div class="ctx-item danger" onclick="ctxDelete()">🗑 削除</div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'kakeibo-tasks-v1';
+  let tasks = [];
+  let currentFilter = 'all';
+  let dragId = null;
+  let ctxTargetId = null;
+  let editingId = null;
+
+  function load() {
+    try { tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { tasks = []; }
+  }
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+
+  function genId() { return Date.now() + Math.random().toString(36).slice(2); }
+
+  function render() {
+    ['urgent','normal','someday'].forEach(col => {
+      const list = document.getElementById('col-' + col);
+      const filtered = tasks.filter(t => t.priority === col && (currentFilter === 'all' || t.tag === currentFilter));
+      list.innerHTML = filtered.map(t => cardHTML(t)).join('');
+      document.getElementById('count-' + col).textContent = tasks.filter(t => t.priority === col).length;
+    });
+  }
+
+  function cardHTML(t) {
+    return `
+      <div class="card" id="card-${t.id}" draggable="true"
+        ondragstart="onDragStart(event,'${t.id}')"
+        ondragend="onDragEnd(event)">
+        <div class="card-top">
+          <div class="card-title">${esc(t.title)}</div>
+          <button class="card-menu-btn" onclick="openCtx(event,'${t.id}')">⋯</button>
+        </div>
+        ${t.body ? `<div class="card-body">${esc(t.body)}</div>` : ''}
+        <div class="card-footer">
+          <span class="tag tag-${t.tag}">${t.tag.toUpperCase()}</span>
+        </div>
+      </div>`;
+  }
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // Modal
+  function openModal(id) {
+    editingId = id || null;
+    const modal = document.getElementById('modal-overlay');
+    const t = id ? tasks.find(x => x.id === id) : null;
+    document.getElementById('modal-title').textContent = id ? 'タスクを編集' : 'タスクを追加';
+    document.getElementById('f-title').value = t ? t.title : '';
+    document.getElementById('f-body').value = t ? (t.body || '') : '';
+    document.getElementById('f-priority').value = t ? t.priority : 'normal';
+    document.getElementById('f-tag').value = t ? t.tag : 'ui';
+    document.getElementById('btn-delete').style.display = id ? 'block' : 'none';
+    modal.classList.add('open');
+    setTimeout(() => document.getElementById('f-title').focus(), 50);
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    editingId = null;
+  }
+  function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+  function saveCard() {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { document.getElementById('f-title').focus(); return; }
+    if (editingId) {
+      const t = tasks.find(x => x.id === editingId);
+      t.title = title;
+      t.body = document.getElementById('f-body').value.trim();
+      t.priority = document.getElementById('f-priority').value;
+      t.tag = document.getElementById('f-tag').value;
+    } else {
+      tasks.push({ id: genId(), title, body: document.getElementById('f-body').value.trim(), priority: document.getElementById('f-priority').value, tag: document.getElementById('f-tag').value });
+    }
+    save(); render(); closeModal();
+  }
+  function deleteCard() {
+    if (!editingId) return;
+    tasks = tasks.filter(t => t.id !== editingId);
+    save(); render(); closeModal();
+  }
+
+  // Drag & Drop
+  function onDragStart(e, id) { dragId = id; setTimeout(() => document.getElementById('card-'+id)?.classList.add('dragging'), 0); }
+  function onDragEnd(e) { document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging')); }
+  function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+  function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+  function onDrop(e, col) {
+    e.currentTarget.classList.remove('drag-over');
+    if (!dragId) return;
+    const t = tasks.find(x => x.id === dragId);
+    if (t) { t.priority = col; save(); render(); }
+    dragId = null;
+  }
+
+  // Context menu
+  function openCtx(e, id) {
+    e.stopPropagation();
+    ctxTargetId = id;
+    const menu = document.getElementById('ctx-menu');
+    menu.style.left = Math.min(e.clientX, window.innerWidth - 160) + 'px';
+    menu.style.top = Math.min(e.clientY, window.innerHeight - 200) + 'px';
+    menu.classList.add('open');
+  }
+  function closeCtx() { document.getElementById('ctx-menu').classList.remove('open'); }
+  function ctxEdit() { closeCtx(); openModal(ctxTargetId); }
+  function ctxMove(col) { const t = tasks.find(x => x.id === ctxTargetId); if(t){t.priority=col;save();render();} closeCtx(); }
+  function ctxDelete() { tasks = tasks.filter(t => t.id !== ctxTargetId); save(); render(); closeCtx(); }
+  document.addEventListener('click', closeCtx);
+
+  // Filter
+  function setFilter(el, tag) {
+    currentFilter = tag;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  function seedEcoTasks() {
+    const FLAG = 'kakeibo-eco-seeded-v1';
+    if (localStorage.getItem(FLAG)) return;
+    const eco = [
+      {
+        priority: 'urgent', tag: 'eco',
+        title: 'オブジェクトを木・岩・湖の形に変える',
+        body: 'ecoDrawPond / ecoDrawGrass / ecoDrawBubble を円・楕円から脱却させる。銀行=湖（波紋付き水面）、現金=木（幹と葉）、QR/プリペイド=岩（立体感のある石）に描き直す。'
+      },
+      {
+        priority: 'urgent', tag: 'eco',
+        title: '全体サイズを大きく',
+        body: 'ecoR() の minR/maxR と各描画関数の係数を全体的に1.5〜2倍にする。虫（蟻・蜂・天道虫・蚊）のサイズも同様に拡大。画面に迫力が出るよう調整。'
+      },
+      {
+        priority: 'urgent', tag: 'eco',
+        title: '雨をしっかり降らせる',
+        body: '現状14本の雨粒を60〜100本に増やし、角度・長さにランダム性を持たせる。地面への着弾時にしぶきエフェクト（小さい円弧）を追加。給与月らしい本降りの雨にする。'
+      },
+      {
+        priority: 'normal', tag: 'eco',
+        title: '晴れ・曇りの天気表現を追加',
+        body: '天気が雨（給与月）以外に表現がない。vitality高い=太陽+光芒、中程度=白い雲、低い=灰色の曇り空、給与月=雨。snap.hasSalary と vitality の組み合わせで分岐。'
+      },
+      {
+        priority: 'normal', tag: 'eco',
+        title: '荒れた大地にひび割れを描く',
+        body: 'vitality < 0.35 のときに地面へひびわれパターン（不規則な折れ線）を描画。vitality が上がるにつれてひびが消えていくよう lerp で透明度を制御。'
+      },
+      {
+        priority: 'normal', tag: 'eco',
+        title: '蟻のぞろぞろ感を改善',
+        body: '現状は直線的に横歩きするだけ。軌跡をサイン波でふらつかせ、隣の蟻と距離が近いと密集して見えるよう位置を調整。地表ギリギリを這うようにY座標も微振動させる。'
+      },
+      {
+        priority: 'normal', tag: 'eco',
+        title: 'ゲーム感・達成表示を追加',
+        body: '月間黒字額が大きい月に花火・星エフェクトを短時間表示。現在進行中の月のヒント欄に「今月のスコア」（収支・節約率など）を数値で見せてモチベーション向上を促す。'
+      },
+      {
+        priority: 'someday', tag: 'eco',
+        title: '虫の種類を増やす',
+        body: '現状は蟻・蜂・天道虫・蚊の4種。追加候補: バッタ（食費が多い月）・ちょうちょ（給与翌月・黒字月）・ミミズ（貯蓄残高多い月）・ホタル（キャッシュバック多い夜）。'
+      },
+      {
+        priority: 'someday', tag: 'eco',
+        title: 'オブジェクトの経年変化を表現',
+        body: '資産が記録されてから12ヶ月以上経過したオブジェクトに苔・古木感・水草などの経年ビジュアルを追加。月が重なるほど育ちを感じられるようにする。'
+      },
+    ];
+    eco.forEach(t => tasks.push({ id: genId(), ...t }));
+    save();
+    localStorage.setItem(FLAG, '1');
+  }
+
+  load();
+  seedEcoTasks();
+  render();
+
+  function switchView(v) {
+    document.getElementById('view-overview').classList.toggle('active', v === 'overview');
+    document.getElementById('view-kanban').classList.toggle('active', v === 'kanban');
+    document.querySelectorAll('.view-tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && v === 'overview') || (i === 1 && v === 'kanban'));
+    });
+  }
+</script>
+</body>
+</html>
