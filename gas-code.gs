@@ -9,6 +9,9 @@ function doGet(e) {
   if (action === 'info') return getInfo();
   if (action === 'delete') return deleteRecord(e.parameter);
   if (action === 'update') return updateRecord(e.parameter);
+  if (action === 'updateInventoryItem') return updateInventoryItem(e.parameter);
+  if (action === 'getInventorySummary') return getInventorySummary();
+  if (action === 'migrateInventory') return migrateInventoryToSummary();
   return ContentService.createTextOutput('家計簿API').setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -204,6 +207,113 @@ function migrateShisanAdd() {
   return ContentService
     .createTextOutput(JSON.stringify({ status: 'ok', migrated: count }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ===== 準資産サマリーシート =====
+// 1資産1行で点数（累計）・想定価値を管理する。全データの取引記録と二重書き。
+
+function updateInventoryItem(params) {
+  const sheet = getOrCreateSummarySheet();
+  const name = String(params.name || '');
+  if (!name) return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'name required' })).setMimeType(ContentService.MimeType.JSON);
+
+  const qtyDelta = Number(params.qtyDelta) || 0;
+  const hasValue = params.value !== undefined && params.value !== '';
+  const value = hasValue ? Number(params.value) : undefined;
+  const rows = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === name) {
+      const newQty = Math.max(0, Number(rows[i][1] || 0) + qtyDelta);
+      sheet.getRange(i + 1, 2).setValue(newQty);
+      if (value !== undefined) sheet.getRange(i + 1, 3).setValue(value);
+      sheet.getRange(i + 1, 4).setValue(new Date());
+      return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  sheet.appendRow([name, Math.max(0, qtyDelta), value !== undefined ? value : 0, new Date()]);
+  return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getInventorySummary() {
+  const sheet = getOrCreateSummarySheet();
+  const rows = sheet.getDataRange().getValues();
+  const items = rows.slice(1)
+    .filter(r => r[0])
+    .map(r => ({ name: String(r[0]), qty: Number(r[1]) || 0, value: Number(r[2]) || 0 }));
+  return ContentService.createTextOutput(JSON.stringify({ status: 'ok', items })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function migrateInventoryToSummary() {
+  const dataSheet = getSheet();
+  const rows = dataSheet.getDataRange().getValues();
+  const map = {};
+
+  rows.slice(1).forEach(row => {
+    const service  = row[3];
+    const amount   = Number(row[7]) || 0;
+    const payment1 = String(row[8] || '');
+    const cat2     = String(row[5] || '');
+    const cat1     = String(row[4] || '');
+    const qty      = row[11];
+
+    if (service === '資産追加') {
+      const name = payment1 || cat2 || cat1;
+      if (!name) return;
+      if (!map[name]) map[name] = 0;
+      map[name] += Number(qty || amount) || 1;
+    } else if (service === '資産使用') {
+      const name = cat2 || cat1;
+      if (!name) return;
+      if (!map[name]) map[name] = 0;
+      map[name] -= Number(qty) || 1;
+    } else if (service === '売却') {
+      const name = cat2 || cat1;
+      if (!name || !map[name]) return;
+      map[name] -= Number(qty) || 1;
+    }
+  });
+
+  const summarySheet = getOrCreateSummarySheet();
+
+  // 既存の想定価値を退避（クリア前に読んでおく）
+  const existingValues = {};
+  const existingRows = summarySheet.getDataRange().getValues();
+  existingRows.slice(1).forEach(r => {
+    if (r[0] && r[2]) existingValues[String(r[0])] = Number(r[2]) || 0;
+  });
+
+  const lastRow = summarySheet.getLastRow();
+  if (lastRow > 1) summarySheet.deleteRows(2, lastRow - 1);
+
+  let count = 0;
+  Object.entries(map).forEach(([name, qty]) => {
+    const q = Math.max(0, qty);
+    if (q > 0) {
+      summarySheet.appendRow([name, q, existingValues[name] || 0, new Date()]);
+      count++;
+    }
+  });
+
+  return ContentService.createTextOutput(JSON.stringify({ status: 'ok', migrated: count })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getOrCreateSummarySheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const SHEET = '準資産サマリー';
+  let sheet = ss.getSheetByName(SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET);
+    sheet.appendRow(['資産名', '点数', '想定価値（円/点）', '最終更新']);
+    sheet.setFrozenRows(1);
+    const h = sheet.getRange(1, 1, 1, 4);
+    h.setBackground('#6366f1');
+    h.setFontColor('#ffffff');
+    h.setFontWeight('bold');
+    [160, 80, 160, 160].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+  }
+  return sheet;
 }
 
 // ===== シート管理 =====
