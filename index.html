@@ -166,6 +166,12 @@
     .asset-init-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .asset-init-item label { font-size: 13px; font-weight: 600; color: #1e293b; text-transform: none; letter-spacing: 0; width: 100px; flex-shrink: 0; margin: 0; }
     .asset-init-item input { font-size: 14px; padding: 8px 10px; }
+    .custom-asset-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1.5px solid #e2e8f0; }
+    .custom-asset-form input[type="text"], .custom-asset-form input[type="number"], .custom-asset-form select { font-size: 14px; padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: white; font-family: inherit; }
+    .custom-asset-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .custom-asset-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .custom-asset-item .label { font-size: 13px; font-weight: 600; color: #1e293b; flex: 1; }
+    .custom-asset-item .type-badge { font-size: 11px; color: #94a3b8; }
 
     /* Toast */
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 600; transition: transform 0.3s ease; z-index: 100; white-space: nowrap; }
@@ -335,6 +341,21 @@
     .store-select-wrap select { flex:1; padding:11px 13px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:15px; background:#f8fafc; color:#1e293b; -webkit-appearance:none; }
     .store-select-wrap select:focus { outline:none; border-color:#3b82f6; }
     .store-open-btn { padding:11px 18px; background:#3b82f6; color:white; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
+    /* === 生態系ビュー === */
+    .eco-wrap { padding:12px; display:flex; flex-direction:column; gap:12px; }
+    .eco-canvas-box { border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.13); }
+    #eco-canvas { display:block; width:100%; }
+    .eco-controls { background:white; border-radius:14px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+    .eco-date-label { font-size:15px; font-weight:700; color:#1e293b; text-align:center; margin-bottom:6px; }
+    .eco-credit-label { font-size:12px; text-align:center; color:#dc2626; margin-bottom:8px; font-weight:600; min-height:16px; }
+    .eco-slider { width:100%; accent-color:#10b981; margin-bottom:12px; cursor:pointer; }
+    .eco-btn-row { display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap; }
+    .eco-btn { padding:8px 16px; border-radius:20px; border:none; font-size:13px; font-weight:700; cursor:pointer; }
+    .eco-play-btn { background:#10b981; color:white; min-width:88px; }
+    .eco-speed-label { font-size:12px; color:#64748b; }
+    .eco-speed-btn { background:#f1f5f9; color:#475569; padding:6px 11px; font-size:12px; }
+    .eco-speed-btn.active { background:#3b82f6; color:white; }
+    .eco-hint { background:white; border-radius:14px; padding:12px 16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); font-size:11px; color:#64748b; line-height:1.7; }
   </style>
 </head>
 <body>
@@ -347,6 +368,7 @@
   <div class="tab" data-tab="dashboard">📊 ダッシュボード</div>
   <div class="tab" data-tab="assets">💰 資産</div>
   <div class="tab" data-tab="list">📋 一覧</div>
+  <div class="tab" data-tab="ecosystem">🌿 生態系</div>
   <div class="tab" data-tab="settings">⚙️ 設定</div>
 </div>
 
@@ -400,22 +422,42 @@
       </div>
     </div>
 
-    <!-- 品目名（ギフト券類購入・売却のみ） -->
+    <!-- 品目名（売却のみ） -->
     <div class="form-section conditional" id="f-itemname-section">
       <span class="form-label">品目名</span>
       <input type="text" id="f-itemname" class="text-input-field" placeholder="例：Amazonギフト券、Anker充電器">
     </div>
 
-    <!-- 数量（ギフト券類購入・売却のみ） -->
+    <!-- 数量（売却のみ） -->
     <div class="form-section conditional" id="f-quantity-section">
       <span class="form-label">数量（点）</span>
       <input type="number" id="f-quantity" class="amount-input" placeholder="1" inputmode="numeric" style="font-size:22px;">
+    </div>
+
+    <!-- 準資産情報（ギフト券類購入のみ） -->
+    <div class="form-section conditional" id="f-junshisan-section">
+      <span class="form-label">資産名</span>
+      <input type="text" id="f-junshisan-name" class="text-input-field" placeholder="例：Amazonギフト券">
+      <div style="margin-top:10px;">
+        <span class="form-label">点数</span>
+        <input type="number" id="f-junshisan-qty" class="amount-input" placeholder="1" inputmode="numeric" style="font-size:22px;">
+      </div>
+      <div style="margin-top:10px;">
+        <span class="form-label">想定価値（円/点）</span>
+        <input type="number" id="f-junshisan-value" class="amount-input" placeholder="0" inputmode="numeric" style="font-size:22px;">
+      </div>
     </div>
 
     <!-- 資産名（資産追加のみ） -->
     <div class="form-section conditional" id="f-shisan-name-section">
       <span class="form-label">資産名</span>
       <input type="text" id="f-shisan-name" class="text-input-field" placeholder="例：Amazonギフト券">
+    </div>
+
+    <!-- 想定価値（資産追加のみ） -->
+    <div class="form-section conditional" id="f-shisan-value-section">
+      <span class="form-label">想定価値（円/点）</span>
+      <input type="number" id="f-shisan-value" class="amount-input" placeholder="0" inputmode="numeric" style="font-size:22px;">
     </div>
 
     <!-- 食料品詳細（品目=食料品のみ） -->
@@ -453,6 +495,33 @@
       <input type="number" id="f-amount" class="amount-input" placeholder="0" inputmode="numeric">
     </div>
 
+    <!-- 税込み額計算ヘルパー（購入・複数カテゴリーレシート用） -->
+    <div class="form-section conditional" id="f-tax-helper-section">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#475569;margin-bottom:10px;">
+        <input type="checkbox" id="f-tax-helper-toggle" onchange="toggleTaxHelper(this.checked)" style="width:16px;height:16px;">
+        🧮 税込み額を計算する（複数カテゴリーのレシート用）
+      </label>
+      <div class="conditional" id="f-tax-helper-body">
+        <div class="form-section">
+          <span class="form-label">レシートの合計金額（税込）</span>
+          <input type="number" id="f-tax-total" class="amount-input" placeholder="0" inputmode="numeric" style="font-size:20px;" oninput="calcTaxAmount()">
+        </div>
+        <div class="form-section">
+          <span class="form-label">この品目の税抜き額 <span id="f-tax-rate-badge" style="font-weight:400;text-transform:none;letter-spacing:normal;color:#94a3b8;"></span></span>
+          <input type="number" id="f-tax-pretax" class="amount-input" placeholder="0" inputmode="numeric" style="font-size:20px;" oninput="calcTaxAmount()">
+        </div>
+        <div class="form-section">
+          <span class="form-label">端数処理</span>
+          <div class="chips" id="f-tax-rounding-chips">
+            <div class="chip selected" data-val="floor" onclick="selectTaxRounding(this)">切り捨て</div>
+            <div class="chip" data-val="round" onclick="selectTaxRounding(this)">四捨五入</div>
+            <div class="chip" data-val="ceil" onclick="selectTaxRounding(this)">切り上げ</div>
+          </div>
+        </div>
+        <div id="f-tax-result" style="font-size:13px;color:#475569;line-height:1.7;background:#f8fafc;border-radius:8px;padding:10px;"></div>
+      </div>
+    </div>
+
     <!-- 支払い手段 -->
     <div class="form-section conditional show" id="f-shiharai-section">
       <span class="form-label">支払い手段</span>
@@ -476,39 +545,19 @@
     <!-- 受け取り先（キャッシュバックのみ） -->
     <div class="form-section conditional" id="f-uketori-section">
       <span class="form-label">受け取り先</span>
-      <div class="chips" id="f-uketori-chips">
-        <div class="chip" data-val="PayPay1" onclick="selectChip(this,'uketori')">PayPay1</div>
-        <div class="chip" data-val="PayPay2" onclick="selectChip(this,'uketori')">PayPay2</div>
-        <div class="chip" data-val="Vポイント" onclick="selectChip(this,'uketori')">Vポイント</div>
-        <div class="chip" data-val="VポイントPay" onclick="selectChip(this,'uketori')">VポイントPay</div>
-        <div class="chip" data-val="Amazonポイント" onclick="selectChip(this,'uketori')">Amazonポイント</div>
-        <div class="chip" data-val="Amazonギフトカード" onclick="selectChip(this,'uketori')">Amazonギフトカード</div>
-        <div class="chip" data-val="majica" onclick="selectChip(this,'uketori')">majica</div>
-        <div class="chip" data-val="Fami Pay" onclick="selectChip(this,'uketori')">Fami Pay</div>
-        <div class="chip" data-val="Ponta" onclick="selectChip(this,'uketori')">Ponta</div>
-        <div class="chip" data-val="リクルートポイント" onclick="selectChip(this,'uketori')">リクルートポイント</div>
-        <div class="chip" data-val="現金" onclick="selectChip(this,'uketori')">現金</div>
-      </div>
+      <div class="chips" id="f-uketori-chips"></div>
     </div>
 
     <!-- 授受先（もらう・あげるのみ） -->
     <div class="form-section conditional" id="f-jusho-section">
       <span class="form-label">授受先</span>
-      <div class="chips" id="f-jusho-chips">
-        <div class="chip" data-val="現金" onclick="selectChip(this,'jusho')">現金</div>
-        <div class="chip" data-val="PayPay1" onclick="selectChip(this,'jusho')">PayPay1</div>
-        <div class="chip" data-val="PayPay2" onclick="selectChip(this,'jusho')">PayPay2</div>
-      </div>
+      <div class="chips" id="f-jusho-chips"></div>
     </div>
 
     <!-- 給与受取口座（給与のみ） -->
     <div class="form-section conditional" id="f-kyuyo-section">
       <span class="form-label">受取口座</span>
-      <div class="chips" id="f-kyuyo-chips">
-        <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'kyuyo')">ゆうちょ銀行</div>
-        <div class="chip" data-val="三井住友" onclick="selectChip(this,'kyuyo')">三井住友</div>
-        <div class="chip" data-val="住信SBI" onclick="selectChip(this,'kyuyo')">住信SBI</div>
-      </div>
+      <div class="chips" id="f-kyuyo-chips"></div>
     </div>
 
     <!-- 方向（ATM・振込のみ） -->
@@ -523,11 +572,7 @@
     <!-- 銀行（ATM・振込・クレカ引き落とし） -->
     <div class="form-section conditional" id="f-bank-section">
       <span class="form-label" id="f-bank-label">銀行</span>
-      <div class="chips" id="f-bank-chips">
-        <div class="chip" data-val="ゆうちょ銀行" onclick="selectBankChip(this)">ゆうちょ銀行</div>
-        <div class="chip" data-val="三井住友" onclick="selectBankChip(this)">三井住友</div>
-        <div class="chip" data-val="住信SBI" onclick="selectBankChip(this)">住信SBI</div>
-      </div>
+      <div class="chips" id="f-bank-chips"></div>
       <div id="yucho-warn" style="display:none; margin-top:6px; font-size:12px; color:#ef4444; font-weight:600;">
         ⚠️ ゆうちょ銀行は引き出しのみ対応
       </div>
@@ -536,41 +581,19 @@
     <!-- 振込先（振込出金のみ） -->
     <div class="form-section conditional" id="f-furikomi-to-section">
       <span class="form-label">振込先</span>
-      <div class="chips" id="f-furikomi-to-chips">
-        <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'furikomiTo')">ゆうちょ銀行</div>
-        <div class="chip" data-val="三井住友" onclick="selectChip(this,'furikomiTo')">三井住友</div>
-        <div class="chip" data-val="住信SBI" onclick="selectChip(this,'furikomiTo')">住信SBI</div>
-      </div>
+      <div class="chips" id="f-furikomi-to-chips"></div>
     </div>
 
     <!-- チャージ先（チャージのみ） -->
     <div class="form-section conditional" id="f-charge-to-section">
       <span class="form-label">チャージ先</span>
-      <div class="chips" id="f-charge-to-chips">
-        <div class="chip" data-val="majica" onclick="selectChip(this,'chargeTo')">majica</div>
-        <div class="chip" data-val="Fami Pay" onclick="selectChip(this,'chargeTo')">Fami Pay</div>
-        <div class="chip" data-val="WAON" onclick="selectChip(this,'chargeTo')">WAON</div>
-        <div class="chip" data-val="PayPay1" onclick="selectChip(this,'chargeTo')">PayPay1</div>
-        <div class="chip" data-val="PayPay2" onclick="selectChip(this,'chargeTo')">PayPay2</div>
-        <div class="chip" data-val="VポイントPay" onclick="selectChip(this,'chargeTo')">VポイントPay</div>
-        <div class="chip" data-val="quoカード" onclick="selectChip(this,'chargeTo')">quoカード</div>
-        <div class="chip" data-val="スタバカード" onclick="selectChip(this,'chargeTo')">スタバカード</div>
-        <div class="chip" data-val="PASMO" onclick="selectChip(this,'chargeTo')">PASMO</div>
-      </div>
+      <div class="chips" id="f-charge-to-chips"></div>
     </div>
 
     <!-- チャージ元（チャージのみ） -->
     <div class="form-section conditional" id="f-charge-from-section">
       <span class="form-label">チャージ元</span>
-      <div class="chips" id="f-charge-from-chips">
-        <div class="chip" data-val="現金" onclick="selectChip(this,'chargeFrom')">現金</div>
-        <div class="chip" data-val="クレカ" onclick="selectChip(this,'chargeFrom')">クレカ</div>
-        <div class="chip" data-val="三井住友" onclick="selectChip(this,'chargeFrom')">三井住友</div>
-        <div class="chip" data-val="ゆうちょ銀行" onclick="selectChip(this,'chargeFrom')">ゆうちょ銀行</div>
-        <div class="chip" data-val="住信SBI" onclick="selectChip(this,'chargeFrom')">住信SBI</div>
-        <div class="chip" data-val="Vポイント" onclick="selectChip(this,'chargeFrom')">Vポイント</div>
-        <div class="chip" data-val="VポイントPay" onclick="selectChip(this,'chargeFrom')">VポイントPay</div>
-      </div>
+      <div class="chips" id="f-charge-from-chips"></div>
     </div>
 
     <button class="register-btn" onclick="registerRecord()">登録する</button>
@@ -667,41 +690,11 @@
       </div>
       <div class="field">
         <label>支払い手段1 <span class="ai-badge">AI</span></label>
-        <select id="r-payment1">
-          <option value="現金">現金</option>
-          <option value="クレカ">クレカ</option>
-          <option value="デビット">デビット</option>
-          <option value="三井住友">三井住友</option>
-          <option value="PayPay1">PayPay1</option>
-          <option value="PayPay2">PayPay2</option>
-          <option value="quoカード">quoカード</option>
-          <option value="majica">majica</option>
-          <option value="Fami Pay">Fami Pay</option>
-          <option value="WAON">WAON</option>
-          <option value="VポイントPay">VポイントPay</option>
-          <option value="Vポイント">Vポイント</option>
-          <option value="Amazonポイント">Amazonポイント</option>
-          <option value="Amazonギフトカード">Amazonギフトカード</option>
-          <option value="Ponta">Ponta</option>
-          <option value="ゆうちょ銀行">ゆうちょ銀行</option>
-          <option value="住信SBI">住信SBI</option>
-          <option value="その他">その他</option>
-        </select>
+        <select id="r-payment1"></select>
       </div>
       <div class="field">
         <label>支払い手段2（チャージ元など）</label>
-        <select id="r-payment2">
-          <option value="">なし</option>
-          <option value="現金">現金</option>
-          <option value="クレカ">クレカ</option>
-          <option value="三井住友">三井住友</option>
-          <option value="PayPay1">PayPay1</option>
-          <option value="PayPay2">PayPay2</option>
-          <option value="Vポイント">Vポイント</option>
-          <option value="VポイントPay">VポイントPay</option>
-          <option value="ゆうちょ銀行">ゆうちょ銀行</option>
-          <option value="住信SBI">住信SBI</option>
-        </select>
+        <select id="r-payment2"></select>
       </div>
       <button class="btn btn-green" onclick="saveRecord()">💾 保存する</button>
     </div>
@@ -766,7 +759,7 @@
 <!-- 資産 -->
 <div class="page" id="page-assets">
   <div class="total-assets-bar">
-    <div class="label">総資産（本資産）</div>
+    <div class="label">総資産（本資産 + 準資産）</div>
     <div class="amount" id="total-assets">¥-</div>
     <div style="font-size:12px; opacity:0.8; margin-top:4px;" id="assets-change-label"></div>
   </div>
@@ -788,11 +781,46 @@
     <div class="empty-state"><div class="icon">⏳</div><p>読み込み中...</p></div>
   </div>
 
+  <div class="card" id="inventory-trend-card" style="display:none; margin-top:12px;">
+    <div class="card-title">準資産 点数推移</div>
+    <div class="chart-container" style="height:180px;">
+      <canvas id="inventory-trend-chart"></canvas>
+    </div>
+  </div>
+
   <details class="credit-details-card">
     <summary>クレカ月別利用額</summary>
     <div id="credit-monthly-table"></div>
     <div style="font-size:11px; color:#94a3b8; margin-top:8px;">引き落とし済は「クレカ引き落とし」で登録してください</div>
   </details>
+</div>
+
+<!-- 生態系 -->
+<div class="page" id="page-ecosystem">
+  <div class="eco-wrap">
+    <div class="eco-canvas-box">
+      <canvas id="eco-canvas"></canvas>
+    </div>
+    <div class="eco-controls">
+      <div class="eco-date-label" id="eco-date-label">--</div>
+      <div class="eco-credit-label" id="eco-credit-label"></div>
+      <input type="range" class="eco-slider" id="eco-slider" min="0" max="0" value="0" oninput="ecoSeek(this.value)">
+      <div class="eco-btn-row">
+        <button class="eco-btn eco-play-btn" id="eco-play-btn" onclick="ecoTogglePlay()">▶ 再生</button>
+        <span class="eco-speed-label">速度:</span>
+        <button class="eco-btn eco-speed-btn active" onclick="ecoSetSpeed(1,this)">1ヶ月</button>
+        <button class="eco-btn eco-speed-btn" onclick="ecoSetSpeed(3,this)">3ヶ月</button>
+        <button class="eco-btn eco-speed-btn" onclick="ecoSetSpeed(6,this)">6ヶ月</button>
+      </div>
+    </div>
+    <div class="eco-hint">
+      🏦 <b>銀行</b>=湖　💴 <b>現金</b>=木　💳 <b>電子マネー</b>=岩　✨ <b>ポイント</b>=水晶<br>
+      🦟 <b>蚊</b>=クレカ負債（成長するほど凶悪）　🐜 <b>蟻</b>=銀行残高が多いほど大行進<br>
+      🐝 <b>蜂</b>=キャッシュバック量　🐞 <b>天道虫</b>=ポイント資産<br>
+      🦋 <b>蝶</b>=黒字・CB月に出現　🪲 <b>ホタル</b>=CB月に光る<br>
+      🌧 <b>雨</b>=給与月　☀ <b>晴れ</b>=好調月　🌱 <b>土地</b>=月間収支
+    </div>
+  </div>
 </div>
 
 <!-- 一覧 -->
@@ -820,6 +848,27 @@
     <div class="settings-section">
       <h3>資産の初期残高（円）</h3>
       <div id="asset-init-list"></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>カスタム資産</h3>
+      <div id="custom-asset-list"></div>
+      <div class="custom-asset-form">
+        <input type="text" id="new-asset-name" placeholder="資産名（例：楽天ペイ）">
+        <select id="new-asset-type">
+          <option value="QR決済">QR決済</option>
+          <option value="プリペイド">プリペイド</option>
+          <option value="ポイント">ポイント</option>
+          <option value="銀行">銀行</option>
+          <option value="現金">現金</option>
+        </select>
+        <input type="number" id="new-asset-init" placeholder="初��残高（円）" inputmode="numeric">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <label style="font-size:12px;color:#64748b;">色</label>
+          <input type="color" id="new-asset-color" value="#94a3b8" style="width:40px;height:32px;padding:2px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+        </div>
+        <button class="btn btn-green" onclick="addCustomAsset()" style="margin-top:0;">追加</button>
+      </div>
     </div>
 
     <button class="btn btn-green" onclick="saveSettings()">保存する</button>
@@ -1031,10 +1080,10 @@
 
 <script>
 // ===== 手入力フォーム =====
-const EMONEY_MAP = {
-  'プリペイド': ['quoカード', 'PASMO', 'スタバカード', 'majica', 'Amazonギフトカード', 'VポイントPay'],
+const BUILTIN_EMONEY_MAP = {
+  'プリペイド': ['Suica', 'quoカード', 'PASMO', 'スタバカード', 'majica', 'Amazonギフトカード', 'VポイントPay', 'WAON'],
   'QR決済':    ['PayPay1', 'PayPay2', 'Fami Pay'],
-  'ポイント':   ['Ponta', 'WAON', 'Amazonポイント', 'Vポイント', 'リクルートポイント'],
+  'ポイント':   ['Ponta', 'Amazonポイント', 'Vポイント', 'リクルートポイント'],
   'デビット':   ['住信SBI', '三井住友'],
 };
 
@@ -1056,10 +1105,19 @@ let fState = {
   chargeFrom: '',
   itemName: '',
   quantity: '',
+  junshisanName: '',
+  junshisanQty: '',
+  junshisanValue: '',
+  shisanValue: '',
 };
 
 // サービスID管理（同じレシート内の複数登録で共有）
 let currentServiceId = null;
+
+// 税込み額計算ヘルパー（同じレシート内の複数登録で共有）
+let taxHelperEnabled = false;
+let taxRounding = 'floor';
+let receiptItemAmounts = []; // このレシート内で既に登録済みの税込み額
 
 // 日付初期化
 document.getElementById('f-date').value = new Date().toLocaleDateString('sv-SE');
@@ -1075,6 +1133,7 @@ function selectService(btn) {
   fState.shiharai = ''; fState.emoney = ''; fState.uketori = ''; fState.jusho = '';
   fState.kyuyo = ''; fState.bank = ''; fState.furikomiTo = ''; fState.chargeTo = ''; fState.chargeFrom = '';
   fState.itemName = ''; fState.quantity = '';
+  fState.junshisanName = ''; fState.junshisanQty = ''; fState.junshisanValue = ''; fState.shisanValue = '';
   clearChips('hinmoku'); clearChips('shokuhin'); clearChips('mise');
   clearChips('shiharai'); clearChips('emoney'); clearChips('uketori'); clearChips('jusho');
   clearChips('kyuyo'); clearChips('bank'); clearChips('furikomiTo'); clearChips('chargeTo');
@@ -1082,6 +1141,10 @@ function selectService(btn) {
   document.getElementById('f-itemname').value = '';
   document.getElementById('f-quantity').value = '';
   document.getElementById('f-shisan-name').value = '';
+  document.getElementById('f-junshisan-name').value = '';
+  document.getElementById('f-junshisan-qty').value = '';
+  document.getElementById('f-junshisan-value').value = '';
+  document.getElementById('f-shisan-value').value = '';
   document.getElementById('yucho-warn').style.display = 'none';
 
   const isGroupBtn = s === 'ATM' || s === '振込';
@@ -1124,7 +1187,9 @@ function updateFormSections(s) {
   toggle('f-shokuhin-section',    false);
   toggle('f-itemname-section',    s === '売却');
   toggle('f-quantity-section',    s === '売却');
+  toggle('f-junshisan-section',   false);
   toggle('f-shisan-name-section', s === '資産追加');
+  toggle('f-shisan-value-section', s === '資産追加');
   toggle('f-mise-section',        s === '購入');
   toggle('f-other-mise-section',  false);
   toggle('f-emoney-section',      false);
@@ -1147,6 +1212,7 @@ function updateFormSections(s) {
     fState.shiharai = ''; clearChips('shiharai'); toggle('f-emoney-section', false);
   }
   document.getElementById('yucho-warn').style.display = 'none';
+  updateTaxHelperVisibility();
 }
 
 function selectChip(chip, group) {
@@ -1158,9 +1224,10 @@ function selectChip(chip, group) {
   if (group === 'hinmoku') {
     toggle('f-shokuhin-section', fState.hinmoku === '食料品');
     if (fState.hinmoku === '食料品') document.getElementById('f-shokuhin-chips').querySelector('.chip')?.focus();
-    const isGift = fState.hinmoku === 'ギフト券類' && fState.service === '購入';
-    toggle('f-itemname-section', isGift);
-    toggle('f-quantity-section', isGift);
+    const isGiftPurchase = fState.hinmoku === 'ギフト券類' && ['購入', '立て替え'].includes(fState.service);
+    toggle('f-junshisan-section', isGiftPurchase);
+    if (isGiftPurchase) setTimeout(() => document.getElementById('f-junshisan-name').focus(), 100);
+    updateTaxHelperVisibility();
   }
 
   if (group === 'mise') {
@@ -1227,6 +1294,78 @@ function toggle(id, show) {
   if (el) el.classList.toggle('show', show);
 }
 
+// ===== 税込み額計算ヘルパー（複数カテゴリーレシート用） =====
+function getTaxRate() {
+  return fState.hinmoku === '食料品' ? 0.08 : 0.10;
+}
+
+function updateTaxHelperVisibility() {
+  const show = fState.service === '購入' && fState.hinmoku !== '' && fState.hinmoku !== 'ギフト券類';
+  toggle('f-tax-helper-section', show);
+  if (!show && taxHelperEnabled) {
+    document.getElementById('f-tax-helper-toggle').checked = false;
+    toggleTaxHelper(false);
+  } else if (show && taxHelperEnabled) {
+    calcTaxAmount();
+  }
+}
+
+function toggleTaxHelper(enabled) {
+  taxHelperEnabled = enabled;
+  toggle('f-tax-helper-body', enabled);
+  if (enabled) calcTaxAmount();
+}
+
+function selectTaxRounding(chip) {
+  chip.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  taxRounding = chip.dataset.val;
+  calcTaxAmount();
+}
+
+function calcTaxAmount() {
+  const pretax = Number(document.getElementById('f-tax-pretax').value) || 0;
+  const rate = getTaxRate();
+  const raw = pretax * (1 + rate);
+  let amount;
+  if (taxRounding === 'ceil') amount = Math.ceil(raw);
+  else if (taxRounding === 'round') amount = Math.round(raw);
+  else amount = Math.floor(raw);
+
+  document.getElementById('f-amount').value = amount || '';
+  document.getElementById('f-tax-rate-badge').textContent = `（税率${rate === 0.08 ? '8' : '10'}%）`;
+
+  const totalRaw = document.getElementById('f-tax-total').value;
+  const receiptTotal = totalRaw !== '' ? Number(totalRaw) : null;
+  const runningSum = receiptItemAmounts.reduce((s, v) => s + v, 0) + amount;
+
+  let html = `税込み額: <b>¥${amount.toLocaleString()}</b>（税抜¥${pretax.toLocaleString()} × ${rate === 0.08 ? '1.08' : '1.10'}）<br>`;
+  html += `登録予定の合計: ¥${runningSum.toLocaleString()}`;
+  if (receiptTotal !== null) {
+    const diff = receiptTotal - runningSum;
+    html += ` / レシート合計: ¥${receiptTotal.toLocaleString()}`;
+    if (diff === 0) {
+      html += `<br><span style="color:#10b981;font-weight:700;">✓ 一致しています</span>`;
+    } else {
+      html += `<br><span style="color:#ef4444;font-weight:700;">⚠ 差額 ¥${diff.toLocaleString()}（端数処理を変えて調整してください）</span>`;
+    }
+  }
+  document.getElementById('f-tax-result').innerHTML = html;
+}
+
+function resetTaxHelper() {
+  taxHelperEnabled = false;
+  taxRounding = 'floor';
+  receiptItemAmounts = [];
+  document.getElementById('f-tax-helper-toggle').checked = false;
+  document.getElementById('f-tax-total').value = '';
+  document.getElementById('f-tax-pretax').value = '';
+  document.getElementById('f-tax-result').innerHTML = '';
+  document.getElementById('f-tax-rounding-chips').querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('selected', i === 0));
+  toggle('f-tax-helper-body', false);
+  toggle('f-tax-helper-section', false);
+}
+
 function registerRecord() {
   const service = fState.service;
   const amount = document.getElementById('f-amount').value;
@@ -1234,8 +1373,9 @@ function registerRecord() {
   // バリデーション
   if (service === '購入' && !fState.hinmoku) { showToast('品目を選択してください', true); return; }
   if (service === '購入' && fState.hinmoku === '食料品' && !fState.shokuhin) { showToast('食料品の種類を選択してください', true); return; }
-  if (service === '購入' && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
-  if (service === '購入' && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
+  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-junshisan-name').value.trim()) { showToast('資産名を入力してください', true); return; }
+  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-junshisan-qty').value) { showToast('点数を入力してください', true); return; }
+  if (['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類' && !document.getElementById('f-junshisan-value').value) { showToast('想定価値を入力してください', true); return; }
   if (service === '購入' && !fState.mise) { showToast('店を選択してください', true); return; }
   if (fState.mise === 'その他' && !document.getElementById('f-other-mise').value.trim()) { showToast('店名を入力してください', true); return; }
   if (!amount || Number(amount) <= 0) { showToast('金額を入力してください', true); return; }
@@ -1245,7 +1385,8 @@ function registerRecord() {
   if (service === '売却' && !document.getElementById('f-itemname').value.trim()) { showToast('品目名を入力してください', true); return; }
   if (service === '売却' && !document.getElementById('f-quantity').value) { showToast('数量を入力してください', true); return; }
   if (service === '資産追加' && !document.getElementById('f-shisan-name').value.trim()) { showToast('資産名を入力してください', true); return; }
-  if (service === '資産追加' && (!amount || Number(amount) <= 0)) { showToast('数量（金額欄）を入力してください', true); return; }
+  if (service === '資産追加' && (!amount || Number(amount) <= 0)) { showToast('点数（金額欄）を入力してください', true); return; }
+  if (service === '資産追加' && !document.getElementById('f-shisan-value').value) { showToast('想定価値を入力してください', true); return; }
   if (['もらう', 'あげる'].includes(service) && !fState.jusho) { showToast('授受先を選択してください', true); return; }
   if (['ATM', '振込'].includes(service)) { showToast('入金・出金を選択してください', true); return; }
   if (['ATM入金', 'ATM出金', '振込入金', '振込出金', 'クレカ引き落とし'].includes(service) && !fState.bank) { showToast('銀行を選択してください', true); return; }
@@ -1278,22 +1419,26 @@ function registerRecord() {
     payment2 = '';
   }
 
-  const isGiftPurchase = service === '購入' && fState.hinmoku === 'ギフト券類';
+  const isGiftPurchase = ['購入', '立て替え'].includes(service) && fState.hinmoku === 'ギフト券類';
   const isAssetAdd = service === '資産追加';
+
+  const junshisanName  = isGiftPurchase ? document.getElementById('f-junshisan-name').value.trim() : '';
+  const junshisanQty   = isGiftPurchase ? document.getElementById('f-junshisan-qty').value : '';
+  const junshisanValue = isGiftPurchase ? document.getElementById('f-junshisan-value').value : '';
+  const shisanValue    = isAssetAdd ? document.getElementById('f-shisan-value').value : '';
+
   const record = {
     date: document.getElementById('f-date').value,
     service: service,
     category1: isAssetAdd ? '' : fState.hinmoku,
-    category2: (isGiftPurchase || service === '売却')
+    category2: service === '売却'
       ? document.getElementById('f-itemname').value.trim()
-      : (isAssetAdd ? '' : fState.shokuhin),
+      : (isAssetAdd || isGiftPurchase ? '' : fState.shokuhin),
     store: mise,
     amount: amount,
     payment1: payment1,
     payment2: payment2,
-    quantity: (isGiftPurchase || service === '売却')
-      ? document.getElementById('f-quantity').value
-      : '',
+    quantity: service === '売却' ? document.getElementById('f-quantity').value : '',
   };
 
   // サービスIDを付加（新規レシートは連番採番、同一レシートは引き継ぐ）
@@ -1306,18 +1451,23 @@ function registerRecord() {
 
   if (!gasUrl) { showToast('設定タブでGAS URLを入力してください', true); return; }
 
+  if (taxHelperEnabled && service === '購入') {
+    receiptItemAmounts.push(Number(amount) || 0);
+  }
+
   const inventoryItemUsed = fState.shiharai === '準資産' ? fState.emoney : null;
-  checkDuplicate(record, () => doRegister(record, inventoryItemUsed));
+  checkDuplicate(record, () => doRegister(record, inventoryItemUsed, { junshisanName, junshisanQty, junshisanValue, shisanValue }));
 }
 
-function doRegister(record, inventoryItemUsed = null) {
+function doRegister(record, inventoryItemUsed = null, junshisanData = {}) {
+  const { junshisanName, junshisanQty, junshisanValue, shisanValue } = junshisanData;
   showLoading('登録中...');
   const params = new URLSearchParams({ action: 'add', ...record });
   fetch(gasUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' })
     .then(() => {
-      // 準資産支払い → 資産使用レコードを自動登録
+      // 準資産支払い → 資産使用レコード + サマリー更新
       if (inventoryItemUsed) {
-        const usageParams = new URLSearchParams({
+        fetch(gasUrl + '?' + new URLSearchParams({
           action: 'add',
           date: record.date,
           service: '資産使用',
@@ -1327,25 +1477,33 @@ function doRegister(record, inventoryItemUsed = null) {
           amount: record.amount,
           payment1: inventoryItemUsed,
           serviceId: currentServiceId,
-        });
-        fetch(gasUrl + '?' + usageParams.toString(), { method: 'GET', mode: 'no-cors' });
+        }).toString(), { method: 'GET', mode: 'no-cors' });
+        fetch(gasUrl + '?' + new URLSearchParams({ action: 'updateInventoryItem', name: inventoryItemUsed, qtyDelta: -1 }).toString(), { method: 'GET', mode: 'no-cors' });
       }
 
-      // ギフト券類購入 → 資産追加レコードを自動登録（同じserviceId）
+      // ギフト券類購入 → 資産追加レコード + サマリー更新
       const isGiftPurchase = ['購入', '立て替え'].includes(record.service) && record.category1 === 'ギフト券類';
-      if (isGiftPurchase && record.category2 && record.quantity) {
-        const assetParams = new URLSearchParams({
+      if (isGiftPurchase && junshisanName && junshisanQty) {
+        fetch(gasUrl + '?' + new URLSearchParams({
           action: 'add',
           date: record.date,
           service: '資産追加',
           category1: 'ギフト券類',
-          category2: record.category2,
-          quantity: record.quantity,
-          amount: record.amount,
-          payment1: record.category2,
+          amount: junshisanQty,
+          payment1: junshisanName,
           serviceId: currentServiceId,
-        });
-        fetch(gasUrl + '?' + assetParams.toString(), { method: 'GET', mode: 'no-cors' });
+        }).toString(), { method: 'GET', mode: 'no-cors' });
+        fetch(gasUrl + '?' + new URLSearchParams({ action: 'updateInventoryItem', name: junshisanName, qtyDelta: junshisanQty, value: junshisanValue || 0 }).toString(), { method: 'GET', mode: 'no-cors' });
+      }
+
+      // 資産追加の直接登録 → サマリー更新
+      if (record.service === '資産追加' && record.payment1) {
+        fetch(gasUrl + '?' + new URLSearchParams({ action: 'updateInventoryItem', name: record.payment1, qtyDelta: record.amount, value: shisanValue || 0 }).toString(), { method: 'GET', mode: 'no-cors' });
+      }
+
+      // 売却 → サマリーから差し引き
+      if (record.service === '売却' && record.category2) {
+        fetch(gasUrl + '?' + new URLSearchParams({ action: 'updateInventoryItem', name: record.category2, qtyDelta: -(Number(record.quantity) || 1) }).toString(), { method: 'GET', mode: 'no-cors' });
       }
 
       hideLoading();
@@ -1363,6 +1521,10 @@ function addMore() {
   document.getElementById('f-amount').value = '';
   document.getElementById('add-more-bar').classList.remove('show');
   document.getElementById('f-amount').focus();
+  if (taxHelperEnabled) {
+    document.getElementById('f-tax-pretax').value = '';
+    calcTaxAmount();
+  }
 }
 
 let pendingFurikomiDraft = null;
@@ -1443,11 +1605,12 @@ function resetForm() {
   document.getElementById('chip-debit').style.display = '';
   document.getElementById('add-more-bar').classList.remove('show');
   document.getElementById('furikomi-draft-bar').classList.remove('show');
+  resetTaxHelper();
   showToast('リセットしました');
 }
 
 // ===== 資産マスター =====
-const ASSETS = [
+const BUILTIN_ASSETS = [
   { key: '現金', label: '現金', type: '現金' },
   { key: '三井住友', label: '三井住友', type: '銀行' },
   { key: 'ゆうちょ銀行', label: 'ゆうちょ銀行', type: '銀行' },
@@ -1458,6 +1621,7 @@ const ASSETS = [
   { key: 'Fami Pay', label: 'Fami Pay', type: 'QR決済' },
   { key: 'WAON', label: 'WAON', type: 'プリペイド' },
   { key: 'VポイントPay', label: 'VポイントPay', type: 'プリペイド' },
+  { key: 'Suica', label: 'Suica', type: 'プリペイド' },
   { key: 'quoカード', label: 'quoカード', type: 'プリペイド' },
   { key: 'Amazonギフトカード', label: 'Amazonギフトカード', type: 'プリペイド' },
   { key: 'Vポイント', label: 'Vポイント', type: 'ポイント' },
@@ -1474,6 +1638,24 @@ let selectedImageBase64 = null;
 let allRecords = [];
 let monthlyChart, categoryChart, paymentChart, assetTrendChart;
 
+// ===== 動的資産初期化 =====
+const customAssets = JSON.parse(localStorage.getItem('customAssets') || '[]');
+const ASSETS = [...BUILTIN_ASSETS, ...customAssets];
+
+const EMONEY_MAP = (() => {
+  const m = JSON.parse(JSON.stringify(BUILTIN_EMONEY_MAP));
+  customAssets.forEach(a => {
+    if (!a.type) return;
+    if (m[a.type]) m[a.type].push(a.key);
+    else m[a.type] = [a.key];
+  });
+  return m;
+})();
+
+// ASSETSに含まれない固定支払い手段（残高管理なし）
+const EXTRA_PAYMENTS = ['クレカ', 'デビット', 'PASMO', 'スタバカード', 'リクルートポイント'];
+const VALID_PAYMENT = [...EXTRA_PAYMENTS, ...ASSETS.map(a => a.key)];
+
 // 初期残高の基準日（2025年8月23日終了時点）
 const INIT_DATE = '2025-08-23';
 
@@ -1481,6 +1663,7 @@ const INIT_DATE = '2025-08-23';
 document.getElementById('claude-key').value = claudeKey;
 document.getElementById('gas-url').value = gasUrl;
 buildAssetInitList();
+buildDynamicUI();
 if (gasUrl) loadAllData();
 
 // ===== Tabs =====
@@ -1492,6 +1675,8 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById('page-' + tab.dataset.tab).classList.add('active');
     const t = tab.dataset.tab;
     if (t === 'dashboard' || t === 'assets' || t === 'list') loadAllData();
+    if (t === 'ecosystem') { if (allRecords.length) initEcosystem(); else loadAllData(); }
+    if (t !== 'ecosystem') ecoStopLoop();
   });
 });
 
@@ -1550,8 +1735,8 @@ async function scanReceipt() {
 - store: 購入の場合のみ「コンビニ/スーパー/ドンキ/クリエイト/マック/自販機/Amazon/その他」から1つ選ぶ。立て替えの場合は空文字「""」
   【店名マッピング例】ファミリーマート・ファミマ・FamilyMart→コンビニ、セブンイレブン・7-Eleven→コンビニ、ローソン・Lawson→コンビニ、ミニストップ→コンビニ、デイリーヤマザキ→コンビニ、ドン・キホーテ・ドンキホーテ→ドンキ、マクドナルド・McDonald's→マック、イオン・イトーヨーカドー・オーケー・西友・ライフ→スーパー
 - amount: 合計金額（数字のみ、円記号なし）
-- payment1: 「現金/クレカ/デビット/quoカード/PASMO/スタバカード/majica/Amazonギフトカード/VポイントPay/PayPay1/PayPay2/Fami Pay/Ponta/WAON/Amazonポイント/Vポイント/リクルートポイント/住信SBI/三井住友/ゆうちょ銀行」から1つ選ぶ
-  【支払い方法マッピング例】ファミペイ・FamiPay→Fami Pay、PayPay→PayPay1、WAONポイント→WAON、デビットカード・debit→デビット
+- payment1: 「${VALID_PAYMENT.join('/')}」から1つ選ぶ
+  【支払い方法マッピング例】ファミペイ・FamiPay→Fami Pay、PayPay→PayPay1、WAONポイント→WAON、デビットカード・debit→デビット、Suica・suica→Suica
 - payment2: チャージ元があれば上記payment1の選択肢から選ぶ、なければ空文字「""」`;
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1563,7 +1748,7 @@ async function scanReceipt() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
         messages: [{
           role: 'user',
@@ -1610,11 +1795,12 @@ const VALID_STORES = ['コンビニ','スーパー','ドンキ','クリエイト
 const VALID_CAT1 = ['食料品','趣味','衣類','日用品','交通費','医療','ギフト券類'];
 const VALID_CAT2 = ['昼飯','エナドリ','一般'];
 const VALID_SERVICES = ['購入','立て替え','キャッシュバック','チャージ','もらう','あげる','ATM入金','ATM出金','振込入金','振込出金','給与','売却','クレカ引き落とし','預け入れ','引き出し','振込'];
-const VALID_PAYMENT = ['現金','クレカ','デビット','quoカード','PASMO','スタバカード','majica','Amazonギフトカード','VポイントPay','PayPay1','PayPay2','Fami Pay','Ponta','WAON','Amazonポイント','Vポイント','リクルートポイント','住信SBI','三井住友','ゆうちょ銀行'];
+// VALID_PAYMENT は State セクションで ASSETS から動的生成済み
 const PAYMENT_NORMALIZE = {
   'ファミペイ': 'Fami Pay', 'famipay': 'Fami Pay', 'famiPay': 'Fami Pay',
   'paypay': 'PayPay1', 'PayPay': 'PayPay1',
   'waonポイント': 'WAON',
+  'suica': 'Suica', 'SUICA': 'Suica',
 };
 
 function normalizeAiOutput(d) {
@@ -1695,12 +1881,21 @@ async function saveRecord() {
 }
 
 // ===== Load all data =====
+let inventorySummary = []; // { name, qty, value }[]
+
 async function loadAllData() {
   if (!gasUrl) return;
   try {
-    const recordsRes = await fetch(gasUrl + '?action=list');
+    const [recordsRes, summaryRes] = await Promise.all([
+      fetch(gasUrl + `?action=list&t=${Date.now()}`),
+      fetch(gasUrl + `?action=getInventorySummary&t=${Date.now()}`),
+    ]);
     const recordsData = await recordsRes.json();
     allRecords = recordsData.records || [];
+    try {
+      const summaryData = await summaryRes.json();
+      if (summaryData.status === 'ok') inventorySummary = summaryData.items || [];
+    } catch(_) {}
 
     // ローカルのserviceId採番をシートの実績最大値に合わせる
     if (allRecords.length > 0) {
@@ -1713,6 +1908,7 @@ async function loadAllData() {
     renderDashboard();
     renderAssets();
     renderList();
+    if (document.getElementById('page-ecosystem').classList.contains('active')) initEcosystem();
   } catch(e) {
     showToast('データの読み込みに失敗しました', true);
   }
@@ -1876,7 +2072,7 @@ let sqService = '購入';
 
 const SQ_SHOKUHIN_LIST = ['昼飯', 'エナドリ', '一般'];
 const SQ_HINMOKU_LIST = ['食料品','趣味','衣類','日用品','交通費','医療','ギフト券類'];
-const SQ_PAYMENT_LIST = ['現金','クレカ','PayPay1','PayPay2','majica','Fami Pay','WAON','VポイントPay','quoカード','Amazonギフトカード','住信SBI','三井住友','Vポイント','Amazonポイント','Ponta'];
+const SQ_PAYMENT_LIST = ['クレカ', ...ASSETS.map(a => a.key)];
 const SQ_SERVICE_LIST = ['購入', 'もらう', 'あげる'];
 
 function showStoreDetail(storeName) {
@@ -2173,10 +2369,19 @@ function calcTotalAssetsAt(records, upToDateStr) {
     }
   });
 
-  return ASSETS.reduce((total, a) => {
+  const mainTotal = ASSETS.reduce((total, a) => {
     const b = balances[a.key];
     return total + b.init + b.in - b.out;
   }, 0);
+
+  const filteredRecords = records.filter(r => String(r.date).slice(0, 10) <= upToDateStr);
+  const inventoryAtDate = getInventoryFromRecords(filteredRecords);
+  const invTotal = inventoryAtDate.reduce((sum, item) => {
+    const found = inventorySummary.find(i => i.name === item.name);
+    return sum + item.quantity * (found ? found.value : 0);
+  }, 0);
+
+  return mainTotal + invTotal;
 }
 
 // ===== 資産推移グラフ =====
@@ -2287,7 +2492,8 @@ function renderAssets() {
 
   renderCreditMonthly();
 
-  let totalAssets = 0;
+  const inventoryTotal = inventorySummary.reduce((s, item) => s + item.qty * item.value, 0);
+  let totalAssets = inventoryTotal;
   const html = ASSETS.map(a => {
     const b = balances[a.key];
     const current = b.init + b.in - b.out;
@@ -2313,14 +2519,16 @@ function renderAssets() {
   renderInventory();
 }
 
-function getInventoryFromRecords() {
+function getInventoryFromRecords(records) {
+  const src = records || allRecords;
   const map = {};
-  allRecords.forEach(r => {
+  src.forEach(r => {
     if (r.service === '資産追加') {
       const name = r.payment1 || r.category2 || r.category1;
       if (!name) return;
       if (!map[name]) map[name] = { qty: 0 };
-      const qty = Number(r.payment1 ? r.amount : r.quantity) || 0;
+      // 後方互換: 旧auto-created は quantity=点数、新/migrated は amount=点数
+      const qty = Number(r.quantity || r.amount) || 0;
       map[name].qty += qty || 1;
     } else if (r.service === '資産使用') {
       const name = r.category2 || r.category1;
@@ -2342,24 +2550,73 @@ function renderInventory() {
   const el = document.getElementById('inventory-grid');
   if (!el) return;
 
-  const active = getInventoryFromRecords();
+  const active = inventorySummary.filter(item => item.qty > 0);
 
   if (active.length === 0) {
     el.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>準資産なし</p></div>';
+    document.getElementById('inventory-trend-card').style.display = 'none';
     return;
   }
 
-  el.innerHTML = active.map(item => `
+  el.innerHTML = active.map(item => {
+    const yenStr = item.value ? `≒ ¥${(item.qty * item.value).toLocaleString()}` : '';
+    return `
     <div class="asset-card">
       <div>
         <div class="asset-name">${esc(item.name)}</div>
-        <div class="asset-type">準資産</div>
+        <div class="asset-type">準資産${item.value ? ` · ¥${item.value.toLocaleString()}/点` : ''}</div>
       </div>
       <div class="asset-amount">
-        <div class="asset-current positive">${item.quantity}点</div>
+        <div class="asset-current positive">${item.qty}点</div>
+        ${yenStr ? `<div class="asset-detail positive">${yenStr}</div>` : ''}
       </div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
+
+  const forTrend = active.map(item => ({ name: item.name, quantity: item.qty }));
+  renderInventoryTrend(forTrend);
+}
+
+// ===== 準資産点数推移グラフ =====
+let inventoryTrendChart = null;
+
+function renderInventoryTrend(active) {
+  const card = document.getElementById('inventory-trend-card');
+  if (!card || active.length === 0) { if (card) card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const now = new Date();
+  const labels = [];
+  let y = 2025, m = 8;
+  while (y < now.getFullYear() || (y === now.getFullYear() && m <= now.getMonth() + 1)) {
+    const lastDay = new Date(y, m, 0);
+    const dateStr = lastDay.toLocaleDateString('sv-SE');
+    if (dateStr >= '2025-08-23') labels.push({ label: `${String(y).slice(2)}/${m}月`, dateStr });
+    m++; if (m > 12) { m = 1; y++; }
+  }
+
+  const colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6','#ec4899'];
+  const datasets = active.map((item, i) => {
+    const data = labels.map(({ dateStr }) => {
+      const recs = allRecords.filter(r => String(r.date).slice(0,10) <= dateStr);
+      const inv = getInventoryFromRecords(recs);
+      const found = inv.find(x => x.name === item.name);
+      return found ? found.quantity : 0;
+    });
+    return { label: item.name, data, borderColor: colors[i % colors.length], backgroundColor: 'transparent', tension: 0.3, pointRadius: 3 };
+  });
+
+  const ctx = document.getElementById('inventory-trend-chart').getContext('2d');
+  if (inventoryTrendChart) inventoryTrendChart.destroy();
+  inventoryTrendChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels.map(l => l.label), datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: active.length > 1, labels: { font: { size: 11 } } } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+    },
+  });
 }
 
 // 貸借判定
@@ -2490,6 +2747,118 @@ function buildAssetInitList() {
     </div>
   `).join('');
   document.getElementById('asset-init-list').innerHTML = html;
+}
+
+function buildDynamicUI() {
+  const chip = (val, group, handler) =>
+    handler
+      ? `<div class="chip" data-val="${val}" onclick="${handler}(this)">${val}</div>`
+      : `<div class="chip" data-val="${val}" onclick="selectChip(this,'${group}')">${val}</div>`;
+
+  const bankAssets  = ASSETS.filter(a => a.type === '銀行').map(a => a.key);
+  const allKeys     = ASSETS.map(a => a.key);
+
+  // チャージ先（プリペイド + QR決済）
+  const chargeToEl = document.getElementById('f-charge-to-chips');
+  if (chargeToEl) {
+    const targets = [...(EMONEY_MAP['プリペイド'] || []), ...(EMONEY_MAP['QR決済'] || [])];
+    chargeToEl.innerHTML = targets.map(k => chip(k, 'chargeTo')).join('');
+  }
+
+  // チャージ元（クレカ + 全資産）
+  const chargeFromEl = document.getElementById('f-charge-from-chips');
+  if (chargeFromEl) {
+    chargeFromEl.innerHTML = ['クレカ', ...allKeys].map(k => chip(k, 'chargeFrom')).join('');
+  }
+
+  // 受け取り先（キャッシュバック・売却 → 全資産）
+  const uketoriEl = document.getElementById('f-uketori-chips');
+  if (uketoriEl) {
+    uketoriEl.innerHTML = allKeys.map(k => chip(k, 'uketori')).join('');
+  }
+
+  // 授受先（もらう・あげる → 全資産）
+  const jushoEl = document.getElementById('f-jusho-chips');
+  if (jushoEl) {
+    jushoEl.innerHTML = allKeys.map(k => chip(k, 'jusho')).join('');
+  }
+
+  // 給与受取口座（銀行型のみ）
+  const kyuyoEl = document.getElementById('f-kyuyo-chips');
+  if (kyuyoEl) {
+    kyuyoEl.innerHTML = bankAssets.map(k => chip(k, 'kyuyo')).join('');
+  }
+
+  // 銀行チップ（ATM・振込・クレカ引き落とし → 銀行型、selectBankChip を使用）
+  const bankEl = document.getElementById('f-bank-chips');
+  if (bankEl) {
+    bankEl.innerHTML = bankAssets.map(k => chip(k, null, 'selectBankChip')).join('');
+  }
+
+  // 振込先（銀行型のみ）
+  const furikomiEl = document.getElementById('f-furikomi-to-chips');
+  if (furikomiEl) {
+    furikomiEl.innerHTML = bankAssets.map(k => chip(k, 'furikomiTo')).join('');
+  }
+
+  // r-payment1 セレクト（スキャンタブ）
+  const rp1 = document.getElementById('r-payment1');
+  if (rp1) {
+    rp1.innerHTML = ['現金', 'クレカ', 'デビット', ...allKeys].map(k =>
+      `<option value="${k}">${k}</option>`).join('');
+  }
+
+  // r-payment2 セレクト（スキャンタブ）
+  const rp2 = document.getElementById('r-payment2');
+  if (rp2) {
+    rp2.innerHTML = `<option value="">なし</option>` +
+      VALID_PAYMENT.map(k => `<option value="${k}">${k}</option>`).join('');
+  }
+
+  // カスタム資産UI（設定タブ）
+  buildCustomAssetUI();
+}
+
+function buildCustomAssetUI() {
+  const list = document.getElementById('custom-asset-list');
+  if (!list) return;
+  if (customAssets.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:#94a3b8;padding:4px 0;">カスタム資産なし</div>';
+    return;
+  }
+  list.innerHTML = customAssets.map(a => `
+    <div class="custom-asset-item">
+      <div class="dot" style="background:${a.color || '#94a3b8'};"></div>
+      <span class="label">${a.label}</span>
+      <span class="type-badge">${a.type}</span>
+      <button onclick="deleteCustomAsset('${a.key}')" style="padding:3px 10px;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;">削除</button>
+    </div>
+  `).join('');
+}
+
+function addCustomAsset() {
+  const name = document.getElementById('new-asset-name').value.trim();
+  const type = document.getElementById('new-asset-type').value;
+  const init = Number(document.getElementById('new-asset-init').value) || 0;
+  const color = document.getElementById('new-asset-color').value;
+
+  if (!name) { showToast('資産名を入力してください', true); return; }
+  if (BUILTIN_ASSETS.some(a => a.key === name)) { showToast('その名前は組み込み資産と重複しています', true); return; }
+  if (customAssets.some(a => a.key === name)) { showToast('その資産名はすでに追加されています', true); return; }
+
+  const updated = [...customAssets, { key: name, label: name, type, color }];
+  const newInits = { ...assetInits, [name]: init };
+  localStorage.setItem('customAssets', JSON.stringify(updated));
+  localStorage.setItem('assetInits', JSON.stringify(newInits));
+  showToast(`✓ ${name} を追加しました`);
+  setTimeout(() => location.reload(), 800);
+}
+
+function deleteCustomAsset(key) {
+  const updated = customAssets.filter(a => a.key !== key);
+  localStorage.setItem('customAssets', JSON.stringify(updated));
+  showToast('削除しました');
+  setTimeout(() => location.reload(), 800);
 }
 
 function saveSettings() {
@@ -2732,7 +3101,7 @@ let aqCategory2 = '';
 let aqChargeFrom = '';
 let aqService = '購入';
 const AQ_SHOKUHIN_LIST = ['昼飯', 'エナドリ', '一般'];
-const AQ_CHARGE_FROM_LIST = ['現金', 'クレカ', '三井住友', 'ゆうちょ銀行', '住信SBI', 'Vポイント', 'VポイントPay', 'PayPay1', 'PayPay2'];
+const AQ_CHARGE_FROM_LIST = ['クレカ', ...ASSETS.map(a => a.key)];
 const AQ_HINMOKU_LIST = ['食料品', '趣味', '衣類', '日用品', '交通費', '医療', 'ギフト券類'];
 const AQ_SERVICE_LIST = ['購入', 'もらう', 'あげる', 'キャッシュバック', 'チャージ'];
 
@@ -3529,6 +3898,656 @@ async function confirmDelete() {
     hideLoading();
     showToast('削除に失敗しました', true);
   }
+}
+
+// ===== 生態系ビュー =====
+const BUILTIN_ECO_COLORS = {
+  '現金':'#22c55e','三井住友':'#3b82f6','ゆうちょ銀行':'#6366f1','住信SBI':'#0ea5e9',
+  'PayPay1':'#ef4444','PayPay2':'#f97316','majica':'#f59e0b','Fami Pay':'#84cc16',
+  'WAON':'#06b6d4','VポイントPay':'#8b5cf6','quoカード':'#ec4899',
+  'Amazonギフトカード':'#d97706','Vポイント':'#7c3aed','Amazonポイント':'#d97706',
+  'Ponta':'#dc2626','貯金箱':'#10b981','Suica':'#38bdf8',
+};
+const ECO_COLORS = {
+  ...BUILTIN_ECO_COLORS,
+  ...Object.fromEntries(customAssets.map(a => [a.key, a.color || '#94a3b8']))
+};
+let ecoSnaps=[], ecoIdx=0, ecoPlaying=false, ecoTimer=null, ecoSpeed=1;
+let ecoRaf=null, ecoT=0, ecoNodes={}, ecoW=0, ecoH=0;
+
+function ecoCalcBalances(records, upTo) {
+  const b={};
+  ASSETS.forEach(a=>{ b[a.key]=Number(assetInits[a.key]||0); });
+  records.filter(r=>String(r.date).slice(0,10)<=upTo).forEach(r=>{
+    const amt=Number(r.amount||0),svc=r.service,p1=r.payment1,p2=r.payment2;
+    if(!p1)return;
+    if(['購入','外食','立て替え','あげる'].includes(svc)){if(b[p1]!==undefined)b[p1]-=amt;}
+    else if(['キャッシュバック','もらう'].includes(svc)){if(b[p1]!==undefined)b[p1]+=amt;}
+    else if(svc==='チャージ'){if(b[p1]!==undefined)b[p1]+=amt;if(p2&&b[p2]!==undefined)b[p2]-=amt;}
+    else if(['預け入れ','ATM入金'].includes(svc)){if(b[p1]!==undefined)b[p1]+=amt;if(b['現金']!==undefined)b['現金']-=amt;}
+    else if(['引き出し','ATM出金'].includes(svc)){if(b[p1]!==undefined)b[p1]-=amt;if(b['現金']!==undefined)b['現金']+=amt;}
+    else if(['振込入金','給与','売却','資産追加'].includes(svc)){if(b[p1]!==undefined)b[p1]+=amt;}
+    else if(['振込出金','振込','クレカ引き落とし'].includes(svc)){if(b[p1]!==undefined)b[p1]-=amt;}
+  });
+  return b;
+}
+
+function ecoCalcDebt(records, upTo) {
+  let d=0;
+  records.filter(r=>String(r.date).slice(0,10)<=upTo).forEach(r=>{
+    const amt=Number(r.amount||0);
+    if(['購入','立て替え','外食'].includes(r.service)&&r.payment1==='クレカ') d+=amt;
+    else if(r.service==='クレカ引き落とし') d-=amt;
+  });
+  return Math.max(0,d);
+}
+
+function buildEcoSnaps() {
+  ecoSnaps=[];
+  const initD=new Date(INIT_DATE);
+  const today=new Date();
+  let d=new Date(initD.getFullYear(),initD.getMonth(),1);
+  const thisMonth=today.toLocaleDateString('sv-SE').slice(0,7);
+  while(d<=today){
+    const ms=d.toLocaleDateString('sv-SE').slice(0,7);
+    const isCurrentMonth=ms===thisMonth;
+    const monthEnd=new Date(d.getFullYear(),d.getMonth()+1,0).toLocaleDateString('sv-SE');
+    const upTo=isCurrentMonth?today.toLocaleDateString('sv-SE'):monthEnd;
+    const mr=allRecords.filter(r=>String(r.date).slice(0,7)===ms);
+    const cashbackTotal=mr.filter(r=>['キャッシュバック','もらう'].includes(r.service)).reduce((s,r)=>s+Number(r.amount||0),0);
+    const incomeTotal=mr.filter(r=>['給与','振込入金'].includes(r.service)).reduce((s,r)=>s+Number(r.amount||0),0);
+    const expenseTotal=mr.filter(r=>['購入','立て替え','外食','あげる','振込出金'].includes(r.service)).reduce((s,r)=>s+Number(r.amount||0),0);
+    const daysInMonth=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+    const progressRatio=isCurrentMonth?Math.min(1,today.getDate()/daysInMonth):1;
+    ecoSnaps.push({
+      monthLabel:ms,
+      displayLabel:d.toLocaleDateString('ja-JP',{year:'numeric',month:'long'}),
+      balances:ecoCalcBalances(allRecords,upTo),
+      creditDebt:ecoCalcDebt(allRecords,upTo),
+      cashbackTotal,incomeTotal,expenseTotal,
+      hasSalary:mr.some(r=>r.service==='給与'),
+      hasCreditPayment:mr.some(r=>r.service==='クレカ引き落とし'),
+      isCurrentMonth,progressRatio,
+    });
+    d.setMonth(d.getMonth()+1);
+  }
+}
+
+function ecoSetupLayout() {
+  const canvas=document.getElementById('eco-canvas');
+  if(!canvas)return;
+  ecoW=canvas.parentElement.clientWidth;
+  ecoH=Math.min(Math.round(ecoW*0.78),440);
+  canvas.width=ecoW; canvas.height=ecoH;
+  const banks=ASSETS.filter(a=>a.type==='銀行');
+  const cash=ASSETS.filter(a=>a.type==='現金');
+  const qr=ASSETS.filter(a=>a.type==='QR決済');
+  const pre=ASSETS.filter(a=>a.type==='プリペイド');
+  const pts=ASSETS.filter(a=>a.type==='ポイント');
+  banks.forEach((a,i)=>{
+    const ang=(i/Math.max(banks.length,1))*Math.PI-Math.PI/2;
+    const dist=banks.length>1?ecoW*0.09:0;
+    ecoNodes[a.key]={x:ecoW*0.27+Math.cos(ang)*dist, y:ecoH*0.68};
+  });
+  cash.forEach((a,i)=>{ ecoNodes[a.key]={x:ecoW*(0.70+i*0.09),y:ecoH*0.70}; });
+  qr.forEach((a,i)=>{ ecoNodes[a.key]={x:ecoW*(0.13+i*0.19),y:ecoH*0.88}; });
+  pre.forEach((a,i)=>{ ecoNodes[a.key]={x:ecoW*(0.55+(i%3)*0.15),y:ecoH*(0.52+Math.floor(i/3)*0.15)}; });
+  pts.forEach((a,i)=>{ ecoNodes[a.key]={x:ecoW*(0.55+i*0.17),y:ecoH*0.20}; });
+}
+
+function initEcosystem() {
+  if(!allRecords.length)return;
+  ecoStopLoop();
+  buildEcoSnaps();
+  if(!ecoSnaps.length)return;
+  ecoSetupLayout();
+  ecoIdx=ecoSnaps.length-1;
+  const sl=document.getElementById('eco-slider');
+  if(sl){sl.max=ecoSnaps.length-1; sl.value=ecoIdx;}
+  ecoUpdateUI();
+  ecoRaf=requestAnimationFrame(ecoLoop);
+}
+
+function ecoStopLoop() {
+  if(ecoRaf){cancelAnimationFrame(ecoRaf);ecoRaf=null;}
+  if(ecoTimer){clearInterval(ecoTimer);ecoTimer=null;}
+  ecoPlaying=false;
+  const btn=document.getElementById('eco-play-btn');
+  if(btn)btn.textContent='▶ 再生';
+}
+
+function ecoLoop() {
+  ecoT+=0.04;
+  ecoDrawFrame();
+  ecoRaf=requestAnimationFrame(ecoLoop);
+}
+
+function ecoSeek(val) {
+  ecoIdx=parseInt(val);
+  ecoUpdateUI();
+}
+
+function ecoUpdateUI() {
+  if(!ecoSnaps.length)return;
+  const snap=ecoSnaps[ecoIdx];
+  const dl=document.getElementById('eco-date-label');
+  if(dl)dl.textContent=snap.displayLabel+(snap.isCurrentMonth?' (今月)':'');
+  const cl=document.getElementById('eco-credit-label');
+  if(cl){
+    const parts=[];
+    if(snap.creditDebt>0)parts.push(`🦟 クレカ負債 ¥${snap.creditDebt.toLocaleString()}`);
+    if(snap.cashbackTotal>0)parts.push(`🐝 CB ¥${snap.cashbackTotal.toLocaleString()}`);
+    if(parts.length){cl.textContent=parts.join('　');cl.style.display='';}
+    else{cl.textContent='';cl.style.display='none';}
+  }
+}
+
+function ecoTogglePlay() {
+  if(ecoPlaying){
+    ecoPlaying=false; clearInterval(ecoTimer); ecoTimer=null;
+    document.getElementById('eco-play-btn').textContent='▶ 再生';
+  } else {
+    if(ecoIdx>=ecoSnaps.length-1)ecoIdx=0;
+    ecoPlaying=true;
+    document.getElementById('eco-play-btn').textContent='⏸ 停止';
+    ecoTimer=setInterval(()=>{
+      ecoIdx=Math.min(ecoIdx+ecoSpeed,ecoSnaps.length-1);
+      const sl=document.getElementById('eco-slider'); if(sl)sl.value=ecoIdx;
+      ecoUpdateUI();
+      if(ecoIdx>=ecoSnaps.length-1){
+        ecoPlaying=false; clearInterval(ecoTimer);
+        document.getElementById('eco-play-btn').textContent='▶ 再生';
+      }
+    },80);
+  }
+}
+
+function ecoSetSpeed(n,el) {
+  ecoSpeed=n;
+  document.querySelectorAll('.eco-speed-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// --- Drawing ---
+function ecoR(bal,minR,maxR,div) { return Math.max(minR,Math.min(maxR,Math.sqrt(Math.abs(bal)/div)*13)); }
+
+function ecoLerpColor(a,b,t){
+  const p=s=>parseInt(s,16);
+  const hr=s=>s.replace('#','');
+  const [ar,ag,ab]=[p(hr(a).slice(0,2)),p(hr(a).slice(2,4)),p(hr(a).slice(4,6))];
+  const [br,bg,bb]=[p(hr(b).slice(0,2)),p(hr(b).slice(2,4)),p(hr(b).slice(4,6))];
+  const r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),bv=Math.round(ab+(bb-ab)*t);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${bv.toString(16).padStart(2,'0')}`;
+}
+
+function ecoDrawFrame() {
+  const canvas=document.getElementById('eco-canvas');
+  if(!canvas||!ecoSnaps.length)return;
+  const ctx=canvas.getContext('2d');
+  const snap=ecoSnaps[ecoIdx];
+  const W=ecoW,H=ecoH;
+  ctx.clearRect(0,0,W,H);
+
+  const netIncome=snap.incomeTotal-snap.expenseTotal;
+  let vitality=Math.max(0,Math.min(1,(netIncome+30000)/130000));
+  if(snap.isCurrentMonth)vitality*=(0.25+snap.progressRatio*0.75);
+  const HORIZON=H*0.44;
+
+  // Sky
+  const skyTop=ecoLerpColor('#6b8fa8','#87ceeb',vitality);
+  const skyBot=ecoLerpColor('#8fafc5','#c9e8f8',vitality);
+  const skyG=ctx.createLinearGradient(0,0,0,HORIZON);
+  skyG.addColorStop(0,skyTop); skyG.addColorStop(1,skyBot);
+  ctx.fillStyle=skyG; ctx.fillRect(0,0,W,HORIZON);
+
+  // Sun (high vitality, no rain)
+  if(!snap.hasSalary&&vitality>0.55){
+    const sa=Math.min(1,(vitality-0.55)/0.45);
+    const sx=W*0.82,sy=H*0.1,sr=H*0.075;
+    ctx.save(); ctx.globalAlpha=0.4+sa*0.6;
+    ctx.strokeStyle='#fde68a'; ctx.lineWidth=2;
+    for(let i=0;i<8;i++){
+      const a=i/8*Math.PI*2+ecoT*0.2;
+      const r1=sr+5,r2=sr+13+Math.sin(ecoT*1.5+i)*3;
+      ctx.beginPath(); ctx.moveTo(sx+Math.cos(a)*r1,sy+Math.sin(a)*r1);
+      ctx.lineTo(sx+Math.cos(a)*r2,sy+Math.sin(a)*r2); ctx.stroke();
+    }
+    const sg=ctx.createRadialGradient(sx-sr*0.2,sy-sr*0.2,0,sx,sy,sr);
+    sg.addColorStop(0,'#fff7ed'); sg.addColorStop(1,'#fbbf24');
+    ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  // Clouds
+  if(!snap.hasSalary){
+    const numC=vitality>0.7?1:vitality>0.4?2:4;
+    const cAlpha=vitality>0.5?0.82:0.62;
+    ctx.save(); ctx.fillStyle=vitality>0.5?`rgba(255,255,255,${cAlpha})`:`rgba(155,180,200,${cAlpha})`;
+    for(let i=0;i<numC;i++){
+      const cx=((W*(0.1+i*0.26)+ecoT*6*(i%2===0?1:-0.8))%W+W)%W;
+      const cy=H*(0.06+i*0.05);
+      const cw=W*(0.09+i*0.013);
+      ctx.beginPath();
+      ctx.ellipse(cx,cy,cw,cw*0.38,0,0,Math.PI*2);
+      ctx.ellipse(cx-cw*0.4,cy+cw*0.1,cw*0.6,cw*0.32,0,0,Math.PI*2);
+      ctx.ellipse(cx+cw*0.4,cy+cw*0.1,cw*0.6,cw*0.32,0,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Ground
+  const gTop=ecoLerpColor('#a16207','#86efac',vitality);
+  const gBot=ecoLerpColor('#78350f','#4ade80',vitality);
+  const gLine=ecoLerpColor('#92400e','#15803d',vitality);
+  const gG=ctx.createLinearGradient(0,HORIZON,0,H);
+  gG.addColorStop(0,gTop); gG.addColorStop(1,gBot);
+  ctx.fillStyle=gG; ctx.fillRect(0,HORIZON,W,H-HORIZON);
+  ctx.fillStyle=gLine; ctx.fillRect(0,HORIZON-3,W,5);
+
+  // Ground cracks
+  if(vitality<0.35){
+    const ca=(0.35-vitality)/0.35*0.75;
+    ctx.save(); ctx.strokeStyle=`rgba(50,20,0,${ca})`; ctx.lineWidth=1;
+    [[W*0.12,HORIZON+H*0.07],[W*0.35,HORIZON+H*0.14],[W*0.6,HORIZON+H*0.06],[W*0.8,HORIZON+H*0.17],[W*0.5,HORIZON+H*0.25]].forEach(([cx,cy])=>{
+      for(let b=0;b<3;b++){
+        const ba=b/3*Math.PI*2+0.8;
+        ctx.beginPath(); ctx.moveTo(cx,cy);
+        let lx=cx,ly=cy;
+        for(let s=0;s<4;s++){
+          const nx=lx+Math.cos(ba+s*0.5+b)*(W*0.035);
+          const ny=ly+Math.sin(ba+s*0.4)*(H*0.025);
+          ctx.lineTo(nx,ny); lx=nx; ly=ny;
+        }
+        ctx.stroke();
+      }
+    });
+    ctx.restore();
+  }
+
+  // Assets
+  ASSETS.forEach(a=>{
+    const node=ecoNodes[a.key]; if(!node)return;
+    const bal=snap.balances[a.key]||0; if(bal<50)return;
+    const col=ECO_COLORS[a.key]||'#94a3b8';
+    if(a.type==='銀行') ecoDrawLake(ctx,node.x,node.y,bal,col,a.label);
+    else if(a.type==='現金') ecoDrawTree(ctx,node.x,node.y,bal,col,a.label);
+    else if(a.type==='ポイント') ecoDrawCrystal(ctx,node.x,node.y,bal,col,a.label);
+    else ecoDrawRock(ctx,node.x,node.y,bal,col,a.label);
+  });
+
+  // Mosquito
+  const debt=snap.creditDebt;
+  const moqStage=ecoMoqStage(debt);
+  let mainBankKey=null,mainBankBal=0;
+  ASSETS.filter(a=>a.type==='銀行').forEach(a=>{
+    if(ecoNodes[a.key]&&(snap.balances[a.key]||0)>mainBankBal){mainBankBal=snap.balances[a.key]||0;mainBankKey=a.key;}
+  });
+  if(mainBankKey&&ecoNodes[mainBankKey]){
+    const {x:bx,y:by}=ecoNodes[mainBankKey];
+    const mx=bx+Math.sin(ecoT*0.8)*35,my=by-72-Math.abs(Math.sin(ecoT*0.5))*12;
+    ecoDrawMoq(ctx,mx,my,moqStage,ecoT,bx,by,snap.hasCreditPayment);
+  }
+
+  // Ants (ぞろぞろ)
+  const bankTot=ASSETS.filter(a=>a.type==='銀行').reduce((s,a)=>s+(snap.balances[a.key]||0),0);
+  const numAnts=Math.min(16,Math.max(2,Math.floor(bankTot/50000)));
+  for(let i=0;i<numAnts;i++){
+    const prog=((ecoT*0.14+i/numAnts)%1);
+    const ax=prog*W;
+    const row=Math.floor(i/6);
+    const ay=HORIZON+H*0.015+row*8+Math.sin(ecoT*4+i*1.9)*2.5;
+    ecoDrawAnt(ctx,ax,ay,ecoT+i*1.4,i);
+  }
+
+  // Bees
+  const numBees=Math.min(8,Math.max(snap.hasSalary?2:0,Math.floor(snap.cashbackTotal/400)));
+  for(let i=0;i<numBees;i++){
+    const bX=W*(0.3+i*0.09)+Math.sin(ecoT*0.75+i*1.4)*W*0.06;
+    const bY=H*(0.07+(i%2)*0.08)+Math.cos(ecoT*0.52+i*0.9)*H*0.04;
+    ecoDrawBee(ctx,bX,bY,ecoT);
+  }
+
+  // Butterflies (good month)
+  if(snap.cashbackTotal>800||netIncome>15000){
+    const nbf=Math.min(3,1+Math.floor((snap.cashbackTotal+Math.max(0,netIncome))/5000));
+    for(let i=0;i<nbf;i++){
+      const bfX=W*(0.18+i*0.26)+Math.sin(ecoT*0.38+i*2.1)*W*0.07;
+      const bfY=HORIZON*0.65+Math.cos(ecoT*0.3+i*1.7)*H*0.09;
+      ecoDrawButterfly(ctx,bfX,bfY,ecoT+i*1.2);
+    }
+  }
+
+  // Rain (salary month)
+  if(snap.hasSalary){
+    ctx.save();
+    ctx.strokeStyle='#93c5fd'; ctx.lineWidth=1.3; ctx.globalAlpha=0.65;
+    for(let i=0;i<80;i++){
+      const spd=0.55+((i*7)%11)/11*0.9;
+      const rx=((i/80+ecoT*spd*0.28)%1)*W;
+      const ry=((ecoT*spd+i*0.053)%1)*H*0.9;
+      const rl=7+((i*3)%9);
+      ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx-2,ry+rl); ctx.stroke();
+    }
+    ctx.strokeStyle='#bfdbfe'; ctx.lineWidth=0.9; ctx.globalAlpha=0.4;
+    for(let i=0;i<20;i++){
+      const sx2=((i/20+ecoT*0.28)%1)*W;
+      const ph=((ecoT*2.8+i*0.31)%1);
+      ctx.beginPath(); ctx.arc(sx2,HORIZON+1,ph*8,Math.PI,Math.PI*2); ctx.stroke();
+    }
+    ctx.fillStyle='rgba(90,120,155,0.72)'; ctx.globalAlpha=1;
+    ctx.beginPath();
+    ctx.ellipse(W*0.5,H*0.055,W*0.24,H*0.055,0,0,Math.PI*2);
+    ctx.ellipse(W*0.36,H*0.082,W*0.16,H*0.042,0,0,Math.PI*2);
+    ctx.ellipse(W*0.64,H*0.082,W*0.16,H*0.042,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Ladybugs on points
+  ASSETS.filter(a=>a.type==='ポイント').forEach((a,i)=>{
+    const node=ecoNodes[a.key]; if(!node||(snap.balances[a.key]||0)<100)return;
+    ecoDrawLadybug(ctx,node.x+Math.sin(ecoT*0.85+i*1.6)*10,node.y-20,ecoT);
+  });
+
+  // Fireflies (cashback)
+  if(snap.cashbackTotal>400){
+    const nff=Math.min(6,Math.floor(snap.cashbackTotal/600));
+    for(let i=0;i<nff;i++){
+      const fx=W*(0.08+i*0.16)+Math.sin(ecoT*0.55+i*2.3)*W*0.06;
+      const fy=HORIZON+H*(0.22+i*0.09)+Math.cos(ecoT*0.41+i*1.9)*H*0.05;
+      ecoDrawFirefly(ctx,fx,fy,ecoT+i*0.9);
+    }
+  }
+
+  // Score box (top right)
+  ctx.fillStyle='rgba(255,255,255,0.88)';
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(W-118,6,110,38,8); else ctx.rect(W-118,6,110,38);
+  ctx.fill();
+  ctx.textAlign='right';
+  ctx.fillStyle='#94a3b8'; ctx.font='9px sans-serif'; ctx.fillText('月間収支',W-10,20);
+  ctx.fillStyle=netIncome>=0?'#10b981':'#ef4444'; ctx.font='bold 14px sans-serif';
+  ctx.fillText((netIncome>=0?'+':'')+(netIncome/10000).toFixed(1)+'万',W-10,37);
+
+  // Info box (top left)
+  ctx.fillStyle='rgba(255,255,255,0.88)';
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(6,6,120,38,8); else ctx.rect(6,6,120,38);
+  ctx.fill();
+  ctx.textAlign='left'; ctx.fillStyle='#1e293b'; ctx.font='bold 11px sans-serif';
+  ctx.fillText(snap.displayLabel,12,22);
+  ctx.fillStyle=snap.hasSalary?'#3b82f6':vitality>0.6?'#f59e0b':'#94a3b8';
+  ctx.font='10px sans-serif';
+  ctx.fillText(snap.hasSalary?'🌧 給与月':vitality>0.6?'☀ 好調':'',12,36);
+}
+
+function ecoDrawLake(ctx,x,y,bal,col,label){
+  const rw=ecoR(bal,35,90,400),rh=rw*0.4;
+  ctx.save();
+  ctx.fillStyle='#a07040';
+  ctx.beginPath(); ctx.ellipse(x,y,rw+9,rh+6,0,0,Math.PI*2); ctx.fill();
+  const wg=ctx.createRadialGradient(x-rw*0.2,y-rh*0.2,0,x,y,rw);
+  wg.addColorStop(0,col+'ee'); wg.addColorStop(1,col+'55');
+  ctx.fillStyle=wg; ctx.beginPath(); ctx.ellipse(x,y,rw,rh,0,0,Math.PI*2); ctx.fill();
+  for(let i=0;i<3;i++){
+    const ph=(ecoT*0.35+i*0.33)%1;
+    ctx.strokeStyle=col+Math.round((1-ph)*80).toString(16).padStart(2,'0');
+    ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.ellipse(x,y,rw*(1+ph*0.4),rh*(1+ph*0.4),0,0,Math.PI*2); ctx.stroke();
+  }
+  ctx.save(); ctx.globalAlpha=0.22; ctx.strokeStyle='#fff'; ctx.lineWidth=2.5;
+  for(let i=0;i<3;i++){
+    const lx=x-rw*0.25+i*rw*0.25,ly=y+Math.sin(ecoT*1.8+i)*2;
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx+rw*0.18,ly); ctx.stroke();
+  }
+  ctx.restore();
+  ctx.lineWidth=2.2;
+  [[-rw*0.72,-rh*0.15],[rw*0.68,-rh*0.05],[-rw*0.48,rh*0.45],[rw*0.52,rh*0.38]].forEach(([dx,dy],ri)=>{
+    const sw=Math.sin(ecoT*1.6+ri)*2.5;
+    ctx.strokeStyle='#4d7c0f';
+    ctx.beginPath(); ctx.moveTo(x+dx,y+dy); ctx.quadraticCurveTo(x+dx+sw,y+dy-14,x+dx+sw*1.2,y+dy-26); ctx.stroke();
+    ctx.fillStyle='#3f6212'; ctx.beginPath(); ctx.ellipse(x+dx+sw*1.2,y+dy-29,3.5,7,0.3,0,Math.PI*2); ctx.fill();
+  });
+  ctx.fillStyle='#1e293b'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(label.length>4?label.slice(0,4):label,x,y+rh+22);
+  ctx.font='10px sans-serif'; ctx.fillStyle='#475569';
+  ctx.fillText('¥'+Math.round(bal/1000)+'k',x,y+rh+34);
+  ctx.restore();
+}
+
+function ecoDrawTree(ctx,x,y,bal,col,label){
+  const r=ecoR(bal,22,65,250);
+  ctx.save();
+  const tw=Math.max(6,r*0.18),th=r*0.65;
+  const trG=ctx.createLinearGradient(x-tw,0,x+tw,0);
+  trG.addColorStop(0,'#92400e'); trG.addColorStop(0.5,'#b45309'); trG.addColorStop(1,'#78350f');
+  ctx.fillStyle=trG; ctx.fillRect(x-tw,y,tw*2,th);
+  ctx.strokeStyle='#78350f'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(x-tw,y+th*0.8); ctx.lineTo(x-tw-r*0.22,y+th); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+tw,y+th*0.8); ctx.lineTo(x+tw+r*0.22,y+th); ctx.stroke();
+  [[0,-r*0.5,r*1.0],[r*0.38,-r*0.18,r*0.8],[-r*0.38,-r*0.18,r*0.8]].forEach(([dx,dy,cr],li)=>{
+    const sw=Math.sin(ecoT*1.1+li)*2.5;
+    const cg=ctx.createRadialGradient(x+dx+sw-cr*0.25,y+dy-cr*0.2,0,x+dx+sw,y+dy,cr);
+    cg.addColorStop(0,'#86efac'); cg.addColorStop(0.7,'#22c55e'); cg.addColorStop(1,'#15803d');
+    ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(x+dx+sw,y+dy,cr,0,Math.PI*2); ctx.fill();
+  });
+  ctx.save(); ctx.globalAlpha=0.18; ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.arc(x-r*0.2,y-r*0.6,r*0.28,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle='#1e293b'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(label.length>3?label.slice(0,3):label,x,y+th+15);
+  ctx.font='10px sans-serif'; ctx.fillStyle='#475569';
+  ctx.fillText('¥'+Math.round(bal/1000)+'k',x,y+th+27);
+  ctx.restore();
+}
+
+function ecoDrawRock(ctx,x,y,bal,col,label){
+  const r=ecoR(bal,16,46,150);
+  ctx.save(); ctx.translate(x,y);
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.beginPath(); ctx.ellipse(r*0.1,r*0.2,r*0.9,r*0.3,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0,-r);
+  ctx.bezierCurveTo(r*0.55,-r*0.95,r*1.1,-r*0.35,r*0.95,r*0.2);
+  ctx.bezierCurveTo(r*0.8,r*0.72,r*0.3,r*0.65,0,r*0.52);
+  ctx.bezierCurveTo(-r*0.5,r*0.75,-r*1.05,r*0.38,-r*0.9,-r*0.1);
+  ctx.bezierCurveTo(-r*1.0,-r*0.62,-r*0.5,-r*1.05,0,-r);
+  ctx.closePath();
+  const rg=ctx.createRadialGradient(-r*0.28,-r*0.32,0,0,0,r*1.15);
+  rg.addColorStop(0,col+'ff'); rg.addColorStop(0.55,col+'cc'); rg.addColorStop(1,col+'44');
+  ctx.fillStyle=rg; ctx.fill();
+  ctx.strokeStyle=col+'77'; ctx.lineWidth=1; ctx.stroke();
+  ctx.save(); ctx.globalAlpha=0.28; ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.ellipse(-r*0.22,-r*0.38,r*0.22,r*0.12,-0.5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle='#1e293b'; ctx.font=`bold ${Math.min(11,r*0.35)}px sans-serif`; ctx.textAlign='center';
+  ctx.fillText(label.length>4?label.slice(0,4):label,0,r*0.68+16);
+  ctx.font='10px sans-serif'; ctx.fillStyle='#475569';
+  ctx.fillText('¥'+Math.round(bal/1000)+'k',0,r*0.68+28);
+  ctx.restore();
+}
+
+function ecoDrawCrystal(ctx,x,y,bal,col,label){
+  const r=ecoR(bal,14,35,80);
+  const pulse=0.85+Math.sin(ecoT*2.5)*0.15;
+  const h=r*2.3*pulse,hw=r*0.75*pulse;
+  ctx.save(); ctx.translate(x,y);
+  ctx.shadowColor=col; ctx.shadowBlur=18*pulse;
+  ctx.beginPath();
+  ctx.moveTo(0,-h*0.55); ctx.lineTo(hw,-h*0.08); ctx.lineTo(hw*0.65,h*0.45);
+  ctx.lineTo(0,h*0.55); ctx.lineTo(-hw*0.65,h*0.45); ctx.lineTo(-hw,-h*0.08);
+  ctx.closePath();
+  const cg=ctx.createLinearGradient(-hw,0,hw,0);
+  cg.addColorStop(0,col+'88'); cg.addColorStop(0.45,'#ffffff'); cg.addColorStop(1,col+'88');
+  ctx.fillStyle=cg; ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='#fff'; ctx.lineWidth=1.2; ctx.globalAlpha=0.65*pulse;
+  [[r*1.0,-r*0.8],[r*1.3,-r*0.05],[-r*0.9,-r*0.6]].forEach(([sx2,sy2],si)=>{
+    const sl=2.5+Math.sin(ecoT*3.5+si*2.2)*2;
+    ctx.beginPath(); ctx.moveTo(sx2,sy2-sl); ctx.lineTo(sx2,sy2+sl); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx2-sl,sy2); ctx.lineTo(sx2+sl,sy2); ctx.stroke();
+  });
+  ctx.globalAlpha=1;
+  ctx.fillStyle='#1e293b'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(label.length>3?label.slice(0,3):label,0,h*0.55+13);
+  ctx.font='9px sans-serif'; ctx.fillStyle='#475569';
+  ctx.fillText('¥'+Math.round(bal/1000)+'k',0,h*0.55+23);
+  ctx.restore();
+}
+
+function ecoMoqStage(debt){
+  if(debt<=0)return 'egg';
+  if(debt<2000)return 'larva1';
+  if(debt<8000)return 'larva2';
+  if(debt<25000)return 'pupa';
+  if(debt<60000)return 'small';
+  if(debt<120000)return 'medium';
+  return 'large';
+}
+
+function ecoDrawMoq(ctx,x,y,stage,t,bx,by,justPaid){
+  ctx.save();
+  if(justPaid) ctx.globalAlpha=0.6+Math.sin(t*20)*0.4;
+  if(stage==='egg'){
+    ctx.fillStyle='#fef3c7'; ctx.strokeStyle='#d97706'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.ellipse(x,y,3,5,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.restore(); return;
+  }
+  if(stage==='larva1'||stage==='larva2'){
+    const sc=stage==='larva1'?0.55:0.9;
+    ctx.translate(x+Math.sin(t*3)*2,y); ctx.scale(sc,sc);
+    ctx.fillStyle='#92400e';
+    for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(Math.sin(t*3+i)*1.5,i*4-8,3.5,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle='#78350f'; ctx.beginPath(); ctx.arc(0,-12,4.5,0,Math.PI*2); ctx.fill();
+    ctx.restore(); return;
+  }
+  if(stage==='pupa'){
+    ctx.translate(x,y); ctx.fillStyle='#a16207';
+    ctx.beginPath(); ctx.ellipse(0,0,5,11,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#78350f'; ctx.beginPath(); ctx.arc(0,-9,4,0,Math.PI*2); ctx.fill();
+    ctx.restore(); return;
+  }
+  const sc=stage==='small'?1.0:stage==='medium'?1.55:2.3;
+  const hy=Math.sin(t*2.5)*3;
+  ctx.translate(x,y+hy); ctx.scale(sc,sc);
+  ctx.globalAlpha=0.5; ctx.fillStyle='#bfdbfe';
+  const wf=Math.sin(t*16)*4;
+  ctx.beginPath(); ctx.ellipse(-7,-5+wf,9,4,-0.35,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(7,-5+wf,9,4,0.35,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=justPaid?ctx.globalAlpha:1;
+  ctx.fillStyle='#44403c'; ctx.beginPath(); ctx.ellipse(0,0,3.5,7,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#1c1917'; ctx.lineWidth=0.6;
+  for(let s=-1;s<=2;s++){ctx.beginPath();ctx.moveTo(-3.5,s*2.5);ctx.lineTo(3.5,s*2.5);ctx.stroke();}
+  ctx.fillStyle='#292524'; ctx.beginPath(); ctx.arc(0,-8,3,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#44403c'; ctx.lineWidth=0.7;
+  for(let i=-1;i<=1;i++){
+    const lw=Math.sin(t*4+i)*2;
+    ctx.beginPath();ctx.moveTo(-3.5,i*3);ctx.lineTo(-11+lw,i*3+6);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(3.5,i*3);ctx.lineTo(11-lw,i*3+6);ctx.stroke();
+  }
+  ctx.restore();
+  ctx.save(); ctx.translate(x,y+hy);
+  const ang=Math.atan2(by-(y+hy)+8*sc,bx-x);
+  const pLen=(stage==='small'?12:stage==='medium'?17:25)*sc;
+  ctx.strokeStyle='#292524'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.moveTo(0,-8*sc); ctx.lineTo(Math.cos(ang)*pLen,-8*sc+Math.sin(ang)*pLen); ctx.stroke();
+  if(['small','medium','large'].includes(stage)){
+    ctx.save(); ctx.setLineDash([3,5]); ctx.strokeStyle='#dc262699'; ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(ang)*pLen,-8*sc+Math.sin(ang)*pLen);
+    ctx.lineTo(bx-x,by-(y+hy));
+    ctx.stroke(); ctx.restore();
+  }
+  ctx.restore();
+}
+
+function ecoDrawAnt(ctx,x,y,t,idx){
+  const sc=1.4;
+  ctx.save(); ctx.translate(x,y); ctx.scale(sc,sc);
+  const dir=((idx||0)%2===0)?1:-1;
+  ctx.scale(dir,1);
+  ctx.fillStyle='#1c1917';
+  ctx.beginPath(); ctx.ellipse(0,0,5,7,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0,-10,3,4,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0,-16,3.5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#1c1917'; ctx.lineWidth=0.9;
+  ctx.beginPath(); ctx.moveTo(-1,-19); ctx.lineTo(-6,-25); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(1,-19); ctx.lineTo(6,-25); ctx.stroke();
+  for(let i=0;i<3;i++){
+    const lp=Math.sin(t*5+i*2.1)*3;
+    ctx.beginPath(); ctx.moveTo(-3,-9+i*4); ctx.lineTo(-12,-6+i*4+lp); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(3,-9+i*4); ctx.lineTo(12,-6+i*4-lp); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function ecoDrawBee(ctx,x,y,t){
+  ctx.save(); ctx.translate(x,y); ctx.scale(1.5,1.5);
+  const wf=Math.sin(t*18)*6;
+  ctx.globalAlpha=0.55; ctx.fillStyle='#bfdbfe';
+  ctx.beginPath(); ctx.ellipse(-9,-12+wf,10,5,-0.3,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(9,-12+wf,10,5,0.3,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.fillStyle='#fbbf24'; ctx.beginPath(); ctx.ellipse(0,0,6,10,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#1c1917'; ctx.fillRect(-6,-5,12,4); ctx.fillRect(-6,2,12,4);
+  ctx.beginPath(); ctx.arc(0,-12,5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#92400e'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.moveTo(-1,-17); ctx.lineTo(-4,-22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(1,-17); ctx.lineTo(4,-22); ctx.stroke();
+  ctx.restore();
+}
+
+function ecoDrawLadybug(ctx,x,y,t){
+  ctx.save(); ctx.translate(x,y); ctx.scale(1.5,1.5);
+  ctx.fillStyle='#ef4444'; ctx.beginPath(); ctx.ellipse(0,0,7,8,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#1c1917'; ctx.beginPath(); ctx.arc(0,-10,4.5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#1c1917'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,-8); ctx.lineTo(0,8); ctx.stroke();
+  [[-3,-2],[3,-2],[-3,3],[3,3]].forEach(([dx,dy])=>{
+    ctx.beginPath(); ctx.arc(dx,dy,1.6,0,Math.PI*2); ctx.fill();
+  });
+  ctx.strokeStyle='#1c1917'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.moveTo(-1,-14); ctx.lineTo(-4,-20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(1,-14); ctx.lineTo(4,-20); ctx.stroke();
+  ctx.restore();
+}
+
+function ecoDrawButterfly(ctx,x,y,t){
+  ctx.save(); ctx.translate(x,y);
+  const flap=Math.sin(t*7)*0.55;
+  function drawWing(flip){
+    ctx.save(); ctx.scale(flip,1); ctx.rotate(flap*flip);
+    const wg=ctx.createRadialGradient(8,-8,0,8,-8,18);
+    wg.addColorStop(0,'#fb923c'); wg.addColorStop(1,'#9a3412');
+    ctx.fillStyle=wg; ctx.globalAlpha=0.85;
+    ctx.beginPath(); ctx.moveTo(0,0);
+    ctx.bezierCurveTo(6,-14,20,-16,17,-4);
+    ctx.bezierCurveTo(14,4,5,4,0,0); ctx.fill();
+    ctx.fillStyle='#f97316'; ctx.globalAlpha=0.7;
+    ctx.beginPath(); ctx.moveTo(0,1);
+    ctx.bezierCurveTo(5,5,13,7,11,2);
+    ctx.bezierCurveTo(9,-2,4,-1,0,1); ctx.fill();
+    ctx.restore();
+  }
+  drawWing(1); drawWing(-1);
+  ctx.globalAlpha=1;
+  ctx.fillStyle='#1c1917'; ctx.beginPath(); ctx.ellipse(0,0,1.5,7,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#1c1917'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.moveTo(-1,-6); ctx.quadraticCurveTo(-5,-12,-3,-16); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(1,-6); ctx.quadraticCurveTo(5,-12,3,-16); ctx.stroke();
+  ctx.restore();
+}
+
+function ecoDrawFirefly(ctx,x,y,t){
+  const glow=(Math.sin(t*4)+1)/2;
+  ctx.save(); ctx.translate(x,y);
+  ctx.shadowColor='#fef08a'; ctx.shadowBlur=12*glow;
+  ctx.fillStyle=`rgba(254,240,138,${0.35+glow*0.65})`;
+  ctx.beginPath(); ctx.arc(0,0,3+glow*2,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#365314'; ctx.beginPath(); ctx.ellipse(0,1,2.5,4.5,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 
 function showToast(msg, isError=false) {
